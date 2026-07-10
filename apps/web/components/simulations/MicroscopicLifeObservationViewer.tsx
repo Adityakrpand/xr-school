@@ -14,21 +14,25 @@ const STAGES = [
     title: 'Observe',
     cue: 'Watch the live microscope field and notice the different shapes moving through the water sample.',
     action: 'Point to one moving organism and describe its shape before naming it.',
+    teacher: 'In this activity we are studying microscopic life. A water sample can look clear to our eyes, but under a microscope it can contain many living organisms. Look carefully for shape, colour, and movement. These are observations. A good scientist first observes, then explains.',
   },
   {
     title: 'Compare',
     cue: 'Some organisms are oval, some are long and flexible, and some look green because of chlorophyll.',
     action: 'Compare two organisms by shape, colour, and motion.',
+    teacher: 'Now compare what you see. Some organisms are rounded, some are stretched, and some are green because they contain chlorophyll-like pigments. Do not guess the name first. Compare their features: how they move, how they are shaped, and whether they seem to have internal colour.',
   },
   {
     title: 'Explain',
     cue: 'A drop of pond water can contain many living microorganisms that are invisible without magnification.',
     action: 'Explain why a microscope changes what we can observe about living things.',
+    teacher: 'The microscope changes the scale of the lesson. It lets us see living forms that are normally invisible. When an organism changes position, turns, or pulses, that movement is evidence that the sample contains life. This is why microscopes are important tools in biology.',
   },
   {
     title: 'Review',
     cue: 'Use evidence from the video to separate observation from guesswork.',
     action: 'Say one observation that proves the sample contains living organisms.',
+    teacher: 'Let us review like a biology teacher would ask in class. What did you actually see? Did something move by itself? Did one organism have a different shape from another? Use those observations as evidence, then make a careful conclusion about microscopic life in the sample.',
   },
 ] as const;
 
@@ -104,7 +108,7 @@ function addCylinder(
   return mesh;
 }
 
-function addLabInterior(scene: THREE.Scene) {
+function addLabInterior(scene: THREE.Object3D) {
   const lab = new THREE.Group();
   lab.name = 'modern-biology-laboratory-interior';
   scene.add(lab);
@@ -188,10 +192,10 @@ function addLabInterior(scene: THREE.Scene) {
   return lab;
 }
 
-function addMicroscopeModel(scene: THREE.Scene) {
+function addMicroscopeModel(scene: THREE.Object3D) {
   const microscope = new THREE.Group();
   microscope.name = 'realistic-binocular-laboratory-microscope';
-  microscope.position.set(0, 0.84, -1.38);
+  microscope.position.set(-2.15, 0.84, -1.62);
   scene.add(microscope);
 
   addBox(microscope, 'heavy-microscope-base', [0.76, 0.12, 0.48], [0, 0.06, 0], 0x111827, { roughness: 0.38 });
@@ -326,7 +330,7 @@ function makeStageButton(stage: (typeof STAGES)[number], index: number) {
     }),
   );
   button.name = `microscope-stage-${index}`;
-  button.position.set(-1.75 + index * 1.16, 1.18, -2.12);
+  button.position.set(3.02, 2.38 - index * 0.38, -3.04);
   const label = makeLabel(stage.title, '#6ee7b7');
   label.position.z = 0.052;
   label.scale.setScalar(0.68);
@@ -349,7 +353,7 @@ export default function MicroscopicLifeObservationViewer() {
 
   const narrateStage = useCallback((index: number) => {
     const item = STAGES[index];
-    void playSimulationNarration(`${item.title}. ${item.cue} ${item.action}`, index);
+    void playSimulationNarration(`${item.title}. ${item.teacher}`, index);
   }, []);
 
   const markerText = useMemo(
@@ -395,8 +399,11 @@ export default function MicroscopicLifeObservationViewer() {
     daylight.position.set(-4, 3, -5);
     scene.add(daylight);
 
-    addLabInterior(scene);
-    const { microscope, objective } = addMicroscopeModel(scene);
+    const labRoot = new THREE.Group();
+    labRoot.name = 'free-movable-microscope-lab-world';
+    scene.add(labRoot);
+    addLabInterior(labRoot);
+    const { microscope, objective } = addMicroscopeModel(labRoot);
 
     const video = document.createElement('video');
     video.src = VIDEO_SRC;
@@ -416,11 +423,11 @@ export default function MicroscopicLifeObservationViewer() {
     );
     microscopeFrame.position.set(0, 1.72, -3.35);
     microscopeFrame.castShadow = true;
-    scene.add(microscopeFrame);
+    labRoot.add(microscopeFrame);
 
     const screenGroup = new THREE.Group();
     screenGroup.name = 'microscope-zoom-transition-video-group';
-    scene.add(screenGroup);
+    labRoot.add(screenGroup);
     const screen = new THREE.Mesh(
       new THREE.PlaneGeometry(4.0, 2.25),
       new THREE.MeshBasicMaterial({ map: videoTexture }),
@@ -461,10 +468,10 @@ export default function MicroscopicLifeObservationViewer() {
       }),
     );
     title.position.set(0, 3.18, -3.35);
-    scene.add(title);
+    labRoot.add(title);
 
     const stageButtons = STAGES.map(makeStageButton);
-    stageButtons.forEach(button => scene.add(button));
+    stageButtons.forEach(button => labRoot.add(button));
 
     const specimenButtons = SPECIMENS.map((specimen, index) => {
       const button = new THREE.Mesh(
@@ -477,12 +484,12 @@ export default function MicroscopicLifeObservationViewer() {
         }),
       );
       button.name = `specimen-button-${specimen.id}`;
-      button.position.set(-1.18 + index * 1.18, 0.84, -2.12);
+      button.position.set(-3.05, 1.72 - index * 0.34, -3.04);
       const label = makeLabel(specimen.label, specimen.color);
       label.position.z = 0.052;
       label.scale.setScalar(0.56);
       button.add(label);
-      scene.add(button);
+      labRoot.add(button);
       return button;
     });
 
@@ -503,7 +510,7 @@ export default function MicroscopicLifeObservationViewer() {
       label.position.y = 0.3;
       label.scale.setScalar(0.52);
       node.add(label);
-      scene.add(node);
+      labRoot.add(node);
       return node;
     });
 
@@ -515,7 +522,8 @@ export default function MicroscopicLifeObservationViewer() {
     const backLatches = [false, false];
     const previousStepLatches = [false, false];
     const specimenCycleLatches = [false, false];
-    let labYaw = 0;
+    const moveDirection = new THREE.Vector3();
+    const strafeDirection = new THREE.Vector3();
     let focusPulse = 0;
 
     const goToStage = (index: number) => {
@@ -588,8 +596,19 @@ export default function MicroscopicLifeObservationViewer() {
         session?.inputSources.forEach((inputSource, index) => {
           const gamepad = inputSource.gamepad;
           if (!gamepad) return;
-          const horizontal = gamepad.axes[2] ?? gamepad.axes[0] ?? 0;
-          if (Math.abs(horizontal) > 0.16) labYaw -= horizontal * dt * 1.35;
+          const axisX = gamepad.axes[2] ?? gamepad.axes[0] ?? 0;
+          const axisY = gamepad.axes[3] ?? gamepad.axes[1] ?? 0;
+          if (inputSource.handedness === 'right' && Math.abs(axisX) > 0.16) {
+            labRoot.rotation.y -= axisX * dt * 1.45;
+          }
+          if (inputSource.handedness === 'left') {
+            camera.getWorldDirection(moveDirection);
+            moveDirection.y = 0;
+            moveDirection.normalize();
+            strafeDirection.crossVectors(moveDirection, new THREE.Vector3(0, 1, 0)).normalize();
+            if (Math.abs(axisY) > 0.16) labRoot.position.addScaledVector(moveDirection, axisY * dt * 1.25);
+            if (Math.abs(axisX) > 0.16) labRoot.position.addScaledVector(strafeDirection, axisX * dt * 1.25);
+          }
 
           const back = updateButtonLatch(
             isQuestBackPressed(gamepad.buttons, inputSource.handedness),
@@ -614,9 +633,6 @@ export default function MicroscopicLifeObservationViewer() {
             explainCurrentStage();
           }
         });
-        const radius = 3.25;
-        camera.position.set(Math.sin(labYaw) * radius, 1.62, Math.cos(labYaw) * radius + 0.2);
-        camera.lookAt(0, 1.7, -3.12);
       }
       focusPulse = Math.max(0, focusPulse - dt * 1.6);
       const focusScale = 1 + focusPulse * 0.11 + Math.sin(elapsed * 1.2) * 0.006;
@@ -735,7 +751,7 @@ export default function MicroscopicLifeObservationViewer() {
               <button key={item.id} onClick={() => selectBrowserSpecimen(index)} style={smallButtonStyle(index === specimenIndex ? item.color : '#1f2937', index === specimenIndex ? '#04111a' : '#f8fafc')}>{item.label}</button>
             ))}
           </div>
-          <p style={{ color: '#64748b', lineHeight: 1.35, margin: '12px 0 0', fontSize: 12 }}>Quest: trigger selects visible lab buttons, joystick rotates, B goes back, X moves to previous step.</p>
+          <p style={{ color: '#64748b', lineHeight: 1.35, margin: '12px 0 0', fontSize: 12 }}>Quest: trigger selects visible lab buttons, left stick moves, right stick rotates, B goes back, X moves to previous step.</p>
         </section>
       )}
     </div>
