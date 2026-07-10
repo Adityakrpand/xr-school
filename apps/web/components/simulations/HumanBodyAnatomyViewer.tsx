@@ -177,7 +177,7 @@ function makePanel(title: string, body: string, accent = '#fca5a5') {
   );
 }
 
-function addVideoSky(root: THREE.Object3D) {
+function addVideoScreen(root: THREE.Object3D) {
   const video = document.createElement('video');
   video.src = HUMAN_BODY_VIDEO_SRC;
   video.loop = true;
@@ -189,22 +189,45 @@ function addVideoSky(root: THREE.Object3D) {
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
-  texture.repeat.set(1, 0.5);
-  texture.offset.set(0, 0.5);
 
-  const sky = new THREE.Mesh(
-    new THREE.SphereGeometry(45, 96, 48),
+  const frame = new THREE.Mesh(
+    new THREE.BoxGeometry(5.5, 3.18, 0.12),
+    new THREE.MeshStandardMaterial({
+      color: 0x1f1111,
+      roughness: 0.28,
+      metalness: 0.12,
+      emissive: 0x450a0a,
+      emissiveIntensity: 0.2,
+    }),
+  );
+  frame.name = 'human-body-anatomy-video-frame';
+  frame.position.set(0, 1.72, -3.42);
+  root.add(frame);
+
+  const screen = new THREE.Mesh(
+    new THREE.PlaneGeometry(5.08, 2.86),
     new THREE.MeshBasicMaterial({
       map: texture,
-      side: THREE.BackSide,
+    }),
+  );
+  screen.name = 'human-body-anatomy-full-video-screen';
+  screen.position.set(0, 1.72, -3.34);
+  root.add(screen);
+
+  const glow = new THREE.Mesh(
+    new THREE.PlaneGeometry(5.18, 2.96),
+    new THREE.MeshBasicMaterial({
+      color: 0xfca5a5,
+      transparent: true,
+      opacity: 0.08,
       depthWrite: false,
     }),
   );
-  sky.name = 'human-body-anatomy-immersive-video-sky';
-  sky.rotation.y = Math.PI;
-  root.add(sky);
+  glow.name = 'human-body-anatomy-screen-glow';
+  glow.position.set(0, 1.72, -3.46);
+  root.add(glow);
 
-  return { video, texture };
+  return { video, texture, frame, screen, glow };
 }
 
 function addStageButton(root: THREE.Object3D, targets: THREE.Object3D[], stageIndex: number, label: string) {
@@ -271,7 +294,7 @@ export default function HumanBodyAnatomyViewer() {
     if (!mount) return;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -287,8 +310,8 @@ export default function HumanBodyAnatomyViewer() {
     worldRoot.name = 'free-movable-human-body-anatomy-world';
     scene.add(worldRoot);
 
-    const videoSky = addVideoSky(worldRoot);
-    videoRef.current = videoSky.video;
+    const videoStage = addVideoScreen(worldRoot);
+    videoRef.current = videoStage.video;
 
     const panel = makePanel(HUMAN_BODY_STAGES[0].title, HUMAN_BODY_STAGES[0].focus, '#fca5a5');
     panel.name = 'human-body-anatomy-teacher-explanation-panel';
@@ -425,7 +448,7 @@ export default function HumanBodyAnatomyViewer() {
     return () => {
       renderer.setAnimationLoop(null);
       window.removeEventListener('resize', onResize);
-      videoSky.video.pause();
+      videoStage.video.pause();
       videoRef.current = null;
       interactionSystem.dispose();
       guidedCamera.dispose();
@@ -439,7 +462,7 @@ export default function HumanBodyAnatomyViewer() {
           material.dispose();
         });
       });
-      videoSky.texture.dispose();
+      videoStage.texture.dispose();
       audioRef.current?.oscillators.forEach(oscillator => oscillator.stop());
       audioRef.current?.context.close().catch(() => undefined);
       audioRef.current = null;
