@@ -9,9 +9,9 @@ import { validateCurriculumGraph } from '../../packages/simulation-schema/src/in
 
 describe('canonical curriculum content', () => {
   it('defines typed courses, chapters, and concepts for every working simulation', () => {
-    expect(COURSES).toHaveLength(8);
-    expect(CURRICULUM_CHAPTERS).toHaveLength(9);
-    expect(LEARNING_CONCEPTS.length).toBeGreaterThanOrEqual(32);
+    expect(COURSES).toHaveLength(9);
+    expect(CURRICULUM_CHAPTERS).toHaveLength(10);
+    expect(LEARNING_CONCEPTS.length).toBeGreaterThanOrEqual(35);
 
     const linkedSimulationIds = new Set(COURSES.flatMap(course => course.simulationIds));
     for (const simulation of SIMULATION_MODULES) {
@@ -54,6 +54,7 @@ describe('canonical curriculum content', () => {
       'sim-c1-math-ch01-introduction-to-money',
       'sim-c2-english-ch01-prepositions',
       'sim-c8-10-science-solar-system',
+      'sim-c10-ch07-a02-microscopic-life-observation',
     ]) {
       expect(linkedSimulationIds.has(simulationId)).toBe(true);
     }
@@ -67,5 +68,8 @@ describe('canonical curriculum content', () => {
     expect(CURRICULUM_CHAPTERS.find(
       item => item.id === 'chapter-cbse-c8-solar-system',
     )?.simulationIds).toEqual(['sim-c8-10-science-solar-system']);
+    expect(CURRICULUM_CHAPTERS.find(
+      item => item.id === 'chapter-cbse-c10-life-processes',
+    )?.simulationIds).toEqual(['sim-c10-ch07-a02-microscopic-life-observation']);
   });
 });

@@ -3,6 +3,80 @@ import type { CurriculumSearchDocument } from '../../../packages/simulation-sche
 
 export const CURRICULUM_SEARCH_DOCUMENTS = [
   {
+    "id": "course:course-cbse-c1-mathematics",
+    "kind": "course",
+    "title": "CBSE Class 1 Mathematics",
+    "summary": "Early mathematics built around counting, comparison, money, and everyday number sense.",
+    "href": "/simulations#course-cbse-c1-mathematics",
+    "classLevels": [
+      1
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-money-values",
+      "concept-indian-coins-notes",
+      "concept-simple-shopping"
+    ],
+    "tokens": [
+      "cbse",
+      "class",
+      "1",
+      "mathematics",
+      "early",
+      "built",
+      "around",
+      "counting",
+      "comparison",
+      "money",
+      "and",
+      "everyday",
+      "number",
+      "sense",
+      "coins",
+      "notes",
+      "rupees"
+    ]
+  },
+  {
+    "id": "course:course-cbse-c2-english",
+    "kind": "course",
+    "title": "CBSE Class 2 English",
+    "summary": "Foundational English language practice through listening, speaking, grammar, and everyday sentences.",
+    "href": "/simulations#course-cbse-c2-english",
+    "classLevels": [
+      2
+    ],
+    "subjects": [
+      "english"
+    ],
+    "conceptIds": [
+      "concept-position-words",
+      "concept-spatial-sentences",
+      "concept-preposition-use"
+    ],
+    "tokens": [
+      "cbse",
+      "class",
+      "2",
+      "english",
+      "foundational",
+      "language",
+      "practice",
+      "through",
+      "listening",
+      "speaking",
+      "grammar",
+      "and",
+      "everyday",
+      "sentences",
+      "prepositions",
+      "position",
+      "words"
+    ]
+  },
+  {
     "id": "course:course-cbse-c5-environmental-science",
     "kind": "course",
     "title": "CBSE Class 5 Environmental Studies",
@@ -119,6 +193,47 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
     ]
   },
   {
+    "id": "course:course-cbse-c8-science",
+    "kind": "course",
+    "title": "CBSE Class 8 Science",
+    "summary": "Middle-school science connecting space, matter, force, living systems, and technology through observable models.",
+    "href": "/simulations#course-cbse-c8-science",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-solar-system",
+      "concept-planet-order",
+      "concept-orbits-gravity",
+      "concept-planet-features"
+    ],
+    "tokens": [
+      "cbse",
+      "class",
+      "8",
+      "science",
+      "middle",
+      "school",
+      "connecting",
+      "space",
+      "matter",
+      "force",
+      "living",
+      "systems",
+      "and",
+      "technology",
+      "through",
+      "observable",
+      "models",
+      "solar",
+      "system",
+      "planets"
+    ]
+  },
+  {
     "id": "course:course-cbse-c9-science",
     "kind": "course",
     "title": "CBSE Class 9 Science",
@@ -188,6 +303,102 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "resistance",
       "ohms",
       "law"
+    ]
+  },
+  {
+    "id": "course:course-cbse-c10-biology",
+    "kind": "course",
+    "title": "CBSE Class 10 Biology",
+    "summary": "Life-science concepts explored through observation, evidence, microorganisms, and body processes.",
+    "href": "/simulations#course-cbse-c10-biology",
+    "classLevels": [
+      10
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-microscopic-life",
+      "concept-microscope-observation",
+      "concept-protist-movement"
+    ],
+    "tokens": [
+      "cbse",
+      "class",
+      "10",
+      "biology",
+      "life",
+      "science",
+      "concepts",
+      "explored",
+      "through",
+      "observation",
+      "evidence",
+      "microorganisms",
+      "and",
+      "body",
+      "processes",
+      "microscope"
+    ]
+  },
+  {
+    "id": "chapter:chapter-cbse-c1-math-money",
+    "kind": "chapter",
+    "title": "Introduction to Money",
+    "summary": "CBSE Class 1 Mathematics · Chapter 1",
+    "href": "/simulations#chapter-cbse-c1-math-money",
+    "classLevels": [
+      1
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-money-values",
+      "concept-indian-coins-notes",
+      "concept-simple-shopping"
+    ],
+    "tokens": [
+      "introduction",
+      "to",
+      "money",
+      "cbse",
+      "class",
+      "1",
+      "mathematics",
+      "chapter",
+      "topic",
+      "values"
+    ]
+  },
+  {
+    "id": "chapter:chapter-cbse-c2-english-prepositions",
+    "kind": "chapter",
+    "title": "Prepositions",
+    "summary": "CBSE Class 2 English · Chapter 1",
+    "href": "/simulations#chapter-cbse-c2-english-prepositions",
+    "classLevels": [
+      2
+    ],
+    "subjects": [
+      "english"
+    ],
+    "conceptIds": [
+      "concept-position-words",
+      "concept-spatial-sentences",
+      "concept-preposition-use"
+    ],
+    "tokens": [
+      "prepositions",
+      "cbse",
+      "class",
+      "2",
+      "english",
+      "chapter",
+      "1",
+      "topic",
+      "position",
+      "words"
     ]
   },
   {
@@ -329,6 +540,39 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
     ]
   },
   {
+    "id": "chapter:chapter-cbse-c8-solar-system",
+    "kind": "chapter",
+    "title": "Stars and the Solar System",
+    "summary": "CBSE Class 8 Science · Chapter 17",
+    "href": "/simulations#chapter-cbse-c8-solar-system",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-solar-system",
+      "concept-planet-order",
+      "concept-orbits-gravity",
+      "concept-planet-features"
+    ],
+    "tokens": [
+      "stars",
+      "and",
+      "the",
+      "solar",
+      "system",
+      "cbse",
+      "class",
+      "8",
+      "science",
+      "chapter",
+      "17",
+      "topic"
+    ]
+  },
+  {
     "id": "chapter:chapter-cbse-c9-matter",
     "kind": "chapter",
     "title": "Matter in Our Surroundings",
@@ -390,6 +634,37 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "topic",
       "current",
       "resistance"
+    ]
+  },
+  {
+    "id": "chapter:chapter-cbse-c10-life-processes",
+    "kind": "chapter",
+    "title": "Life Processes",
+    "summary": "CBSE Class 10 Biology · Chapter 7",
+    "href": "/simulations#chapter-cbse-c10-life-processes",
+    "classLevels": [
+      10
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-microscopic-life",
+      "concept-microscope-observation",
+      "concept-protist-movement"
+    ],
+    "tokens": [
+      "life",
+      "processes",
+      "cbse",
+      "class",
+      "10",
+      "biology",
+      "chapter",
+      "7",
+      "topic",
+      "microscopic",
+      "observation"
     ]
   },
   {
@@ -1322,6 +1597,580 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
     ]
   },
   {
+    "id": "concept:concept-money-values",
+    "kind": "concept",
+    "title": "Money values",
+    "summary": "Understanding that coins and notes represent specific values that can be counted and compared.",
+    "href": "/simulations#concept-money-values",
+    "classLevels": [
+      1
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-money-values"
+    ],
+    "tokens": [
+      "money",
+      "values",
+      "understanding",
+      "that",
+      "coins",
+      "and",
+      "notes",
+      "represent",
+      "specific",
+      "can",
+      "be",
+      "counted",
+      "compared",
+      "supports",
+      "early",
+      "numeracy",
+      "in",
+      "shops",
+      "saving",
+      "everyday",
+      "transactions",
+      "currency",
+      "value",
+      "rupee",
+      "counting"
+    ]
+  },
+  {
+    "id": "concept:concept-indian-coins-notes",
+    "kind": "concept",
+    "title": "Indian coins and notes",
+    "summary": "Recognition of common Indian currency forms and their written values.",
+    "href": "/simulations#concept-indian-coins-notes",
+    "classLevels": [
+      1
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-indian-coins-notes"
+    ],
+    "tokens": [
+      "indian",
+      "coins",
+      "and",
+      "notes",
+      "recognition",
+      "of",
+      "common",
+      "currency",
+      "forms",
+      "their",
+      "written",
+      "values",
+      "helps",
+      "children",
+      "identify",
+      "money",
+      "used",
+      "at",
+      "home",
+      "school",
+      "events",
+      "shops",
+      "coin",
+      "note",
+      "rupee"
+    ]
+  },
+  {
+    "id": "concept:concept-simple-shopping",
+    "kind": "concept",
+    "title": "Simple shopping with money",
+    "summary": "Using money values to choose enough currency for simple priced items.",
+    "href": "/simulations#concept-simple-shopping",
+    "classLevels": [
+      1
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-simple-shopping"
+    ],
+    "tokens": [
+      "simple",
+      "shopping",
+      "with",
+      "money",
+      "using",
+      "values",
+      "to",
+      "choose",
+      "enough",
+      "currency",
+      "for",
+      "priced",
+      "items",
+      "connects",
+      "counting",
+      "and",
+      "comparison",
+      "safe",
+      "pretend",
+      "practice",
+      "buying",
+      "matching",
+      "price",
+      "shop",
+      "buy",
+      "pay"
+    ]
+  },
+  {
+    "id": "concept:concept-position-words",
+    "kind": "concept",
+    "title": "Position words",
+    "summary": "Words that describe where one object is in relation to another object.",
+    "href": "/simulations#concept-position-words",
+    "classLevels": [
+      2
+    ],
+    "subjects": [
+      "english"
+    ],
+    "conceptIds": [
+      "concept-position-words"
+    ],
+    "tokens": [
+      "position",
+      "words",
+      "that",
+      "describe",
+      "where",
+      "one",
+      "object",
+      "is",
+      "in",
+      "relation",
+      "to",
+      "another",
+      "supports",
+      "classroom",
+      "instructions",
+      "reading",
+      "speaking",
+      "and",
+      "writing",
+      "location",
+      "spatial",
+      "on",
+      "under",
+      "behind",
+      "between"
+    ]
+  },
+  {
+    "id": "concept:concept-spatial-sentences",
+    "kind": "concept",
+    "title": "Spatial sentences",
+    "summary": "Complete sentences that use position words to describe object location clearly.",
+    "href": "/simulations#concept-spatial-sentences",
+    "classLevels": [
+      2
+    ],
+    "subjects": [
+      "english"
+    ],
+    "conceptIds": [
+      "concept-spatial-sentences"
+    ],
+    "tokens": [
+      "spatial",
+      "sentences",
+      "complete",
+      "that",
+      "use",
+      "position",
+      "words",
+      "to",
+      "describe",
+      "object",
+      "location",
+      "clearly",
+      "helps",
+      "children",
+      "answer",
+      "where",
+      "questions",
+      "in",
+      "speech",
+      "and",
+      "writing",
+      "sentence",
+      "place"
+    ]
+  },
+  {
+    "id": "concept:concept-preposition-use",
+    "kind": "concept",
+    "title": "Preposition use",
+    "summary": "Use of prepositions to show relationships between nouns or pronouns and other words.",
+    "href": "/simulations#concept-preposition-use",
+    "classLevels": [
+      2
+    ],
+    "subjects": [
+      "english"
+    ],
+    "conceptIds": [
+      "concept-preposition-use"
+    ],
+    "tokens": [
+      "preposition",
+      "use",
+      "of",
+      "prepositions",
+      "to",
+      "show",
+      "relationships",
+      "between",
+      "nouns",
+      "or",
+      "pronouns",
+      "and",
+      "other",
+      "words",
+      "builds",
+      "accurate",
+      "speaking",
+      "reading",
+      "comprehension",
+      "writing",
+      "using",
+      "grammar",
+      "place",
+      "relationship"
+    ]
+  },
+  {
+    "id": "concept:concept-solar-system",
+    "kind": "concept",
+    "title": "Solar system",
+    "summary": "The Sun, planets, dwarf planets, moons, asteroids, and comets bound together by gravity.",
+    "href": "/simulations#concept-solar-system",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-solar-system"
+    ],
+    "tokens": [
+      "solar",
+      "system",
+      "the",
+      "sun",
+      "planets",
+      "dwarf",
+      "moons",
+      "asteroids",
+      "and",
+      "comets",
+      "bound",
+      "together",
+      "by",
+      "gravity",
+      "supports",
+      "astronomy",
+      "space",
+      "missions",
+      "satellites",
+      "seasons",
+      "night",
+      "sky",
+      "observation",
+      "planetary",
+      "planet",
+      "moon",
+      "asteroid",
+      "comet"
+    ]
+  },
+  {
+    "id": "concept:concept-planet-order",
+    "kind": "concept",
+    "title": "Planet order",
+    "summary": "The sequence of the eight planets from the Sun: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune.",
+    "href": "/simulations#concept-planet-order",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-planet-order"
+    ],
+    "tokens": [
+      "planet",
+      "order",
+      "the",
+      "sequence",
+      "of",
+      "eight",
+      "planets",
+      "from",
+      "sun",
+      "mercury",
+      "venus",
+      "earth",
+      "mars",
+      "jupiter",
+      "saturn",
+      "uranus",
+      "and",
+      "neptune",
+      "creates",
+      "a",
+      "foundation",
+      "for",
+      "comparing",
+      "distance",
+      "temperature",
+      "orbital",
+      "periods",
+      "to"
+    ]
+  },
+  {
+    "id": "concept:concept-orbits-gravity",
+    "kind": "concept",
+    "title": "Orbits and gravity",
+    "summary": "Gravity keeps planets and other bodies moving along orbital paths around larger bodies.",
+    "href": "/simulations#concept-orbits-gravity",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "physics"
+    ],
+    "conceptIds": [
+      "concept-orbits-gravity"
+    ],
+    "tokens": [
+      "orbits",
+      "and",
+      "gravity",
+      "keeps",
+      "planets",
+      "other",
+      "bodies",
+      "moving",
+      "along",
+      "orbital",
+      "paths",
+      "around",
+      "larger",
+      "explains",
+      "satellites",
+      "moon",
+      "motion",
+      "planetary",
+      "years",
+      "spaceflight",
+      "planet",
+      "in",
+      "space",
+      "orbit",
+      "path",
+      "satellite"
+    ]
+  },
+  {
+    "id": "concept:concept-planet-features",
+    "kind": "concept",
+    "title": "Planet features",
+    "summary": "Observable and modelled differences between planets, including size, surface, atmosphere, rings, and moons.",
+    "href": "/simulations#concept-planet-features",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-planet-features"
+    ],
+    "tokens": [
+      "planet",
+      "features",
+      "observable",
+      "and",
+      "modelled",
+      "differences",
+      "between",
+      "planets",
+      "including",
+      "size",
+      "surface",
+      "atmosphere",
+      "rings",
+      "moons",
+      "supports",
+      "comparison",
+      "classification",
+      "evidence",
+      "based",
+      "space",
+      "learning",
+      "properties",
+      "rocky",
+      "gas",
+      "giant"
+    ]
+  },
+  {
+    "id": "concept:concept-microscopic-life",
+    "kind": "concept",
+    "title": "Microscopic life",
+    "summary": "Living organisms that are too small to observe clearly without magnification.",
+    "href": "/simulations#concept-microscopic-life",
+    "classLevels": [
+      10
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-microscopic-life"
+    ],
+    "tokens": [
+      "microscopic",
+      "life",
+      "living",
+      "organisms",
+      "that",
+      "are",
+      "too",
+      "small",
+      "to",
+      "observe",
+      "clearly",
+      "without",
+      "magnification",
+      "supports",
+      "biology",
+      "hygiene",
+      "pond",
+      "water",
+      "observation",
+      "and",
+      "careful",
+      "scientific",
+      "description",
+      "microorganisms",
+      "protists",
+      "in",
+      "microorganism",
+      "protist",
+      "microscope"
+    ]
+  },
+  {
+    "id": "concept:concept-microscope-observation",
+    "kind": "concept",
+    "title": "Microscope observation",
+    "summary": "Use of magnification to observe shape, colour, structure, and movement in tiny samples.",
+    "href": "/simulations#concept-microscope-observation",
+    "classLevels": [
+      10
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-microscope-observation"
+    ],
+    "tokens": [
+      "microscope",
+      "observation",
+      "use",
+      "of",
+      "magnification",
+      "to",
+      "observe",
+      "shape",
+      "colour",
+      "structure",
+      "and",
+      "movement",
+      "in",
+      "tiny",
+      "samples",
+      "builds",
+      "lab",
+      "skills",
+      "helps",
+      "students",
+      "separate",
+      "from",
+      "inference",
+      "magnified",
+      "observing",
+      "under",
+      "slide",
+      "sample"
+    ]
+  },
+  {
+    "id": "concept:concept-protist-movement",
+    "kind": "concept",
+    "title": "Protist movement",
+    "summary": "Visible motion patterns used by many microscopic organisms to move through water.",
+    "href": "/simulations#concept-protist-movement",
+    "classLevels": [
+      10
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-protist-movement"
+    ],
+    "tokens": [
+      "protist",
+      "movement",
+      "visible",
+      "motion",
+      "patterns",
+      "used",
+      "by",
+      "many",
+      "microscopic",
+      "organisms",
+      "to",
+      "move",
+      "through",
+      "water",
+      "connects",
+      "microscope",
+      "evidence",
+      "living",
+      "processes",
+      "and",
+      "organism",
+      "comparison",
+      "microorganism",
+      "ciliated",
+      "ciliate",
+      "amoeba",
+      "paramecium",
+      "euglena"
+    ]
+  },
+  {
     "id": "simulation:pollination",
     "kind": "simulation",
     "title": "Plant Pollination & Growth Cycle",
@@ -1787,6 +2636,305 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "vegetables",
       "chewing",
       "exercise"
+    ]
+  },
+  {
+    "id": "simulation:c1-math-ch01-introduction-to-money",
+    "kind": "simulation",
+    "title": "Introduction to Money",
+    "summary": "Explore Magic Money Town, identify Indian coins and notes, buy simple items, and earn a careful shopper badge.",
+    "href": "/simulations/c1-math-ch01-introduction-to-money",
+    "classLevels": [
+      1
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-money-values",
+      "concept-indian-coins-notes",
+      "concept-simple-shopping"
+    ],
+    "releaseMaturity": "internalQA",
+    "tokens": [
+      "introduction",
+      "to",
+      "money",
+      "explore",
+      "magic",
+      "town",
+      "identify",
+      "indian",
+      "coins",
+      "and",
+      "notes",
+      "buy",
+      "simple",
+      "items",
+      "earn",
+      "a",
+      "careful",
+      "shopper",
+      "badge",
+      "students",
+      "will",
+      "common",
+      "compare",
+      "their",
+      "values",
+      "choose",
+      "suitable",
+      "for",
+      "purchases",
+      "mathematics",
+      "currency",
+      "value",
+      "rupee",
+      "counting",
+      "coin",
+      "note",
+      "shopping",
+      "with",
+      "buying",
+      "matching",
+      "price",
+      "shop",
+      "pay"
+    ]
+  },
+  {
+    "id": "simulation:c2-english-ch01-prepositions",
+    "kind": "simulation",
+    "title": "Preposition Adventure",
+    "summary": "Move objects through a playful world and learn position words such as in, on, under, behind, near, and between.",
+    "href": "/simulations/c2-english-ch01-prepositions",
+    "classLevels": [
+      2
+    ],
+    "subjects": [
+      "english"
+    ],
+    "conceptIds": [
+      "concept-position-words",
+      "concept-spatial-sentences",
+      "concept-preposition-use"
+    ],
+    "releaseMaturity": "internalQA",
+    "tokens": [
+      "preposition",
+      "adventure",
+      "move",
+      "objects",
+      "through",
+      "a",
+      "playful",
+      "world",
+      "and",
+      "learn",
+      "position",
+      "words",
+      "such",
+      "as",
+      "in",
+      "on",
+      "under",
+      "behind",
+      "near",
+      "between",
+      "students",
+      "will",
+      "understand",
+      "common",
+      "prepositions",
+      "by",
+      "placing",
+      "correct",
+      "positions",
+      "speaking",
+      "simple",
+      "sentences",
+      "that",
+      "describe",
+      "location",
+      "english",
+      "spatial",
+      "sentence",
+      "where",
+      "object",
+      "place",
+      "use",
+      "using",
+      "grammar",
+      "relationship"
+    ]
+  },
+  {
+    "id": "simulation:c8-10-science-solar-system",
+    "kind": "simulation",
+    "title": "Exploring Our Solar System",
+    "summary": "Pilot a spacecraft through the Sun, planets, moons, asteroids, comets, and dwarf planets while scanning key features.",
+    "href": "/simulations/c8-10-science-solar-system",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "science",
+      "physics",
+      "geography"
+    ],
+    "conceptIds": [
+      "concept-solar-system",
+      "concept-planet-order",
+      "concept-orbits-gravity",
+      "concept-planet-features"
+    ],
+    "releaseMaturity": "internalQA",
+    "tokens": [
+      "exploring",
+      "our",
+      "solar",
+      "system",
+      "pilot",
+      "a",
+      "spacecraft",
+      "through",
+      "the",
+      "sun",
+      "planets",
+      "moons",
+      "asteroids",
+      "comets",
+      "and",
+      "dwarf",
+      "while",
+      "scanning",
+      "key",
+      "features",
+      "students",
+      "will",
+      "sequence",
+      "eight",
+      "compare",
+      "rocky",
+      "gas",
+      "ice",
+      "giants",
+      "explain",
+      "important",
+      "objects",
+      "motions",
+      "science",
+      "physics",
+      "geography",
+      "planetary",
+      "planet",
+      "moon",
+      "asteroid",
+      "comet",
+      "order",
+      "of",
+      "mercury",
+      "to",
+      "neptune",
+      "venus",
+      "earth",
+      "mars",
+      "jupiter",
+      "saturn",
+      "uranus",
+      "orbits",
+      "gravity",
+      "in",
+      "space",
+      "orbit",
+      "path",
+      "satellite",
+      "properties",
+      "giant",
+      "rings",
+      "atmosphere"
+    ]
+  },
+  {
+    "id": "simulation:c10-ch07-a02-microscopic-life-observation",
+    "kind": "simulation",
+    "title": "Microscopic Life Observation Lab",
+    "summary": "Step into a stationary microscope theatre, watch real water-sample footage, and identify microorganisms by shape, colour, and motion.",
+    "href": "/simulations/c10-ch07-a02-microscopic-life-observation",
+    "classLevels": [
+      10
+    ],
+    "subjects": [
+      "biology",
+      "science"
+    ],
+    "conceptIds": [
+      "concept-microscopic-life",
+      "concept-microscope-observation",
+      "concept-protist-movement"
+    ],
+    "releaseMaturity": "internalQA",
+    "tokens": [
+      "microscopic",
+      "life",
+      "observation",
+      "lab",
+      "step",
+      "into",
+      "a",
+      "stationary",
+      "microscope",
+      "theatre",
+      "watch",
+      "real",
+      "water",
+      "sample",
+      "footage",
+      "and",
+      "identify",
+      "microorganisms",
+      "by",
+      "shape",
+      "colour",
+      "motion",
+      "students",
+      "will",
+      "observe",
+      "organisms",
+      "compare",
+      "visible",
+      "features",
+      "explain",
+      "how",
+      "microscopes",
+      "reveal",
+      "living",
+      "forms",
+      "that",
+      "are",
+      "invisible",
+      "to",
+      "the",
+      "unaided",
+      "eye",
+      "biology",
+      "science",
+      "protists",
+      "in",
+      "microorganism",
+      "protist",
+      "pond",
+      "magnified",
+      "observing",
+      "under",
+      "magnification",
+      "slide",
+      "movement",
+      "ciliated",
+      "ciliate",
+      "amoeba",
+      "paramecium",
+      "euglena"
     ]
   },
   {

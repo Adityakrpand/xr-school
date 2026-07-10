@@ -108,6 +108,18 @@ Ask students to sequence the eight planets, compare inner and outer planets, and
 REVISION TRIGGER
 One week later, show planet feature cards and ask students to match each clue to the correct planet or region of the solar system.`;
 
+const microscopicLifeObservationScript = `SETUP
+Show students a clear water sample and ask what might be living inside even if the water looks empty. Non-headset students prepare an observation table with shape, colour, and movement columns.
+
+DURING HEADSET BATCH
+Guide students through the microscope theatre. Ask them to watch the video field, identify oval protists, green algae-like forms, and ciliated cells, then separate direct observations from guesses.
+
+DEBRIEF
+Ask students why a microscope is needed to study microorganisms. Review how motion, shape, internal colour, and repeated observation help students describe microscopic life responsibly.
+
+REVISION TRIGGER
+One week later, show a still microscope image and ask students to write three observations and one careful inference about the living organisms shown.`;
+
 export const POLLINATION_MODULE: SimulationModuleRecord = {
   id: 'sim-pollination-001',
   slug: 'pollination',
@@ -494,6 +506,65 @@ export const SOLAR_SYSTEM_MISSION_MODULE: SimulationModuleRecord = {
   status: 'released',
 };
 
+export const MICROSCOPIC_LIFE_OBSERVATION_MODULE: SimulationModuleRecord = {
+  id: 'sim-c10-ch07-a02-microscopic-life-observation',
+  slug: 'c10-ch07-a02-microscopic-life-observation',
+  title: 'Microscopic Life Observation Lab',
+  summary: 'Step into a stationary microscope theatre, watch real water-sample footage, and identify microorganisms by shape, colour, and motion.',
+  gradeBands: ['class9To10'],
+  subjects: ['biology', 'science'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c10-ch07-life-processes'],
+  conceptIds: [
+    'concept-microscopic-life',
+    'concept-microscope-observation',
+    'concept-protist-movement',
+  ],
+  simulationFormat: 'immersiveVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Microorganisms are too small to inspect directly, and a single classroom microscope limits participation. VR lets students observe enlarged real microscope footage together, pause around key forms, and discuss evidence from a stable seated viewpoint.',
+  learningObjective: 'Students will observe microscopic organisms, compare visible features, and explain how microscopes reveal living forms that are invisible to the unaided eye.',
+  scientificConceptExplanation: 'Many water samples contain microscopic living organisms such as protists and algae-like cells. Under magnification, students can observe shape, colour, internal structures, and movement patterns that support careful biological description.',
+  misconceptionsAddressed: [
+    'Clear water cannot contain living organisms.',
+    'All microorganisms have the same shape and movement.',
+    'A microscope image is just a picture and does not require evidence-based observation.',
+  ],
+  visualizationStrategy: 'Use the supplied microscope video as a large immersive screen with labeled observation markers, stage prompts, and a stationary lab environment for Quest comfort.',
+  interactionStrategy: 'Students start the microscope feed, select observation stages, inspect organism markers, and describe evidence using shape, colour, and movement prompts.',
+  imaginationHelperStrategy: 'Tiny living forms are enlarged into an immersive microscope theatre so students can notice motion and structure without needing a physical microscope for every learner.',
+  practicalUseCase: 'Connects biology lessons to pond water, hygiene, microscopes, scientific observation, and evidence-based descriptions of living systems.',
+  cueCardIds: [
+    'cue-micro-life-observe-001',
+    'cue-micro-life-compare-002',
+    'cue-micro-life-microscope-003',
+    'cue-micro-life-evidence-004',
+  ],
+  revisionCardIds: ['rev-micro-life-observation-001'],
+  assessmentHookIds: [
+    'assess-micro-life-pre-001',
+    'assess-micro-life-post-001',
+    'assess-micro-life-misconception-001',
+  ],
+  instructorScript: microscopicLifeObservationScript,
+  batchActivityPrompt: 'Draw one organism from the microscope video, label shape, colour, and movement, then write one careful inference.',
+  expectedDurationMinutes: 8,
+  maxSessionDurationMinutes: 10,
+  comfortRiskLevel: 'low',
+  safetyNotes: [
+    'Use stationary microscope theatre mode.',
+    'Keep the video screen fixed in front of the learner to avoid motion discomfort.',
+  ],
+  offlineContentPackId: 'pack-biology-microscopic-life-class10-v1',
+  estimatedPackageSizeMb: 80,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 4,
+  status: 'released',
+};
+
 export const SIMULATION_MODULES = [
   POLLINATION_MODULE,
   CIRCUIT_MODULE,
@@ -504,4 +575,5 @@ export const SIMULATION_MODULES = [
   MONEY_TOWN_MODULE,
   PREPOSITION_ADVENTURE_MODULE,
   SOLAR_SYSTEM_MISSION_MODULE,
+  MICROSCOPIC_LIFE_OBSERVATION_MODULE,
 ] as const;

@@ -9,6 +9,7 @@ const VIEWERS = [
   'FoodSourcesSortingViewer.tsx',
   'SolubilityLabViewer.tsx',
   'DigestiveSystemViewer.tsx',
+  'MicroscopicLifeObservationViewer.tsx',
 ];
 
 describe('implemented simulation audio contract', () => {

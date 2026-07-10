@@ -67,6 +67,7 @@ const viewerNameMap = {
   'c1-math-ch01-introduction-to-money': 'MoneyTownViewer',
   'c2-english-ch01-prepositions': 'PrepositionAdventureViewer',
   'c8-10-science-solar-system': 'SolarSystemMissionViewer',
+  'c10-ch07-a02-microscopic-life-observation': 'MicroscopicLifeObservationViewer',
 };
 
 for (const slug of slugs) {

@@ -10,6 +10,7 @@ export const IMPLEMENTED_SIMULATION_SLUGS = [
   'c1-math-ch01-introduction-to-money',
   'c2-english-ch01-prepositions',
   'c8-10-science-solar-system',
+  'c10-ch07-a02-microscopic-life-observation',
 ] as const;
 
 type ImplementedSlug = (typeof IMPLEMENTED_SIMULATION_SLUGS)[number];
@@ -117,6 +118,16 @@ const EXTRA_IMPLEMENTED: Record<ImplementedSlug, Omit<CatalogCard, 'releaseMatur
     topic: 'Stars and the Solar System',
     archetype: 'immersive VR',
     minutes: 10,
+  },
+  'c10-ch07-a02-microscopic-life-observation': {
+    slug: 'c10-ch07-a02-microscopic-life-observation',
+    color: '#6ee7b7',
+    subject: 'biology, science',
+    grade: 'Class 10',
+    title: 'Microscopic Life Observation Lab',
+    topic: 'Life Processes',
+    archetype: 'immersive VR',
+    minutes: 8,
   },
 };
 
