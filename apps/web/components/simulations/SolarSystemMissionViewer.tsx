@@ -37,8 +37,6 @@ const STAGE_FRAMES: Record<SolarMissionStageId, { position: [number, number, num
   'final-celebration': { position: [0, 1.65, 7.8], target: [0, 1.3, -0.8] },
 };
 
-const SOLAR_360_VIDEO_SRC = '/simulations/solar-system-360-space-tour.mp4';
-
 const TEACHER_NARRATION_PREFIX =
   'Teacher guidance. Look around slowly and notice what is happening in space. ';
 
@@ -242,42 +240,6 @@ function addActionTarget(
   group.add(target);
   targets.push(target);
   return target;
-}
-
-function addImmersiveVideoSky(root: THREE.Object3D) {
-  const video = document.createElement('video');
-  video.src = SOLAR_360_VIDEO_SRC;
-  video.loop = true;
-  video.muted = true;
-  video.playsInline = true;
-  video.preload = 'auto';
-  video.crossOrigin = 'anonymous';
-
-  const texture = new THREE.VideoTexture(video);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.minFilter = THREE.LinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.wrapS = THREE.ClampToEdgeWrapping;
-  texture.wrapT = THREE.ClampToEdgeWrapping;
-  texture.repeat.set(1, 0.5);
-  texture.offset.set(0, 0.5);
-
-  const dome = new THREE.Mesh(
-    new THREE.SphereGeometry(42, 96, 48),
-    new THREE.MeshBasicMaterial({
-      map: texture,
-      side: THREE.BackSide,
-      transparent: true,
-      opacity: 0.62,
-      depthWrite: false,
-    }),
-  );
-  dome.name = 'whatsapp-video-aligned-immersive-360-solar-system-space-tour-sky';
-  dome.rotation.y = Math.PI;
-  root.add(dome);
-
-  void video.play().catch(() => undefined);
-  return { video, texture };
 }
 
 function addStarField(scene: THREE.Object3D) {
@@ -618,7 +580,6 @@ export default function SolarSystemMissionViewer() {
   const focusStageRef = useRef<(stageId: SolarMissionStageId, animate?: boolean) => void>(() => undefined);
   const comfortModeRef = useRef(true);
   const worldRootRef = useRef<THREE.Group | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const [started, setStarted] = useState(false);
   const [vrSupported, setVrSupported] = useState(false);
@@ -771,8 +732,6 @@ export default function SolarSystemMissionViewer() {
     worldRoot.name = 'free-movable-solar-system-mission-world';
     scene.add(worldRoot);
     worldRootRef.current = worldRoot;
-    const videoSky = addImmersiveVideoSky(worldRoot);
-    videoRef.current = videoSky.video;
     addStarField(worldRoot);
     const cockpit = addSpacecraftCockpit(worldRoot);
     cockpit.position.set(0, -0.22, 0.08);
@@ -891,8 +850,6 @@ export default function SolarSystemMissionViewer() {
 
     return () => {
       renderer.setAnimationLoop(null);
-      videoSky.video.pause();
-      videoRef.current = null;
       window.removeEventListener('resize', onResize);
       interactionSystem.dispose();
       guidedCamera.dispose();
@@ -906,7 +863,6 @@ export default function SolarSystemMissionViewer() {
           standard.dispose();
         });
       });
-      videoSky.texture.dispose();
       worldRootRef.current = null;
       renderer.dispose();
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
@@ -917,14 +873,12 @@ export default function SolarSystemMissionViewer() {
   const startMission = useCallback(() => {
     setStarted(true);
     setFeedback(SOLAR_MISSION_STAGES[0].interactionPrompt);
-    void videoRef.current?.play().catch(() => undefined);
     speak(SOLAR_MISSION_STAGES[0].narration, 0);
   }, [speak]);
 
   const enterVR = useCallback(async () => {
     if (!rendererRef.current) return;
     setStarted(true);
-    void videoRef.current?.play().catch(() => undefined);
     try {
       const session = await (navigator as any).xr.requestSession('immersive-vr', {
         requiredFeatures: ['local-floor'],

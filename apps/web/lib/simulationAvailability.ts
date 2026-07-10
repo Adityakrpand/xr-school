@@ -10,6 +10,7 @@ export const IMPLEMENTED_SIMULATION_SLUGS = [
   'c1-math-ch01-introduction-to-money',
   'c2-english-ch01-prepositions',
   'c8-10-science-solar-system',
+  'explore-our-galaxy',
   'c10-ch07-a02-microscopic-life-observation',
 ] as const;
 
@@ -118,6 +119,16 @@ const EXTRA_IMPLEMENTED: Record<ImplementedSlug, Omit<CatalogCard, 'releaseMatur
     topic: 'Stars and the Solar System',
     archetype: 'immersive VR',
     minutes: 10,
+  },
+  'explore-our-galaxy': {
+    slug: 'explore-our-galaxy',
+    color: '#93c5fd',
+    subject: 'science, astronomy',
+    grade: 'Class 8-10',
+    title: 'Explore Our Galaxy',
+    topic: 'Stars, planets, and the Milky Way',
+    archetype: 'immersive VR',
+    minutes: 8,
   },
   'c10-ch07-a02-microscopic-life-observation': {
     slug: 'c10-ch07-a02-microscopic-life-observation',

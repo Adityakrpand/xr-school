@@ -494,7 +494,7 @@ export const CURRICULUM_CHAPTERS: CurriculumChapterRecord[] = [
     title: 'Stars and the Solar System',
     topicIds: ['topic-solar-system'],
     conceptIds: ['concept-solar-system', 'concept-planet-order', 'concept-orbits-gravity', 'concept-planet-features'],
-    simulationIds: ['sim-c8-10-science-solar-system'],
+    simulationIds: ['sim-c8-10-science-solar-system', 'sim-explore-our-galaxy'],
   },
   {
     id: 'chapter-cbse-c9-matter',
@@ -619,7 +619,7 @@ export const COURSES: CourseRecord[] = [
     description: 'Middle-school science connecting space, matter, force, living systems, and technology through observable models.',
     chapterIds: ['chapter-cbse-c8-solar-system'],
     conceptIds: ['concept-solar-system', 'concept-planet-order', 'concept-orbits-gravity', 'concept-planet-features'],
-    simulationIds: ['sim-c8-10-science-solar-system'],
+    simulationIds: ['sim-c8-10-science-solar-system', 'sim-explore-our-galaxy'],
     searchKeywords: ['class 8', 'solar system', 'planets', 'space'],
   },
   {

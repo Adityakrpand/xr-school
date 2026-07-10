@@ -108,6 +108,18 @@ Ask students to sequence the eight planets, compare inner and outer planets, and
 REVISION TRIGGER
 One week later, show planet feature cards and ask students to match each clue to the correct planet or region of the solar system.`;
 
+const exploreOurGalaxyScript = `SETUP
+Ask students what they think a galaxy contains. Non-headset students list stars, planets, dust, gas, and any objects they expect to see in deep space.
+
+DURING HEADSET BATCH
+Guide students through the separate galaxy video tour. Ask them to look around slowly, compare stars with planets, notice glowing gas and dust, and connect the Solar System to the larger Milky Way.
+
+DEBRIEF
+Ask students to explain the difference between a star, a planet, a solar system, and a galaxy. Emphasize that the Solar System is only a tiny part of the Milky Way.
+
+REVISION TRIGGER
+One week later, show a space image and ask students to identify whether the clue describes a planet, star, solar system, or galaxy.`;
+
 const microscopicLifeObservationScript = `SETUP
 Show students a clear water sample and ask what might be living inside even if the water looks empty. Non-headset students prepare an observation table with shape, colour, and movement columns.
 
@@ -506,6 +518,49 @@ export const SOLAR_SYSTEM_MISSION_MODULE: SimulationModuleRecord = {
   status: 'released',
 };
 
+export const EXPLORE_OUR_GALAXY_MODULE: SimulationModuleRecord = {
+  id: 'sim-explore-our-galaxy',
+  slug: 'explore-our-galaxy',
+  title: 'Explore Our Galaxy',
+  summary: 'Enter a separate immersive galaxy video tour to compare stars, planets, deep-space clouds, and the Milky Way.',
+  gradeBands: ['class6To8', 'class9To10'],
+  subjects: ['science', 'physics', 'geography'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c8-science-solar-system'],
+  conceptIds: ['concept-solar-system', 'concept-planet-order', 'concept-orbits-gravity', 'concept-planet-features'],
+  simulationFormat: 'threeSixtyVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'A galaxy is too large and distant for students to experience directly. A separate VR video tour lets students look around deep space, distinguish stars from planets, and place the Solar System inside the larger Milky Way.',
+  learningObjective: 'Students will distinguish stars, planets, solar systems, and galaxies, and explain that our Solar System is a small part of the Milky Way.',
+  scientificConceptExplanation: 'A galaxy is a huge system containing billions of stars along with gas, dust, planets, and other objects. Our Sun is one star in the Milky Way galaxy, and Earth is one planet in the Solar System around that star.',
+  misconceptionsAddressed: [
+    'The Solar System and the galaxy are the same thing.',
+    'Planets produce their own light like stars.',
+    'Space between stars is completely empty.',
+  ],
+  visualizationStrategy: 'Use the supplied 360-style space video as an immersive sky with a low observation platform, teacher explanation panels, and clear stage buttons.',
+  interactionStrategy: 'Students select guided stages, listen to teacher narration, move freely with the Quest left stick, rotate with the right stick, and use controller buttons to go back.',
+  imaginationHelperStrategy: 'Abstract scale is made visible by placing familiar Solar System ideas inside a wider deep-space tour.',
+  practicalUseCase: 'Connects astronomy vocabulary to sky observation, space videos, planetarium visits, and science discussions about the Milky Way.',
+  cueCardIds: ['cue-galaxy-stars-001', 'cue-galaxy-planets-002', 'cue-galaxy-milky-way-003'],
+  revisionCardIds: ['rev-galaxy-vocabulary-001'],
+  assessmentHookIds: ['assess-galaxy-pre-001', 'assess-galaxy-post-001'],
+  instructorScript: exploreOurGalaxyScript,
+  batchActivityPrompt: 'Draw four labelled circles: planet, star, solar system, and galaxy. Write one sentence explaining how they are related.',
+  expectedDurationMinutes: 8,
+  maxSessionDurationMinutes: 10,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use stationary or seated play.', 'Encourage slow head movement and avoid forced camera motion.'],
+  offlineContentPackId: 'pack-science-explore-our-galaxy-v1',
+  estimatedPackageSizeMb: 120,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 5,
+  status: 'released',
+};
+
 export const MICROSCOPIC_LIFE_OBSERVATION_MODULE: SimulationModuleRecord = {
   id: 'sim-c10-ch07-a02-microscopic-life-observation',
   slug: 'c10-ch07-a02-microscopic-life-observation',
@@ -575,5 +630,6 @@ export const SIMULATION_MODULES = [
   MONEY_TOWN_MODULE,
   PREPOSITION_ADVENTURE_MODULE,
   SOLAR_SYSTEM_MISSION_MODULE,
+  EXPLORE_OUR_GALAXY_MODULE,
   MICROSCOPIC_LIFE_OBSERVATION_MODULE,
 ] as const;

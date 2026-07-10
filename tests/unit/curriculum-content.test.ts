@@ -54,6 +54,7 @@ describe('canonical curriculum content', () => {
       'sim-c1-math-ch01-introduction-to-money',
       'sim-c2-english-ch01-prepositions',
       'sim-c8-10-science-solar-system',
+      'sim-explore-our-galaxy',
       'sim-c10-ch07-a02-microscopic-life-observation',
     ]) {
       expect(linkedSimulationIds.has(simulationId)).toBe(true);
@@ -67,7 +68,7 @@ describe('canonical curriculum content', () => {
     )?.simulationIds).toEqual(['sim-c2-english-ch01-prepositions']);
     expect(CURRICULUM_CHAPTERS.find(
       item => item.id === 'chapter-cbse-c8-solar-system',
-    )?.simulationIds).toEqual(['sim-c8-10-science-solar-system']);
+    )?.simulationIds).toEqual(['sim-c8-10-science-solar-system', 'sim-explore-our-galaxy']);
     expect(CURRICULUM_CHAPTERS.find(
       item => item.id === 'chapter-cbse-c10-life-processes',
     )?.simulationIds).toEqual(['sim-c10-ch07-a02-microscopic-life-observation']);
