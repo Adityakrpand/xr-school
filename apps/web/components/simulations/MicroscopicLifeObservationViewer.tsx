@@ -39,9 +39,9 @@ const SPECIMENS = [
 ] as const;
 
 const MARKERS = [
-  { id: 'oval-protist', label: 'Oval protist', color: '#6ee7b7', position: [-1.35, 1.38, -2.45] },
-  { id: 'green-algae', label: 'Green algae', color: '#a3e635', position: [0, 1.78, -2.45] },
-  { id: 'ciliated-cell', label: 'Ciliated cell', color: '#f0abfc', position: [1.35, 1.38, -2.45] },
+  { id: 'oval-protist', label: 'Oval protist', color: '#6ee7b7', position: [-1.45, 1.62, -3.28] },
+  { id: 'green-algae', label: 'Green algae', color: '#a3e635', position: [0, 2.05, -3.28] },
+  { id: 'ciliated-cell', label: 'Ciliated cell', color: '#f0abfc', position: [1.45, 1.62, -3.28] },
 ] as const;
 
 type AudioState = {
@@ -191,7 +191,7 @@ function addLabInterior(scene: THREE.Scene) {
 function addMicroscopeModel(scene: THREE.Scene) {
   const microscope = new THREE.Group();
   microscope.name = 'realistic-binocular-laboratory-microscope';
-  microscope.position.set(0, 0.84, -0.25);
+  microscope.position.set(0, 0.84, -1.38);
   scene.add(microscope);
 
   addBox(microscope, 'heavy-microscope-base', [0.76, 0.12, 0.48], [0, 0.06, 0], 0x111827, { roughness: 0.38 });
@@ -317,7 +317,7 @@ function makeControllerRay() {
 
 function makeStageButton(stage: (typeof STAGES)[number], index: number) {
   const button = new THREE.Mesh(
-    new THREE.BoxGeometry(0.82, 0.18, 0.05),
+    new THREE.BoxGeometry(1.04, 0.28, 0.08),
     new THREE.MeshStandardMaterial({
       color: 0x0f766e,
       emissive: 0x14b8a6,
@@ -326,10 +326,10 @@ function makeStageButton(stage: (typeof STAGES)[number], index: number) {
     }),
   );
   button.name = `microscope-stage-${index}`;
-  button.position.set(-1.35 + index * 0.9, 0.62, -1.65);
+  button.position.set(-1.75 + index * 1.16, 1.18, -2.12);
   const label = makeLabel(stage.title, '#6ee7b7');
-  label.position.z = 0.034;
-  label.scale.setScalar(0.56);
+  label.position.z = 0.052;
+  label.scale.setScalar(0.68);
   button.add(label);
   return button;
 }
@@ -339,6 +339,7 @@ export default function MicroscopicLifeObservationViewer() {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const stageRef = useRef(0);
+  const specimenRef = useRef(0);
   const audioRef = useRef<AudioState | null>(null);
   const [started, setStarted] = useState(false);
   const [vrSupported, setVrSupported] = useState(false);
@@ -378,7 +379,7 @@ export default function MicroscopicLifeObservationViewer() {
     const camera = new THREE.PerspectiveCamera(64, mount.clientWidth / mount.clientHeight, 0.05, 50);
     const guidedCamera = createGuidedCamera(camera, renderer.domElement);
     guidedCamera.focusOn(
-      { position: new THREE.Vector3(0, 1.55, 4.4), target: new THREE.Vector3(0, 1.35, -1.8) },
+      { position: new THREE.Vector3(0, 1.62, 3.2), target: new THREE.Vector3(0, 1.62, -3.05) },
       { animate: false },
     );
 
@@ -413,7 +414,7 @@ export default function MicroscopicLifeObservationViewer() {
       new THREE.BoxGeometry(4.42, 2.58, 0.1),
       new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.42, metalness: 0.08 }),
     );
-    microscopeFrame.position.set(0, 1.48, -2.55);
+    microscopeFrame.position.set(0, 1.72, -3.35);
     microscopeFrame.castShadow = true;
     scene.add(microscopeFrame);
 
@@ -425,7 +426,7 @@ export default function MicroscopicLifeObservationViewer() {
       new THREE.MeshBasicMaterial({ map: videoTexture }),
     );
     screen.name = 'large-microscope-video-screen';
-    screen.position.set(0, 1.48, -2.49);
+    screen.position.set(0, 1.72, -3.285);
     screenGroup.add(screen);
 
     const organismLayer = new THREE.Group();
@@ -445,8 +446,8 @@ export default function MicroscopicLifeObservationViewer() {
       mesh.scale.set(1.6 + (index % 3) * 0.5, 0.7 + (index % 4) * 0.2, 1);
       mesh.position.set(
         -1.85 + (index % 9) * 0.45,
-        0.62 + Math.floor(index / 9) * 0.42,
-        -2.475,
+        0.86 + Math.floor(index / 9) * 0.42,
+        -3.265,
       );
       organismLayer.add(mesh);
       return mesh;
@@ -459,7 +460,7 @@ export default function MicroscopicLifeObservationViewer() {
         transparent: true,
       }),
     );
-    title.position.set(0, 2.98, -2.55);
+    title.position.set(0, 3.18, -3.35);
     scene.add(title);
 
     const stageButtons = STAGES.map(makeStageButton);
@@ -476,10 +477,10 @@ export default function MicroscopicLifeObservationViewer() {
         }),
       );
       button.name = `specimen-button-${specimen.id}`;
-      button.position.set(-0.94 + index * 0.94, 0.36, -1.46);
+      button.position.set(-1.18 + index * 1.18, 0.84, -2.12);
       const label = makeLabel(specimen.label, specimen.color);
-      label.position.z = 0.034;
-      label.scale.setScalar(0.44);
+      label.position.z = 0.052;
+      label.scale.setScalar(0.56);
       button.add(label);
       scene.add(button);
       return button;
@@ -513,6 +514,7 @@ export default function MicroscopicLifeObservationViewer() {
     scene.add(ctrl0, ctrl1);
     const backLatches = [false, false];
     const previousStepLatches = [false, false];
+    const specimenCycleLatches = [false, false];
     let labYaw = 0;
     let focusPulse = 0;
 
@@ -527,12 +529,22 @@ export default function MicroscopicLifeObservationViewer() {
 
     const selectSpecimen = (index: number) => {
       const specimen = SPECIMENS[index];
+      specimenRef.current = index;
       setSpecimenIndex(index);
       playTone(audioRef.current, 320 + index * 90, 0.18, 'sawtooth');
       if (video.duration && Number.isFinite(video.duration)) {
         video.currentTime = specimen.offset % Math.max(video.duration - 1, 1);
       }
       void playSimulationNarration(`${specimen.label}. Observe the sample and compare shape, colour, and movement.`, 20 + index);
+    };
+
+    const explainCurrentStage = () => {
+      const current = STAGES[stageRef.current];
+      playTone(audioRef.current, 680, 0.16, 'triangle');
+      void playSimulationNarration(
+        `${current.title}. ${current.cue} ${current.action}`,
+        30 + stageRef.current,
+      );
     };
 
     const interactionSystem = createInteractionSystem({
@@ -593,10 +605,18 @@ export default function MicroscopicLifeObservationViewer() {
           const xButton = updateButtonLatch(Boolean(gamepad.buttons[4]?.pressed), previousStepLatches[index]);
           previousStepLatches[index] = xButton.latched;
           if (xButton.pressed && stageRef.current > 0) goToStage(stageRef.current - 1);
+
+          const secondaryButton = updateButtonLatch(Boolean(gamepad.buttons[1]?.pressed), specimenCycleLatches[index]);
+          specimenCycleLatches[index] = secondaryButton.latched;
+          if (secondaryButton.pressed) {
+            const nextSpecimen = (specimenRef.current + 1) % SPECIMENS.length;
+            selectSpecimen(nextSpecimen);
+            explainCurrentStage();
+          }
         });
-        const radius = 4.4;
-        camera.position.set(Math.sin(labYaw) * radius, 1.55, Math.cos(labYaw) * radius - 1.8);
-        camera.lookAt(0, 1.35, -1.8);
+        const radius = 3.25;
+        camera.position.set(Math.sin(labYaw) * radius, 1.62, Math.cos(labYaw) * radius + 0.2);
+        camera.lookAt(0, 1.7, -3.12);
       }
       focusPulse = Math.max(0, focusPulse - dt * 1.6);
       const focusScale = 1 + focusPulse * 0.11 + Math.sin(elapsed * 1.2) * 0.006;
@@ -660,6 +680,8 @@ export default function MicroscopicLifeObservationViewer() {
       optionalFeatures: ['local-floor', 'bounded-floor'],
     });
     await renderer.xr.setSession(session);
+    await audioRef.current?.context.resume().catch(() => undefined);
+    narrateStage(stageRef.current);
   };
 
   const setStage = (index: number) => {
@@ -670,6 +692,7 @@ export default function MicroscopicLifeObservationViewer() {
   };
 
   const selectBrowserSpecimen = (index: number) => {
+    specimenRef.current = index;
     setSpecimenIndex(index);
     playTone(audioRef.current, 320 + index * 90, 0.14, 'sawtooth');
     const video = videoRef.current;
@@ -712,7 +735,7 @@ export default function MicroscopicLifeObservationViewer() {
               <button key={item.id} onClick={() => selectBrowserSpecimen(index)} style={smallButtonStyle(index === specimenIndex ? item.color : '#1f2937', index === specimenIndex ? '#04111a' : '#f8fafc')}>{item.label}</button>
             ))}
           </div>
-          <p style={{ color: '#64748b', lineHeight: 1.35, margin: '12px 0 0', fontSize: 12 }}>Quest: joystick rotates, B goes back, X moves to previous step.</p>
+          <p style={{ color: '#64748b', lineHeight: 1.35, margin: '12px 0 0', fontSize: 12 }}>Quest: trigger selects visible lab buttons, joystick rotates, B goes back, X moves to previous step.</p>
         </section>
       )}
     </div>

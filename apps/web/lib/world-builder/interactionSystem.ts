@@ -37,6 +37,7 @@ export function createInteractionSystem(config: InteractionSystemConfig) {
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const controllerDirection = new THREE.Vector3();
+  const controllerQuaternion = new THREE.Quaternion();
   const cursor = config.cursor ?? { hover: 'pointer', idle: 'grab' };
 
   let hoveredId: string | undefined;
@@ -154,7 +155,8 @@ export function createInteractionSystem(config: InteractionSystemConfig) {
   const controllerListeners = (config.xrControllers ?? []).map(controller => {
     const onSelectStart = () => {
       raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
-      controllerDirection.set(0, 0, -1).applyQuaternion(controller.quaternion);
+      controller.getWorldQuaternion(controllerQuaternion);
+      controllerDirection.set(0, 0, -1).applyQuaternion(controllerQuaternion);
       raycaster.ray.direction.copy(controllerDirection);
       const hit = hitFromRay();
       if (hit) config.onSelect?.(hit.id, hit.entry.object, 'xr-controller');
