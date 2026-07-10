@@ -132,6 +132,18 @@ Ask students why a microscope is needed to study microorganisms. Review how moti
 REVISION TRIGGER
 One week later, show a still microscope image and ask students to write three observations and one careful inference about the living organisms shown.`;
 
+const humanBodyAnatomyScript = `SETUP
+Ask students to name body parts they already know and predict which internal organs are protected inside the chest and abdomen. Non-headset students sketch a simple body outline and label the parts they can remember.
+
+DURING HEADSET BATCH
+Guide students through the anatomy tour: full body view, skeleton, muscles, internal organs, and body systems working together. Pause at each stage to connect visible structure with function.
+
+DEBRIEF
+Ask students which parts give the body support, which parts help movement, and which organs carry out breathing, circulation, and digestion. Reinforce that body systems work together rather than separately.
+
+REVISION TRIGGER
+One week later, show a blank human outline and ask students to place the heart, lungs, stomach, and major bones in the correct body regions.`;
+
 export const POLLINATION_MODULE: SimulationModuleRecord = {
   id: 'sim-pollination-001',
   slug: 'pollination',
@@ -620,6 +632,49 @@ export const MICROSCOPIC_LIFE_OBSERVATION_MODULE: SimulationModuleRecord = {
   status: 'released',
 };
 
+export const HUMAN_BODY_ANATOMY_MODULE: SimulationModuleRecord = {
+  id: 'sim-human-body-anatomy',
+  slug: 'human-body-anatomy',
+  title: 'Human Body Anatomy',
+  summary: 'Enter a separate immersive body-anatomy video tour to study bones, muscles, major organs, and whole-body systems.',
+  gradeBands: ['class3To5'],
+  subjects: ['biology', 'environmentalScience', 'science'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c5-ch03-digestive-system'],
+  conceptIds: ['concept-digestive-system', 'concept-food-journey', 'concept-digestive-health'],
+  simulationFormat: 'threeSixtyVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Human anatomy includes invisible internal structures that are difficult to visualize from textbook diagrams alone. A separate VR body tour lets students look around the full body, connect visible regions to organs, and place individual systems inside one organized whole.',
+  learningObjective: 'Students will identify major body structures, distinguish support, movement, and organ functions, and explain that body systems work together.',
+  scientificConceptExplanation: 'Human anatomy studies the structure of the body. Bones provide support and protection, muscles enable movement, and organs such as the heart, lungs, and digestive structures carry out specialized life processes inside broader body systems.',
+  misconceptionsAddressed: [
+    'Body parts work independently without forming systems.',
+    'Bones only give shape and do not protect organs.',
+    'Internal organs are randomly placed inside the body.',
+  ],
+  visualizationStrategy: 'Use the supplied anatomy video as an immersive sky with a low observation platform, guided explanation panels, and stage buttons for each major body view.',
+  interactionStrategy: 'Students select guided stages, listen to teacher narration, move freely with the Quest left stick, rotate with the right stick, and use controller buttons to step back through the lesson.',
+  imaginationHelperStrategy: 'Internal body structure becomes easier to imagine when students can stand inside a full-body tour and compare regions, systems, and organ roles in one view.',
+  practicalUseCase: 'Connects textbook body lessons to health education, organ diagrams, posture awareness, and early science discussions about how body systems work together.',
+  cueCardIds: ['cue-body-support-001', 'cue-body-muscles-002', 'cue-body-organs-003'],
+  revisionCardIds: ['rev-body-regions-001'],
+  assessmentHookIds: ['assess-body-pre-001', 'assess-body-post-001'],
+  instructorScript: humanBodyAnatomyScript,
+  batchActivityPrompt: 'Draw a human outline and label one bone, one muscle group, and three organs. Write one sentence about how two body systems work together.',
+  expectedDurationMinutes: 8,
+  maxSessionDurationMinutes: 10,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use stationary or seated play.', 'Encourage slow head movement during the tour.'],
+  offlineContentPackId: 'pack-science-human-body-anatomy-v1',
+  estimatedPackageSizeMb: 110,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 5,
+  status: 'released',
+};
+
 export const SIMULATION_MODULES = [
   POLLINATION_MODULE,
   CIRCUIT_MODULE,
@@ -632,4 +687,5 @@ export const SIMULATION_MODULES = [
   SOLAR_SYSTEM_MISSION_MODULE,
   EXPLORE_OUR_GALAXY_MODULE,
   MICROSCOPIC_LIFE_OBSERVATION_MODULE,
+  HUMAN_BODY_ANATOMY_MODULE,
 ] as const;

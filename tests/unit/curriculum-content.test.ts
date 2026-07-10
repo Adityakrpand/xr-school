@@ -43,7 +43,7 @@ describe('canonical curriculum content', () => {
     expect(chapter).toMatchObject({
       chapterNumber: 3,
       title: 'From Tasting to Digesting',
-      simulationIds: ['sim-c05-ch03-a02-introduction-of-digestive-system'],
+      simulationIds: ['sim-c05-ch03-a02-introduction-of-digestive-system', 'sim-human-body-anatomy'],
     });
   });
 
@@ -56,6 +56,7 @@ describe('canonical curriculum content', () => {
       'sim-c8-10-science-solar-system',
       'sim-explore-our-galaxy',
       'sim-c10-ch07-a02-microscopic-life-observation',
+      'sim-human-body-anatomy',
     ]) {
       expect(linkedSimulationIds.has(simulationId)).toBe(true);
     }
@@ -72,5 +73,8 @@ describe('canonical curriculum content', () => {
     expect(CURRICULUM_CHAPTERS.find(
       item => item.id === 'chapter-cbse-c10-life-processes',
     )?.simulationIds).toEqual(['sim-c10-ch07-a02-microscopic-life-observation']);
+    expect(CURRICULUM_CHAPTERS.find(
+      item => item.id === 'chapter-cbse-c5-from-tasting-to-digesting',
+    )?.simulationIds).toEqual(['sim-c05-ch03-a02-introduction-of-digestive-system', 'sim-human-body-anatomy']);
   });
 });

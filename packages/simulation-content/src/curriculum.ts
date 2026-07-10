@@ -458,7 +458,7 @@ export const CURRICULUM_CHAPTERS: CurriculumChapterRecord[] = [
       'concept-nutrient-absorption',
       'concept-digestive-health',
     ],
-    simulationIds: ['sim-c05-ch03-a02-introduction-of-digestive-system'],
+    simulationIds: ['sim-c05-ch03-a02-introduction-of-digestive-system', 'sim-human-body-anatomy'],
   },
   {
     id: 'chapter-cbse-c5-water-experiments',
@@ -579,6 +579,7 @@ export const COURSES: CourseRecord[] = [
     ],
     simulationIds: [
       'sim-c05-ch03-a02-introduction-of-digestive-system',
+      'sim-human-body-anatomy',
       'sim-c05-ch07-a03-soluble-and-insoluble-substances',
     ],
     searchKeywords: ['class 5', 'EVS', 'digestive system', 'water experiments'],

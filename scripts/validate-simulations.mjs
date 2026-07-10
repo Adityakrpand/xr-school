@@ -69,6 +69,7 @@ const viewerNameMap = {
   'c8-10-science-solar-system': 'SolarSystemMissionViewer',
   'explore-our-galaxy': 'ExploreOurGalaxyViewer',
   'c10-ch07-a02-microscopic-life-observation': 'MicroscopicLifeObservationViewer',
+  'human-body-anatomy': 'HumanBodyAnatomyViewer',
 };
 
 for (const slug of slugs) {

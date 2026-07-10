@@ -12,6 +12,7 @@ export const IMPLEMENTED_SIMULATION_SLUGS = [
   'c8-10-science-solar-system',
   'explore-our-galaxy',
   'c10-ch07-a02-microscopic-life-observation',
+  'human-body-anatomy',
 ] as const;
 
 type ImplementedSlug = (typeof IMPLEMENTED_SIMULATION_SLUGS)[number];
@@ -137,6 +138,16 @@ const EXTRA_IMPLEMENTED: Record<ImplementedSlug, Omit<CatalogCard, 'releaseMatur
     grade: 'Class 10',
     title: 'Microscopic Life Observation Lab',
     topic: 'Life Processes',
+    archetype: 'immersive VR',
+    minutes: 8,
+  },
+  'human-body-anatomy': {
+    slug: 'human-body-anatomy',
+    color: '#fca5a5',
+    subject: 'biology, environmental science',
+    grade: 'Class 5',
+    title: 'Human Body Anatomy',
+    topic: 'Body parts, organs, and systems',
     archetype: 'immersive VR',
     minutes: 8,
   },
