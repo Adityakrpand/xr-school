@@ -37,6 +37,11 @@ const STAGE_FRAMES: Record<SolarMissionStageId, { position: [number, number, num
   'final-celebration': { position: [0, 1.65, 7.8], target: [0, 1.3, -0.8] },
 };
 
+const SOLAR_360_VIDEO_SRC = '/simulations/solar-system-360-space-tour.mp4';
+
+const TEACHER_NARRATION_PREFIX =
+  'Teacher guidance. Look around slowly and notice what is happening in space. ';
+
 function hexToNumber(hex: string) {
   return Number.parseInt(hex.replace('#', ''), 16);
 }
@@ -239,7 +244,43 @@ function addActionTarget(
   return target;
 }
 
-function addStarField(scene: THREE.Scene) {
+function addImmersiveVideoSky(root: THREE.Object3D) {
+  const video = document.createElement('video');
+  video.src = SOLAR_360_VIDEO_SRC;
+  video.loop = true;
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = 'auto';
+  video.crossOrigin = 'anonymous';
+
+  const texture = new THREE.VideoTexture(video);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.repeat.set(1, 0.5);
+  texture.offset.set(0, 0.5);
+
+  const dome = new THREE.Mesh(
+    new THREE.SphereGeometry(42, 96, 48),
+    new THREE.MeshBasicMaterial({
+      map: texture,
+      side: THREE.BackSide,
+      transparent: true,
+      opacity: 0.62,
+      depthWrite: false,
+    }),
+  );
+  dome.name = 'whatsapp-video-aligned-immersive-360-solar-system-space-tour-sky';
+  dome.rotation.y = Math.PI;
+  root.add(dome);
+
+  void video.play().catch(() => undefined);
+  return { video, texture };
+}
+
+function addStarField(scene: THREE.Object3D) {
   const count = 3200;
   const positions = new Float32Array(count * 3);
   for (let index = 0; index < count; index += 1) {
@@ -341,7 +382,7 @@ function addOrbit(group: THREE.Group, radius: number, name: string, color = 0x38
   group.add(orbit);
 }
 
-function addSpacecraftCockpit(scene: THREE.Scene) {
+function addSpacecraftCockpit(scene: THREE.Object3D) {
   const cockpit = new THREE.Group();
   cockpit.name = 'ultra-modern-spacecraft-panoramic-glass-cockpit-holographic-dashboard-ai-assistant';
   scene.add(cockpit);
@@ -413,7 +454,7 @@ function addSpacecraftCockpit(scene: THREE.Scene) {
   return cockpit;
 }
 
-function buildStageGroups(scene: THREE.Scene, targets: THREE.Object3D[]) {
+function buildStageGroups(scene: THREE.Object3D, targets: THREE.Object3D[]) {
   const groups = new Map<SolarMissionStageId, THREE.Group>();
   for (const stage of SOLAR_MISSION_STAGES) {
     const group = new THREE.Group();
@@ -576,6 +617,8 @@ export default function SolarSystemMissionViewer() {
   const goToStageRef = useRef<(index: number) => void>(() => undefined);
   const focusStageRef = useRef<(stageId: SolarMissionStageId, animate?: boolean) => void>(() => undefined);
   const comfortModeRef = useRef(true);
+  const worldRootRef = useRef<THREE.Group | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const [started, setStarted] = useState(false);
   const [vrSupported, setVrSupported] = useState(false);
@@ -594,7 +637,7 @@ export default function SolarSystemMissionViewer() {
 
   const speak = useCallback((text: string, cueIndex = stageIndexRef.current) => {
     if (muted) return;
-    void playSimulationNarration(text, cueIndex);
+    void playSimulationNarration(`${TEACHER_NARRATION_PREFIX}${text}`, cueIndex);
   }, [muted]);
 
   const completeAction = useCallback((stageId: SolarMissionStageId, actionId: string, message = 'Mission task complete.') => {
@@ -724,8 +767,15 @@ export default function SolarSystemMissionViewer() {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x020617);
     scene.fog = new THREE.Fog(0x020617, 12, 45);
-    addStarField(scene);
-    const cockpit = addSpacecraftCockpit(scene);
+    const worldRoot = new THREE.Group();
+    worldRoot.name = 'free-movable-solar-system-mission-world';
+    scene.add(worldRoot);
+    worldRootRef.current = worldRoot;
+    const videoSky = addImmersiveVideoSky(worldRoot);
+    videoRef.current = videoSky.video;
+    addStarField(worldRoot);
+    const cockpit = addSpacecraftCockpit(worldRoot);
+    cockpit.position.set(0, -0.22, 0.08);
 
     const camera = new THREE.PerspectiveCamera(62, mount.clientWidth / mount.clientHeight, 0.05, 80);
     const guidedCamera = createGuidedCamera(camera, renderer.domElement);
@@ -744,15 +794,15 @@ export default function SolarSystemMissionViewer() {
 
     const interactiveTargets: THREE.Object3D[] = [];
     interactiveTargetsRef.current = interactiveTargets;
-    stageGroupsRef.current = buildStageGroups(scene, interactiveTargets);
+    stageGroupsRef.current = buildStageGroups(worldRoot, interactiveTargets);
 
     const nav = new THREE.Group();
     nav.name = 'solar-system-vr-controller-navigation';
-    const back = addActionTarget(nav, interactiveTargets, 'solar-nav-back', 'Back', 0x38bdf8, [-1, 0.34, 1.28]);
+    const back = addActionTarget(nav, interactiveTargets, 'solar-nav-back', 'Back', 0x38bdf8, [-1.75, 0.72, 1.06]);
     back.userData.navigationDelta = -1;
-    const next = addActionTarget(nav, interactiveTargets, 'solar-nav-next', 'Next', 0x22c55e, [1, 0.34, 1.28]);
+    const next = addActionTarget(nav, interactiveTargets, 'solar-nav-next', 'Next', 0x22c55e, [1.75, 0.72, 1.06]);
     next.userData.navigationDelta = 1;
-    scene.add(nav);
+    worldRoot.add(nav);
 
     const controller0 = renderer.xr.getController(0);
     const controller1 = renderer.xr.getController(1);
@@ -782,12 +832,45 @@ export default function SolarSystemMissionViewer() {
     interactiveTargets.forEach(target => interactionSystem.register(target.name, target, { highlightColor: '#bae6fd' }));
 
     const clock = new THREE.Clock();
+    const moveDirection = new THREE.Vector3();
+    const strafeDirection = new THREE.Vector3();
+    const worldUp = new THREE.Vector3(0, 1, 0);
+    let lastControllerNavAt = 0;
     let elapsed = 0;
     renderer.setAnimationLoop(() => {
       const delta = clock.getDelta();
       elapsed += delta;
       const intensity = comfortModeRef.current ? 0.38 : 1;
       if (!renderer.xr.isPresenting) guidedCamera.update(delta);
+      else {
+        for (const source of renderer.xr.getSession()?.inputSources ?? []) {
+          const gamepad = source.gamepad;
+          if (!gamepad) continue;
+
+          const horizontal = gamepad.axes[2] ?? gamepad.axes[0] ?? 0;
+          const vertical = gamepad.axes[3] ?? gamepad.axes[1] ?? 0;
+          if (source.handedness === 'right' && Math.abs(horizontal) > 0.16) {
+            worldRoot.rotation.y -= horizontal * delta * 1.35;
+          }
+          if (source.handedness === 'left') {
+            camera.getWorldDirection(moveDirection);
+            moveDirection.y = 0;
+            moveDirection.normalize();
+            strafeDirection.crossVectors(moveDirection, worldUp).normalize();
+            if (Math.abs(vertical) > 0.16) worldRoot.position.addScaledVector(moveDirection, vertical * delta * 1.25);
+            if (Math.abs(horizontal) > 0.16) worldRoot.position.addScaledVector(strafeDirection, horizontal * delta * 1.25);
+          }
+
+          const buttons = gamepad.buttons;
+          const wantsPrevious =
+            (source.handedness === 'right' && (buttons[1]?.pressed || buttons[5]?.pressed)) ||
+            (source.handedness === 'left' && (buttons[3]?.pressed || buttons[4]?.pressed || buttons[5]?.pressed));
+          if (wantsPrevious && elapsed - lastControllerNavAt > 0.45) {
+            lastControllerNavAt = elapsed;
+            goToStageRef.current(stageIndexRef.current - 1);
+          }
+        }
+      }
       cockpit.rotation.y = Math.sin(elapsed * 0.18) * 0.02 * intensity;
       scene.traverse(object => {
         if (object instanceof THREE.Points) object.rotation.y = elapsed * 0.01 * intensity;
@@ -808,6 +891,8 @@ export default function SolarSystemMissionViewer() {
 
     return () => {
       renderer.setAnimationLoop(null);
+      videoSky.video.pause();
+      videoRef.current = null;
       window.removeEventListener('resize', onResize);
       interactionSystem.dispose();
       guidedCamera.dispose();
@@ -821,6 +906,8 @@ export default function SolarSystemMissionViewer() {
           standard.dispose();
         });
       });
+      videoSky.texture.dispose();
+      worldRootRef.current = null;
       renderer.dispose();
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
       stopSimulationNarration();
@@ -830,12 +917,14 @@ export default function SolarSystemMissionViewer() {
   const startMission = useCallback(() => {
     setStarted(true);
     setFeedback(SOLAR_MISSION_STAGES[0].interactionPrompt);
+    void videoRef.current?.play().catch(() => undefined);
     speak(SOLAR_MISSION_STAGES[0].narration, 0);
   }, [speak]);
 
   const enterVR = useCallback(async () => {
     if (!rendererRef.current) return;
     setStarted(true);
+    void videoRef.current?.play().catch(() => undefined);
     try {
       const session = await (navigator as any).xr.requestSession('immersive-vr', {
         requiredFeatures: ['local-floor'],
