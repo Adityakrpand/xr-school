@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { playSimulationNarration, stopSimulationNarration } from '@/lib/simulationAudio';
+import { isQuestBackPressed, updateButtonLatch } from '@/lib/xrNavigation';
 import { createGuidedCamera } from '@/lib/world-builder/guidedCamera';
 import { createInteractionSystem } from '@/lib/world-builder/interactionSystem';
 
@@ -31,11 +32,239 @@ const STAGES = [
   },
 ] as const;
 
+const SPECIMENS = [
+  { id: 'pond-water', label: 'Pond water', color: '#6ee7b7', offset: 0 },
+  { id: 'algae-bloom', label: 'Algae bloom', color: '#a3e635', offset: 52 },
+  { id: 'ciliate-rich', label: 'Ciliate sample', color: '#f0abfc', offset: 116 },
+] as const;
+
 const MARKERS = [
   { id: 'oval-protist', label: 'Oval protist', color: '#6ee7b7', position: [-1.35, 1.38, -2.45] },
   { id: 'green-algae', label: 'Green algae', color: '#a3e635', position: [0, 1.78, -2.45] },
   { id: 'ciliated-cell', label: 'Ciliated cell', color: '#f0abfc', position: [1.35, 1.38, -2.45] },
 ] as const;
+
+type AudioState = {
+  context: AudioContext;
+  ambientGain: GainNode;
+  musicGain: GainNode;
+  masterGain: GainNode;
+  oscillators: OscillatorNode[];
+};
+
+function addBox(
+  parent: THREE.Object3D,
+  name: string,
+  size: [number, number, number],
+  position: [number, number, number],
+  color: number,
+  options: { roughness?: number; metalness?: number; opacity?: number } = {},
+) {
+  const material = new THREE.MeshStandardMaterial({
+    color,
+    roughness: options.roughness ?? 0.55,
+    metalness: options.metalness ?? 0.05,
+    transparent: options.opacity !== undefined,
+    opacity: options.opacity ?? 1,
+  });
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
+  mesh.name = name;
+  mesh.position.set(...position);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  parent.add(mesh);
+  return mesh;
+}
+
+function addCylinder(
+  parent: THREE.Object3D,
+  name: string,
+  radiusTop: number,
+  radiusBottom: number,
+  height: number,
+  position: [number, number, number],
+  color: number,
+  options: { opacity?: number; radialSegments?: number } = {},
+) {
+  const mesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(radiusTop, radiusBottom, height, options.radialSegments ?? 32),
+    new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.38,
+      metalness: 0.08,
+      transparent: options.opacity !== undefined,
+      opacity: options.opacity ?? 1,
+    }),
+  );
+  mesh.name = name;
+  mesh.position.set(...position);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  parent.add(mesh);
+  return mesh;
+}
+
+function addLabInterior(scene: THREE.Scene) {
+  const lab = new THREE.Group();
+  lab.name = 'modern-biology-laboratory-interior';
+  scene.add(lab);
+
+  addBox(lab, 'realistic-speckled-laboratory-floor', [9.2, 0.08, 8.6], [0, -0.04, -0.7], 0xd9e2e7, { roughness: 0.78 });
+  addBox(lab, 'rear-laboratory-wall', [9.2, 3.5, 0.12], [0, 1.7, -4.65], 0xe5eef3, { roughness: 0.72 });
+  addBox(lab, 'left-laboratory-wall', [0.12, 3.5, 8.6], [-4.6, 1.7, -0.7], 0xdbe7ee, { roughness: 0.72 });
+  addBox(lab, 'right-laboratory-wall', [0.12, 3.5, 8.6], [4.6, 1.7, -0.7], 0xdbe7ee, { roughness: 0.72 });
+  addBox(lab, 'bright-laboratory-ceiling', [9.2, 0.08, 8.6], [0, 3.42, -0.7], 0xf8fafc, { roughness: 0.65 });
+
+  for (let i = 0; i < 4; i += 1) {
+    const light = addBox(lab, `rectangular-led-lab-light-${i + 1}`, [1.2, 0.04, 0.3], [-2.7 + i * 1.8, 3.35, -1.35], 0xffffff);
+    (light.material as THREE.MeshStandardMaterial).emissive.setHex(0xffffff);
+    (light.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.85;
+  }
+
+  for (let i = 0; i < 3; i += 1) {
+    addBox(lab, `window-natural-daylight-glass-${i + 1}`, [1.05, 1.1, 0.05], [-3.0 + i * 1.2, 2.05, -4.58], 0x93c5fd, { opacity: 0.46, roughness: 0.18 });
+    addBox(lab, `window-white-frame-${i + 1}`, [1.16, 0.06, 0.08], [-3.0 + i * 1.2, 2.62, -4.54], 0xf8fafc);
+    addBox(lab, `window-lower-frame-${i + 1}`, [1.16, 0.06, 0.08], [-3.0 + i * 1.2, 1.48, -4.54], 0xf8fafc);
+  }
+
+  [-2.6, 0, 2.6].forEach((x, index) => {
+    addBox(lab, `laboratory-workbench-${index + 1}`, [1.85, 0.14, 0.9], [x, 0.78, -0.65], 0x334155, { roughness: 0.42 });
+    addBox(lab, `steel-workbench-leg-a-${index + 1}`, [0.08, 0.72, 0.08], [x - 0.78, 0.38, -0.98], 0x94a3b8, { metalness: 0.35 });
+    addBox(lab, `steel-workbench-leg-b-${index + 1}`, [0.08, 0.72, 0.08], [x + 0.78, 0.38, -0.98], 0x94a3b8, { metalness: 0.35 });
+  });
+
+  [-3.72, 3.72].forEach((x, side) => {
+    addBox(lab, `storage-cabinet-body-${side + 1}`, [1.25, 1.8, 0.48], [x, 1.05, -3.98], 0x64748b, { roughness: 0.48 });
+    addBox(lab, `storage-cabinet-glass-door-${side + 1}`, [1.12, 1.5, 0.04], [x, 1.15, -3.72], 0xbae6fd, { opacity: 0.34, roughness: 0.16 });
+    for (let row = 0; row < 3; row += 1) {
+      addBox(lab, `cabinet-glass-shelf-${side + 1}-${row + 1}`, [1.08, 0.035, 0.36], [x, 0.58 + row * 0.48, -3.76], 0xdbeafe, { opacity: 0.45 });
+    }
+  });
+
+  for (let i = 0; i < 10; i += 1) {
+    const x = -4.0 + (i % 5) * 0.28;
+    const y = 0.64 + Math.floor(i / 5) * 0.52;
+    const bottle = addCylinder(lab, `specimen-bottle-with-label-${i + 1}`, 0.055, 0.06, 0.28, [x, y, -3.43], i % 2 ? 0x86efac : 0xfca5a5, { opacity: 0.68 });
+    addBox(bottle, `specimen-label-${i + 1}`, [0.1, 0.045, 0.01], [0, -0.02, 0.057], 0xf8fafc);
+  }
+
+  for (let i = 0; i < 8; i += 1) {
+    const x = 2.85 + (i % 4) * 0.22;
+    const y = 0.62 + Math.floor(i / 4) * 0.48;
+    const tube = addCylinder(lab, `test-tube-${i + 1}`, 0.03, 0.035, 0.36, [x, y, -3.43], i % 3 === 0 ? 0x93c5fd : 0xfde68a, { opacity: 0.72, radialSegments: 18 });
+    tube.rotation.z = (i % 2 ? 0.08 : -0.08);
+  }
+
+  ['CELL STRUCTURE', 'MICROSCOPE SAFETY', 'PROTIST MOTION'].forEach((label, index) => {
+    const poster = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.05, 0.62),
+      new THREE.MeshBasicMaterial({ map: makeTextTexture(label, 'Observe - Record - Infer', '#38bdf8', 560, 240), transparent: true }),
+    );
+    poster.name = `biology-chart-educational-poster-${index + 1}`;
+    poster.position.set(-1.25 + index * 1.25, 2.4, -4.57);
+    lab.add(poster);
+  });
+
+  for (let i = 0; i < 6; i += 1) {
+    addCylinder(lab, `petri-dish-${i + 1}`, 0.13, 0.13, 0.035, [-2.95 + i * 0.18, 0.89, -0.56], 0xdbeafe, { opacity: 0.58 });
+  }
+  for (let i = 0; i < 5; i += 1) {
+    const slide = addBox(lab, `prepared-microscope-slide-${i + 1}`, [0.32, 0.014, 0.12], [-0.55 + i * 0.22, 0.865, -0.28], 0xe0f2fe, { opacity: 0.68, roughness: 0.15 });
+    addBox(slide, `slide-specimen-stain-${i + 1}`, [0.08, 0.016, 0.05], [0, 0.008, 0], i % 2 ? 0xa3e635 : 0xf0abfc, { opacity: 0.75 });
+  }
+  for (let i = 0; i < 4; i += 1) {
+    addCylinder(lab, `beaker-${i + 1}`, 0.1, 0.11, 0.28, [1.85 + i * 0.22, 0.93, -0.45], 0xbfdbfe, { opacity: 0.48 });
+  }
+  for (let i = 0; i < 3; i += 1) {
+    const pipette = addCylinder(lab, `pipette-dropper-${i + 1}`, 0.012, 0.018, 0.55, [2.7 + i * 0.12, 0.96, -0.6], 0xf8fafc, { opacity: 0.72, radialSegments: 12 });
+    pipette.rotation.z = Math.PI / 2.4;
+  }
+  addBox(lab, 'open-laboratory-notebook', [0.52, 0.035, 0.38], [-1.95, 0.89, -0.36], 0xf8fafc);
+  addBox(lab, 'notebook-blue-cover', [0.56, 0.03, 0.42], [-2.0, 0.87, -0.36], 0x2563eb);
+  addCylinder(lab, 'hand-sanitizer-bottle', 0.055, 0.07, 0.32, [3.25, 0.95, -0.42], 0xbfdbfe, { opacity: 0.72 });
+  addBox(lab, 'first-aid-safety-box', [0.34, 0.22, 0.2], [3.55, 0.95, -0.42], 0xf8fafc);
+  addBox(lab, 'red-safety-cross-horizontal', [0.18, 0.035, 0.01], [3.55, 0.98, -0.315], 0xef4444);
+  addBox(lab, 'red-safety-cross-vertical', [0.035, 0.16, 0.01], [3.55, 0.98, -0.31], 0xef4444);
+  return lab;
+}
+
+function addMicroscopeModel(scene: THREE.Scene) {
+  const microscope = new THREE.Group();
+  microscope.name = 'realistic-binocular-laboratory-microscope';
+  microscope.position.set(0, 0.84, -0.25);
+  scene.add(microscope);
+
+  addBox(microscope, 'heavy-microscope-base', [0.76, 0.12, 0.48], [0, 0.06, 0], 0x111827, { roughness: 0.38 });
+  addBox(microscope, 'microscope-stage-with-slide-clips', [0.58, 0.055, 0.38], [0, 0.38, -0.08], 0x1f2937, { roughness: 0.32, metalness: 0.1 });
+  addBox(microscope, 'glass-slide-on-stage', [0.42, 0.018, 0.18], [0, 0.425, -0.08], 0xe0f2fe, { opacity: 0.62, roughness: 0.1 });
+  addCylinder(microscope, 'curved-microscope-arm', 0.08, 0.11, 0.9, [0, 0.62, 0.1], 0x0f172a);
+  microscope.children[microscope.children.length - 1].rotation.x = -0.42;
+  addCylinder(microscope, 'objective-turret', 0.18, 0.16, 0.13, [0, 0.82, -0.12], 0x334155);
+  const objective = addCylinder(microscope, 'animated-focusing-objective-lens', 0.055, 0.065, 0.28, [0, 0.63, -0.12], 0x0f172a);
+  addCylinder(microscope, 'eyepiece-tube-left', 0.06, 0.075, 0.44, [-0.09, 1.05, 0.03], 0x111827);
+  addCylinder(microscope, 'eyepiece-tube-right', 0.06, 0.075, 0.44, [0.09, 1.05, 0.03], 0x111827);
+  addCylinder(microscope, 'coarse-focus-knob-left', 0.09, 0.09, 0.07, [-0.34, 0.67, 0.02], 0x475569);
+  microscope.children[microscope.children.length - 1].rotation.z = Math.PI / 2;
+  addCylinder(microscope, 'coarse-focus-knob-right', 0.09, 0.09, 0.07, [0.34, 0.67, 0.02], 0x475569);
+  microscope.children[microscope.children.length - 1].rotation.z = Math.PI / 2;
+  addCylinder(microscope, 'illuminator-glow', 0.13, 0.13, 0.035, [0, 0.26, -0.1], 0xfef3c7);
+  (microscope.children[microscope.children.length - 1] as THREE.Mesh).material = new THREE.MeshStandardMaterial({
+    color: 0xfef3c7,
+    emissive: 0xfacc15,
+    emissiveIntensity: 0.65,
+    roughness: 0.2,
+  });
+  return { microscope, objective };
+}
+
+function createAudioState() {
+  const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AudioContextCtor) return null;
+  const context = new AudioContextCtor();
+  const masterGain = context.createGain();
+  masterGain.gain.value = 0.18;
+  masterGain.connect(context.destination);
+
+  const ambientGain = context.createGain();
+  ambientGain.gain.value = 0.2;
+  ambientGain.connect(masterGain);
+  const musicGain = context.createGain();
+  musicGain.gain.value = 0.08;
+  musicGain.connect(masterGain);
+
+  const hum = context.createOscillator();
+  hum.type = 'sine';
+  hum.frequency.value = 58;
+  hum.connect(ambientGain);
+  hum.start();
+  const air = context.createOscillator();
+  air.type = 'triangle';
+  air.frequency.value = 142;
+  air.connect(ambientGain);
+  air.start();
+  const music = context.createOscillator();
+  music.type = 'sine';
+  music.frequency.value = 220;
+  music.connect(musicGain);
+  music.start();
+
+  return { context, ambientGain, musicGain, masterGain, oscillators: [hum, air, music] };
+}
+
+function playTone(audio: AudioState | null, frequency: number, duration = 0.12, type: OscillatorType = 'sine') {
+  if (!audio) return;
+  const oscillator = audio.context.createOscillator();
+  const gain = audio.context.createGain();
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, audio.context.currentTime);
+  gain.gain.setValueAtTime(0.0001, audio.context.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.16, audio.context.currentTime + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.0001, audio.context.currentTime + duration);
+  oscillator.connect(gain);
+  gain.connect(audio.masterGain);
+  oscillator.start();
+  oscillator.stop(audio.context.currentTime + duration + 0.02);
+}
 
 function makeTextTexture(title: string, subtitle = '', accent = '#6ee7b7', width = 720, height = 260) {
   const canvas = document.createElement('canvas');
@@ -109,9 +338,12 @@ export default function MicroscopicLifeObservationViewer() {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const stageRef = useRef(0);
+  const audioRef = useRef<AudioState | null>(null);
   const [started, setStarted] = useState(false);
   const [vrSupported, setVrSupported] = useState(false);
   const [stageIndex, setStageIndex] = useState(0);
+  const [specimenIndex, setSpecimenIndex] = useState(0);
   const stage = STAGES[stageIndex];
 
   const narrateStage = useCallback((index: number) => {
@@ -142,7 +374,7 @@ export default function MicroscopicLifeObservationViewer() {
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x06131c);
-    scene.fog = new THREE.Fog(0x06131c, 7, 18);
+    scene.fog = new THREE.Fog(0xdbeafe, 8, 22);
     const camera = new THREE.PerspectiveCamera(64, mount.clientWidth / mount.clientHeight, 0.05, 50);
     const guidedCamera = createGuidedCamera(camera, renderer.domElement);
     guidedCamera.focusOn(
@@ -150,17 +382,20 @@ export default function MicroscopicLifeObservationViewer() {
       { animate: false },
     );
 
-    scene.add(new THREE.HemisphereLight(0xdffcff, 0x10202f, 1.3));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    scene.add(new THREE.HemisphereLight(0xf8fafc, 0x94a3b8, 1.15));
     const key = new THREE.DirectionalLight(0xffffff, 1.7);
     key.position.set(3, 5, 4);
+    key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
     scene.add(key);
+    const daylight = new THREE.DirectionalLight(0xdbeafe, 1.1);
+    daylight.position.set(-4, 3, -5);
+    scene.add(daylight);
 
-    const floor = new THREE.Mesh(
-      new THREE.CircleGeometry(6.2, 72),
-      new THREE.MeshStandardMaterial({ color: 0x10202f, roughness: 0.86 }),
-    );
-    floor.rotation.x = -Math.PI / 2;
-    scene.add(floor);
+    addLabInterior(scene);
+    const { microscope, objective } = addMicroscopeModel(scene);
 
     const video = document.createElement('video');
     video.src = VIDEO_SRC;
@@ -175,19 +410,47 @@ export default function MicroscopicLifeObservationViewer() {
     videoTexture.magFilter = THREE.LinearFilter;
 
     const microscopeFrame = new THREE.Mesh(
-      new THREE.BoxGeometry(4.42, 2.58, 0.08),
-      new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.52 }),
+      new THREE.BoxGeometry(4.42, 2.58, 0.1),
+      new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.42, metalness: 0.08 }),
     );
     microscopeFrame.position.set(0, 1.48, -2.55);
+    microscopeFrame.castShadow = true;
     scene.add(microscopeFrame);
 
+    const screenGroup = new THREE.Group();
+    screenGroup.name = 'microscope-zoom-transition-video-group';
+    scene.add(screenGroup);
     const screen = new THREE.Mesh(
       new THREE.PlaneGeometry(4.0, 2.25),
       new THREE.MeshBasicMaterial({ map: videoTexture }),
     );
     screen.name = 'large-microscope-video-screen';
     screen.position.set(0, 1.48, -2.49);
-    scene.add(screen);
+    screenGroup.add(screen);
+
+    const organismLayer = new THREE.Group();
+    organismLayer.name = 'highly-detailed-animated-microscopic-organisms-overlay';
+    screenGroup.add(organismLayer);
+    const organismMeshes = Array.from({ length: 26 }, (_, index) => {
+      const color = [0x84cc16, 0x6ee7b7, 0xf0abfc, 0xfacc15][index % 4];
+      const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.035 + (index % 5) * 0.006, 18, 12),
+        new THREE.MeshBasicMaterial({
+          color,
+          transparent: true,
+          opacity: 0.46,
+        }),
+      );
+      mesh.name = `detailed-microorganism-${index + 1}`;
+      mesh.scale.set(1.6 + (index % 3) * 0.5, 0.7 + (index % 4) * 0.2, 1);
+      mesh.position.set(
+        -1.85 + (index % 9) * 0.45,
+        0.62 + Math.floor(index / 9) * 0.42,
+        -2.475,
+      );
+      organismLayer.add(mesh);
+      return mesh;
+    });
 
     const title = new THREE.Mesh(
       new THREE.PlaneGeometry(2.9, 0.9),
@@ -201,6 +464,26 @@ export default function MicroscopicLifeObservationViewer() {
 
     const stageButtons = STAGES.map(makeStageButton);
     stageButtons.forEach(button => scene.add(button));
+
+    const specimenButtons = SPECIMENS.map((specimen, index) => {
+      const button = new THREE.Mesh(
+        new THREE.BoxGeometry(0.9, 0.16, 0.05),
+        new THREE.MeshStandardMaterial({
+          color: Number.parseInt(specimen.color.slice(1), 16),
+          emissive: Number.parseInt(specimen.color.slice(1), 16),
+          emissiveIntensity: 0.18,
+          roughness: 0.38,
+        }),
+      );
+      button.name = `specimen-button-${specimen.id}`;
+      button.position.set(-0.94 + index * 0.94, 0.36, -1.46);
+      const label = makeLabel(specimen.label, specimen.color);
+      label.position.z = 0.034;
+      label.scale.setScalar(0.44);
+      button.add(label);
+      scene.add(button);
+      return button;
+    });
 
     const markers = MARKERS.map(marker => {
       const color = Number.parseInt(marker.color.slice(1), 16);
@@ -228,6 +511,29 @@ export default function MicroscopicLifeObservationViewer() {
     ctrl0.add(makeControllerRay());
     ctrl1.add(makeControllerRay());
     scene.add(ctrl0, ctrl1);
+    const backLatches = [false, false];
+    const previousStepLatches = [false, false];
+    let labYaw = 0;
+    let focusPulse = 0;
+
+    const goToStage = (index: number) => {
+      const next = THREE.MathUtils.clamp(index, 0, STAGES.length - 1);
+      stageRef.current = next;
+      setStageIndex(next);
+      focusPulse = 1;
+      playTone(audioRef.current, 520, 0.16, 'triangle');
+      narrateStage(next);
+    };
+
+    const selectSpecimen = (index: number) => {
+      const specimen = SPECIMENS[index];
+      setSpecimenIndex(index);
+      playTone(audioRef.current, 320 + index * 90, 0.18, 'sawtooth');
+      if (video.duration && Number.isFinite(video.duration)) {
+        video.currentTime = specimen.offset % Math.max(video.duration - 1, 1);
+      }
+      void playSimulationNarration(`${specimen.label}. Observe the sample and compare shape, colour, and movement.`, 20 + index);
+    };
 
     const interactionSystem = createInteractionSystem({
       camera,
@@ -237,12 +543,18 @@ export default function MicroscopicLifeObservationViewer() {
         if (id.startsWith('microscope-stage-')) {
           const next = Number(id.replace('microscope-stage-', ''));
           if (Number.isInteger(next)) {
-            setStageIndex(next);
-            narrateStage(next);
+            goToStage(next);
           }
+        } else if (id.startsWith('specimen-button-')) {
+          const next = SPECIMENS.findIndex(item => id === `specimen-button-${item.id}`);
+          if (next >= 0) selectSpecimen(next);
         } else {
           const marker = MARKERS.find(item => id === `microscope-marker-${item.id}`);
-          if (marker) void playSimulationNarration(`${marker.label}. ${markerText[MARKERS.indexOf(marker)]}`, 10);
+          if (marker) {
+            focusPulse = 1;
+            playTone(audioRef.current, 740, 0.1, 'square');
+            void playSimulationNarration(`${marker.label}. ${markerText[MARKERS.indexOf(marker)]}`, 10);
+          }
         }
         interactionSystem.setSelected(id);
         guidedCamera.focusOn({ position: camera.position.clone(), target: object.position.clone() });
@@ -250,19 +562,59 @@ export default function MicroscopicLifeObservationViewer() {
     });
 
     stageButtons.forEach(button => interactionSystem.register(button.name, button, { highlightColor: '#6ee7b7' }));
+    specimenButtons.forEach(button => interactionSystem.register(button.name, button, { highlightColor: '#facc15' }));
     markers.forEach(marker => interactionSystem.register(marker.name, marker, { highlightColor: '#facc15' }));
 
     const clock = new THREE.Clock();
     renderer.setAnimationLoop(() => {
       const dt = Math.min(clock.getDelta(), 0.033);
       const elapsed = clock.elapsedTime;
-      if (!renderer.xr.isPresenting) guidedCamera.update(dt);
+      if (!renderer.xr.isPresenting) {
+        guidedCamera.update(dt);
+      } else {
+        const session = renderer.xr.getSession();
+        session?.inputSources.forEach((inputSource, index) => {
+          const gamepad = inputSource.gamepad;
+          if (!gamepad) return;
+          const horizontal = gamepad.axes[2] ?? gamepad.axes[0] ?? 0;
+          if (Math.abs(horizontal) > 0.16) labYaw -= horizontal * dt * 1.35;
+
+          const back = updateButtonLatch(
+            isQuestBackPressed(gamepad.buttons, inputSource.handedness),
+            backLatches[index],
+          );
+          backLatches[index] = back.latched;
+          if (back.pressed) {
+            playTone(audioRef.current, 260, 0.1, 'square');
+            if (stageRef.current > 0) goToStage(stageRef.current - 1);
+            else void session.end();
+          }
+
+          const xButton = updateButtonLatch(Boolean(gamepad.buttons[4]?.pressed), previousStepLatches[index]);
+          previousStepLatches[index] = xButton.latched;
+          if (xButton.pressed && stageRef.current > 0) goToStage(stageRef.current - 1);
+        });
+        const radius = 4.4;
+        camera.position.set(Math.sin(labYaw) * radius, 1.55, Math.cos(labYaw) * radius - 1.8);
+        camera.lookAt(0, 1.35, -1.8);
+      }
+      focusPulse = Math.max(0, focusPulse - dt * 1.6);
+      const focusScale = 1 + focusPulse * 0.11 + Math.sin(elapsed * 1.2) * 0.006;
+      screen.scale.setScalar(focusScale);
+      objective.position.y = 0.63 + Math.sin(elapsed * 1.5) * 0.012 - focusPulse * 0.05;
+      microscope.rotation.y = Math.sin(elapsed * 0.35) * 0.015;
       markers.forEach((marker, index) => {
         marker.position.y += Math.sin(elapsed * 1.8 + index) * 0.0009;
         marker.rotation.y += 0.01;
       });
+      organismMeshes.forEach((organism, index) => {
+        organism.position.x += Math.sin(elapsed * 0.8 + index * 1.7) * 0.0009;
+        organism.position.y += Math.cos(elapsed * 1.1 + index) * 0.0007;
+        organism.rotation.z += 0.012 + index * 0.0004;
+      });
       title.lookAt(camera.position);
       stageButtons.forEach(button => button.lookAt(camera.position));
+      specimenButtons.forEach(button => button.lookAt(camera.position));
       markers.forEach(marker => marker.lookAt(camera.position));
       renderer.render(scene, camera);
     });
@@ -280,6 +632,8 @@ export default function MicroscopicLifeObservationViewer() {
       interactionSystem.dispose();
       guidedCamera.dispose();
       video.pause();
+      audioRef.current?.oscillators.forEach(oscillator => oscillator.stop());
+      audioRef.current?.context.close().catch(() => undefined);
       videoTexture.dispose();
       renderer.dispose();
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
@@ -291,6 +645,9 @@ export default function MicroscopicLifeObservationViewer() {
 
   const startExperience = async () => {
     setStarted(true);
+    if (!audioRef.current) audioRef.current = createAudioState();
+    await audioRef.current?.context.resume().catch(() => undefined);
+    playTone(audioRef.current, 440, 0.14, 'triangle');
     narrateStage(stageIndex);
     await videoRef.current?.play().catch(() => undefined);
   };
@@ -306,8 +663,21 @@ export default function MicroscopicLifeObservationViewer() {
   };
 
   const setStage = (index: number) => {
+    stageRef.current = index;
     setStageIndex(index);
+    playTone(audioRef.current, 520, 0.12, 'triangle');
     narrateStage(index);
+  };
+
+  const selectBrowserSpecimen = (index: number) => {
+    setSpecimenIndex(index);
+    playTone(audioRef.current, 320 + index * 90, 0.14, 'sawtooth');
+    const video = videoRef.current;
+    const specimen = SPECIMENS[index];
+    if (video?.duration && Number.isFinite(video.duration)) {
+      video.currentTime = specimen.offset % Math.max(video.duration - 1, 1);
+    }
+    void playSimulationNarration(`${specimen.label}. Observe the sample and compare shape, colour, and movement.`, 20 + index);
   };
 
   return (
@@ -337,6 +707,12 @@ export default function MicroscopicLifeObservationViewer() {
               <button key={item.title} onClick={() => setStage(index)} style={smallButtonStyle(index === stageIndex ? '#6ee7b7' : '#1f2937', index === stageIndex ? '#04111a' : '#f8fafc')}>{item.title}</button>
             ))}
           </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8, marginTop: 10 }}>
+            {SPECIMENS.map((item, index) => (
+              <button key={item.id} onClick={() => selectBrowserSpecimen(index)} style={smallButtonStyle(index === specimenIndex ? item.color : '#1f2937', index === specimenIndex ? '#04111a' : '#f8fafc')}>{item.label}</button>
+            ))}
+          </div>
+          <p style={{ color: '#64748b', lineHeight: 1.35, margin: '12px 0 0', fontSize: 12 }}>Quest: joystick rotates, B goes back, X moves to previous step.</p>
         </section>
       )}
     </div>
