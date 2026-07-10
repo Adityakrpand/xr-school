@@ -361,6 +361,12 @@ export default function MicroscopicLifeObservationViewer() {
     [],
   );
 
+  const ensureAudioReady = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = createAudioState();
+    await audioRef.current?.context.resume().catch(() => undefined);
+    return audioRef.current;
+  }, []);
+
   useEffect(() => {
     if (typeof navigator !== 'undefined' && 'xr' in navigator) setVrSupported(true);
   }, []);
@@ -586,6 +592,12 @@ export default function MicroscopicLifeObservationViewer() {
     markers.forEach(marker => interactionSystem.register(marker.name, marker, { highlightColor: '#facc15' }));
 
     const clock = new THREE.Clock();
+    renderer.xr.addEventListener('sessionstart', () => {
+      void ensureAudioReady().then(audio => {
+        playTone(audio, 460, 0.12, 'triangle');
+        narrateStage(stageRef.current);
+      });
+    });
     renderer.setAnimationLoop(() => {
       const dt = Math.min(clock.getDelta(), 0.033);
       const elapsed = clock.elapsedTime;
@@ -670,6 +682,7 @@ export default function MicroscopicLifeObservationViewer() {
       video.pause();
       audioRef.current?.oscillators.forEach(oscillator => oscillator.stop());
       audioRef.current?.context.close().catch(() => undefined);
+      audioRef.current = null;
       videoTexture.dispose();
       renderer.dispose();
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
@@ -677,13 +690,12 @@ export default function MicroscopicLifeObservationViewer() {
       rendererRef.current = null;
       stopSimulationNarration();
     };
-  }, [markerText, narrateStage]);
+  }, [ensureAudioReady, markerText, narrateStage]);
 
   const startExperience = async () => {
     setStarted(true);
-    if (!audioRef.current) audioRef.current = createAudioState();
-    await audioRef.current?.context.resume().catch(() => undefined);
-    playTone(audioRef.current, 440, 0.14, 'triangle');
+    const audio = await ensureAudioReady();
+    playTone(audio, 440, 0.14, 'triangle');
     narrateStage(stageIndex);
     await videoRef.current?.play().catch(() => undefined);
   };
@@ -696,7 +708,8 @@ export default function MicroscopicLifeObservationViewer() {
       optionalFeatures: ['local-floor', 'bounded-floor'],
     });
     await renderer.xr.setSession(session);
-    await audioRef.current?.context.resume().catch(() => undefined);
+    const audio = await ensureAudioReady();
+    playTone(audio, 520, 0.12, 'triangle');
     narrateStage(stageRef.current);
   };
 

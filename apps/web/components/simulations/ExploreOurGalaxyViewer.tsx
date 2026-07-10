@@ -49,6 +49,76 @@ const GALAXY_STAGES = [
   },
 ] as const;
 
+type AudioState = {
+  context: AudioContext;
+  ambientGain: GainNode;
+  musicGain: GainNode;
+  masterGain: GainNode;
+  oscillators: OscillatorNode[];
+};
+
+function createAudioState() {
+  const AudioContextCtor =
+    window.AudioContext ||
+    (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AudioContextCtor) return null;
+
+  const context = new AudioContextCtor();
+  const masterGain = context.createGain();
+  masterGain.gain.value = 0.14;
+  masterGain.connect(context.destination);
+
+  const ambientGain = context.createGain();
+  ambientGain.gain.value = 0.12;
+  ambientGain.connect(masterGain);
+
+  const musicGain = context.createGain();
+  musicGain.gain.value = 0.05;
+  musicGain.connect(masterGain);
+
+  const deepSpaceHum = context.createOscillator();
+  deepSpaceHum.type = 'sine';
+  deepSpaceHum.frequency.value = 64;
+  deepSpaceHum.connect(ambientGain);
+  deepSpaceHum.start();
+
+  const shimmer = context.createOscillator();
+  shimmer.type = 'triangle';
+  shimmer.frequency.value = 156;
+  shimmer.connect(ambientGain);
+  shimmer.start();
+
+  const musicBed = context.createOscillator();
+  musicBed.type = 'sine';
+  musicBed.frequency.value = 246;
+  musicBed.connect(musicGain);
+  musicBed.start();
+
+  return {
+    context,
+    ambientGain,
+    musicGain,
+    masterGain,
+    oscillators: [deepSpaceHum, shimmer, musicBed],
+  };
+}
+
+function playTone(audio: AudioState | null, frequency: number, duration = 0.12, type: OscillatorType = 'sine') {
+  if (!audio) return;
+  const oscillator = audio.context.createOscillator();
+  const gain = audio.context.createGain();
+  const startAt = audio.context.currentTime;
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, startAt);
+  gain.gain.setValueAtTime(0.0001, startAt);
+  gain.gain.exponentialRampToValueAtTime(0.12, startAt + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+  oscillator.connect(gain);
+  gain.connect(audio.masterGain);
+  oscillator.start(startAt);
+  oscillator.stop(startAt + duration + 0.02);
+}
+
 function makeTextTexture(title: string, body: string, accent = '#93c5fd') {
   const canvas = document.createElement('canvas');
   canvas.width = 900;
@@ -184,6 +254,7 @@ export default function ExploreOurGalaxyViewer() {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const goToStageRef = useRef<(index: number) => void>(() => undefined);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const audioRef = useRef<AudioState | null>(null);
   const stageIndexRef = useRef(0);
   const mutedRef = useRef(false);
   const [started, setStarted] = useState(false);
@@ -197,6 +268,12 @@ export default function ExploreOurGalaxyViewer() {
   const speak = useCallback((text: string, cueIndex = stageIndexRef.current) => {
     if (mutedRef.current) return;
     void playSimulationNarration(`Teacher guidance. ${text}`, cueIndex);
+  }, []);
+
+  const ensureAudioReady = useCallback(async () => {
+    if (!audioRef.current) audioRef.current = createAudioState();
+    await audioRef.current?.context.resume().catch(() => undefined);
+    return audioRef.current;
   }, []);
 
   useEffect(() => {
@@ -300,6 +377,12 @@ export default function ExploreOurGalaxyViewer() {
     const worldUp = new THREE.Vector3(0, 1, 0);
     let elapsed = 0;
     let lastNavAt = 0;
+    renderer.xr.addEventListener('sessionstart', () => {
+      void ensureAudioReady().then(audio => {
+        playTone(audio, 430, 0.12, 'triangle');
+        speak(GALAXY_STAGES[stageIndexRef.current].narration, stageIndexRef.current);
+      });
+    });
     renderer.setAnimationLoop(() => {
       const delta = clock.getDelta();
       elapsed += delta;
@@ -362,6 +445,9 @@ export default function ExploreOurGalaxyViewer() {
         });
       });
       videoSky.texture.dispose();
+      audioRef.current?.oscillators.forEach(oscillator => oscillator.stop());
+      audioRef.current?.context.close().catch(() => undefined);
+      audioRef.current = null;
       renderer.dispose();
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
       stopSimulationNarration();
@@ -371,13 +457,18 @@ export default function ExploreOurGalaxyViewer() {
   const begin = useCallback(() => {
     setStarted(true);
     void videoRef.current?.play().catch(() => undefined);
+    void ensureAudioReady().then(audio => {
+      playTone(audio, 390, 0.1, 'triangle');
+    });
     speak(GALAXY_STAGES[0].narration, 0);
-  }, [speak]);
+  }, [ensureAudioReady, speak]);
 
   const enterVR = useCallback(async () => {
     if (!rendererRef.current) return;
     setStarted(true);
     void videoRef.current?.play().catch(() => undefined);
+    const audio = await ensureAudioReady();
+    playTone(audio, 460, 0.12, 'triangle');
     try {
       const session = await (navigator as any).xr.requestSession('immersive-vr', {
         requiredFeatures: ['local-floor'],
@@ -388,7 +479,7 @@ export default function ExploreOurGalaxyViewer() {
       speak('VR could not start, so the browser galaxy tour is ready.', 0);
     }
     speak(GALAXY_STAGES[stageIndex].narration, stageIndex);
-  }, [speak, stageIndex]);
+  }, [ensureAudioReady, speak, stageIndex]);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', background: '#020617', color: '#f8fafc', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
