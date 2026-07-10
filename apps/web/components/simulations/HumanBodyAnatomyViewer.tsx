@@ -315,7 +315,7 @@ export default function HumanBodyAnatomyViewer() {
 
     const panel = makePanel(HUMAN_BODY_STAGES[0].title, HUMAN_BODY_STAGES[0].focus, '#fca5a5');
     panel.name = 'human-body-anatomy-teacher-explanation-panel';
-    panel.position.set(0, 2.05, -2.7);
+    panel.position.set(0, 3.02, -2.48);
     worldRoot.add(panel);
 
     const platform = new THREE.Mesh(
