@@ -185,6 +185,19 @@ const CHALLENGES = [
   { prompt: 'Choose the shape used in a can.', answer: 'cylinder' },
 ] as const;
 
+const STAGE_HINTS = [
+  'Start by looking at the lab zones. Each station teaches one idea at a time, so move step by step.',
+  'For 2D shapes, count sides and corners first, then check whether the boundary is straight or curved.',
+  'For 3D shapes, inspect faces, edges, vertices, and whether the surface is flat or curved.',
+  'When comparing shapes, name one similarity first and one difference next.',
+  'Use the real object as your clue. Ask yourself which shape describes the object best.',
+  'Read the property words carefully. The correct shape must match every clue, not just one part.',
+  'Review the big ideas: 2D shapes are flat, 3D shapes are solid, and properties help us identify them.',
+] as const;
+
+const FINAL_RECAP =
+  'Recap. A circle is flat and round, while a sphere is a solid round shape. Triangles have 3 sides. Squares and rectangles both have 4 corners, but a square keeps all sides equal. Cubes and cuboids are solid box shapes, and cylinders have circular ends with one curved surface. Geometry helps us describe the world clearly.';
+
 type AudioState = {
   context: AudioContext;
   masterGain: GainNode;
@@ -200,13 +213,13 @@ function createAudioState() {
   if (!AudioContextCtor) return null;
   const context = new AudioContextCtor();
   const masterGain = context.createGain();
-  masterGain.gain.value = 0.16;
+  masterGain.gain.value = 0.13;
   masterGain.connect(context.destination);
   const ambientGain = context.createGain();
-  ambientGain.gain.value = 0.14;
+  ambientGain.gain.value = 0.09;
   ambientGain.connect(masterGain);
   const musicGain = context.createGain();
-  musicGain.gain.value = 0.05;
+  musicGain.gain.value = 0.03;
   musicGain.connect(masterGain);
   const hum = context.createOscillator();
   hum.type = 'sine';
@@ -411,15 +424,66 @@ function addLabel(parent: THREE.Object3D, text: string, accent: string, scale = 
   return label;
 }
 
+function buildCardLesson(stageIndex: number, shapeIndex: number, compareIndex: number, challengeIndex: number) {
+  const stage = STAGES[stageIndex];
+  if (stageIndex === 1 || stageIndex === 2) {
+    const shape = SHAPES[shapeIndex];
+    return {
+      title: `${stage.title}: ${shape.title}`,
+      body: `${stage.focus} ${shape.identity} ${shape.facts} Examples: ${shape.examples}.`,
+      accent: shape.color,
+    };
+  }
+  if (stageIndex === 3) {
+    const comparison = COMPARISONS[compareIndex];
+    const left = SHAPES.find(shape => shape.id === comparison.left)!;
+    const right = SHAPES.find(shape => shape.id === comparison.right)!;
+    return {
+      title: `${left.title} and ${right.title}`,
+      body: `${comparison.note} Say one similarity, then one difference, to strengthen your comparison.`,
+      accent: '#f97316',
+    };
+  }
+  if (stageIndex === 4) {
+    return {
+      title: 'Real World Match',
+      body: 'Study the object, think about its shape, then match it using the properties you learned earlier.',
+      accent: '#34d399',
+    };
+  }
+  if (stageIndex === 5) {
+    return {
+      title: 'Challenge Prompt',
+      body: `${CHALLENGES[challengeIndex].prompt} Use sides, corners, faces, edges, and curved surfaces to decide.`,
+      accent: '#fbbf24',
+    };
+  }
+  if (stageIndex === 6) {
+    return {
+      title: 'Key Recap',
+      body: FINAL_RECAP,
+      accent: '#a78bfa',
+    };
+  }
+  return {
+    title: stage.title,
+    body: `${stage.focus} ${stage.narration}`,
+    accent: '#38bdf8',
+  };
+}
+
 export default function GeometryMathsLabViewer() {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const audioRef = useRef<AudioState | null>(null);
   const stageChangeRef = useRef<(index: number) => void>(() => undefined);
+  const toggleCardRef = useRef<(visible?: boolean) => void>(() => undefined);
+  const cardHintRef = useRef<() => void>(() => undefined);
   const stageRef = useRef(0);
   const selectedShapeRef = useRef(0);
   const compareIndexRef = useRef(0);
   const challengeIndexRef = useRef(0);
+  const cardVisibleRef = useRef(true);
   const mutedRef = useRef(false);
   const [started, setStarted] = useState(false);
   const [vrSupported, setVrSupported] = useState(false);
@@ -429,6 +493,7 @@ export default function GeometryMathsLabViewer() {
   const [challengeIndex, setChallengeIndex] = useState(0);
   const [feedback, setFeedback] = useState('Choose a station to begin your geometry tour.');
   const [muted, setMuted] = useState(false);
+  const [cardVisible, setCardVisible] = useState(true);
 
   const selectedShape = SHAPES[selectedShapeIndex];
   const stage = STAGES[stageIndex];
@@ -478,12 +543,13 @@ export default function GeometryMathsLabViewer() {
     worldRoot.name = 'free-movable-geometry-maths-lab-world';
     scene.add(worldRoot);
 
-    const camera = new THREE.PerspectiveCamera(68, mount.clientWidth / mount.clientHeight, 0.05, 70);
+    const camera = new THREE.PerspectiveCamera(72, mount.clientWidth / mount.clientHeight, 0.05, 70);
     const guidedCamera = createGuidedCamera(camera, renderer.domElement);
     guidedCamera.focusOn(
-      { position: new THREE.Vector3(0, 1.62, 4.9), target: new THREE.Vector3(0, 1.5, -1.4) },
+      { position: new THREE.Vector3(0, 1.64, 6.2), target: new THREE.Vector3(0, 1.56, -1.45) },
       { animate: false },
     );
+    scene.add(camera);
 
     scene.add(new THREE.HemisphereLight(0xf8fafc, 0x0f172a, 1.2));
     const key = new THREE.DirectionalLight(0xffffff, 1.7);
@@ -555,6 +621,50 @@ export default function GeometryMathsLabViewer() {
     comparePanel.position.set(3.12, 2.55, -2.25);
     worldRoot.add(comparePanel);
 
+    const targets: THREE.Object3D[] = [];
+
+    const initialCard = buildCardLesson(stageRef.current, selectedShapeRef.current, compareIndexRef.current, challengeIndexRef.current);
+    const lessonCardGroup = new THREE.Group();
+    lessonCardGroup.name = 'geometry-vr-lesson-card-group';
+    lessonCardGroup.position.set(-0.92, 0.18, -1.55);
+    camera.add(lessonCardGroup);
+
+    const lessonCardPanel = makePanel(initialCard.title, initialCard.body, initialCard.accent, 2.45, 1.18);
+    lessonCardGroup.add(lessonCardPanel);
+
+    const makeHudButton = (name: string, label: string, accent: string, position: [number, number, number], action: Record<string, unknown>) => {
+      const button = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.11, 0.04), buttonMaterial(hexToNumber(accent)));
+      button.name = name;
+      button.position.set(...position);
+      button.userData = { ...action };
+      const labelMesh = makePanel(label, '', accent, 1.25, 0.28);
+      labelMesh.scale.setScalar(0.16);
+      labelMesh.position.set(0, 0, 0.024);
+      button.add(labelMesh);
+      lessonCardGroup.add(button);
+      targets.push(button);
+      return button;
+    };
+
+    makeHudButton('geometry-card-prev', 'Prev', '#7dd3fc', [-0.72, -0.8, 0], { type: 'card-prev' });
+    makeHudButton('geometry-card-next', 'Next', '#7dd3fc', [-0.22, -0.8, 0], { type: 'card-next' });
+    makeHudButton('geometry-card-hint', 'Hint', '#fbbf24', [0.28, -0.8, 0], { type: 'card-hint' });
+    makeHudButton('geometry-card-close', 'Close', '#f97316', [0.78, -0.8, 0], { type: 'card-close' });
+
+    const lessonCardOpen = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.14, 0.14, 0.05, 28),
+      buttonMaterial(0x38bdf8),
+    );
+    lessonCardOpen.name = 'geometry-card-open';
+    lessonCardOpen.position.set(-1.18, -0.62, -1.25);
+    lessonCardOpen.userData = { type: 'card-open' };
+    camera.add(lessonCardOpen);
+    const lessonCardOpenLabel = makePanel('Open Card', '', '#7dd3fc', 1.4, 0.28);
+    lessonCardOpenLabel.scale.setScalar(0.15);
+    lessonCardOpenLabel.position.set(0, 0.22, 0.03);
+    lessonCardOpen.add(lessonCardOpenLabel);
+    targets.push(lessonCardOpen);
+
     const compareLeftGroup = new THREE.Group();
     compareLeftGroup.position.set(2.2, 1.15, -2.35);
     worldRoot.add(compareLeftGroup);
@@ -579,7 +689,6 @@ export default function GeometryMathsLabViewer() {
     stationAnchors.challengeButtons.position.set(-3.45, 0.96, 1.25);
     stationAnchors.geometryCorner.position.set(-3.7, 0.92, -0.45);
 
-    const targets: THREE.Object3D[] = [];
     const makeButton = (name: string, label: string, color: string, position: [number, number, number], parent: THREE.Object3D, action: Record<string, unknown>) => {
       const button = new THREE.Mesh(new THREE.BoxGeometry(0.94, 0.16, 0.06), buttonMaterial(hexToNumber(color)));
       button.name = name;
@@ -649,10 +758,39 @@ export default function GeometryMathsLabViewer() {
       stationAnchors.geometryCorner.add(mesh);
     });
 
+    const refreshLessonCard = (showHint = false) => {
+      const lesson = showHint
+        ? {
+            title: `${STAGES[stageRef.current].title} Hint`,
+            body: STAGE_HINTS[stageRef.current],
+            accent: '#fbbf24',
+          }
+        : buildCardLesson(stageRef.current, selectedShapeRef.current, compareIndexRef.current, challengeIndexRef.current);
+      lessonCardPanel.material.map?.dispose();
+      lessonCardPanel.material.map = makeTextTexture(lesson.title, lesson.body, lesson.accent, 900, 360);
+      (lessonCardPanel.material as THREE.MeshBasicMaterial).needsUpdate = true;
+    };
+
+    const toggleCard = (visible = !cardVisibleRef.current) => {
+      cardVisibleRef.current = visible;
+      lessonCardGroup.visible = visible;
+      lessonCardOpen.visible = !visible;
+      setCardVisible(visible);
+      if (visible) refreshLessonCard(false);
+    };
+    toggleCardRef.current = toggleCard;
+    cardHintRef.current = () => {
+      toggleCard(true);
+      refreshLessonCard(true);
+      setFeedback(STAGE_HINTS[stageRef.current]);
+      speak(STAGE_HINTS[stageRef.current], 140 + stageRef.current);
+    };
+
     const setStageState = (nextStageIndex: number) => {
       const nextStage = STAGES[nextStageIndex];
       stageRef.current = nextStageIndex;
       setStageIndex(nextStageIndex);
+      toggleCard(true);
       stagePanel.material.map?.dispose();
       stagePanel.material.map = makeTextTexture(nextStage.title, nextStage.focus, '#38bdf8');
       (stagePanel.material as THREE.MeshBasicMaterial).needsUpdate = true;
@@ -663,7 +801,12 @@ export default function GeometryMathsLabViewer() {
       stationAnchors.matchButtons.visible = nextStageIndex >= 4;
       stationAnchors.challengeButtons.visible = nextStageIndex >= 5;
       stationAnchors.geometryCorner.visible = nextStageIndex >= 4;
-      speak(nextStage.narration, nextStageIndex);
+      refreshLessonCard(false);
+      setFeedback(nextStage.focus);
+      const narration = nextStageIndex === STAGES.length - 1
+        ? `${nextStage.narration} ${FINAL_RECAP}`
+        : `${nextStage.narration} ${nextStage.focus}`;
+      speak(narration, nextStageIndex);
     };
     stageChangeRef.current = setStageState;
 
@@ -681,6 +824,7 @@ export default function GeometryMathsLabViewer() {
         shape.color,
       );
       (infoPanel.material as THREE.MeshBasicMaterial).needsUpdate = true;
+      refreshLessonCard(false);
       setFeedback(`${shape.title}: ${shape.facts}`);
       playTone(audioRef.current, 420 + shapeIndex * 35, 0.12, shape.family === '2D' ? 'triangle' : 'sine');
       speak(`${shape.title}. ${shape.identity} ${shape.facts} Real examples include ${shape.examples}.`, 20 + shapeIndex);
@@ -699,6 +843,7 @@ export default function GeometryMathsLabViewer() {
       comparePanel.material.map?.dispose();
       comparePanel.material.map = makeTextTexture('Compare Shapes', comparison.note, '#f97316');
       (comparePanel.material as THREE.MeshBasicMaterial).needsUpdate = true;
+      refreshLessonCard(false);
       setFeedback(comparison.note);
       speak(`Compare ${leftShape.title} and ${rightShape.title}. ${comparison.note}`, 50 + nextIndex);
     };
@@ -708,6 +853,7 @@ export default function GeometryMathsLabViewer() {
       if (!item) return;
       const answerShape = SHAPES.find(shape => shape.id === item.answer)!;
       setFeedback(`${item.label} matches ${answerShape.title}. ${answerShape.compareHint}`);
+      refreshLessonCard(false);
       playTone(audioRef.current, 620, 0.12, 'square');
       speak(`${item.label} matches ${answerShape.title}. ${answerShape.identity}`, 70 + MATCH_ITEMS.findIndex(entry => entry.id === matchId));
     };
@@ -723,6 +869,7 @@ export default function GeometryMathsLabViewer() {
         const next = (challengeIndexRef.current + 1) % CHALLENGES.length;
         challengeIndexRef.current = next;
         setChallengeIndex(next);
+        refreshLessonCard(false);
       } else {
         setFeedback(`Try again. ${chosen.title} does not match this clue.`);
         playTone(audioRef.current, 240, 0.16, 'sawtooth');
@@ -767,6 +914,21 @@ export default function GeometryMathsLabViewer() {
           case 'answer':
             handleChallengeAnswer(data.answerShapeId as string);
             break;
+          case 'card-prev':
+            setStageState(Math.max(0, stageRef.current - 1));
+            break;
+          case 'card-next':
+            setStageState(Math.min(STAGES.length - 1, stageRef.current + 1));
+            break;
+          case 'card-hint':
+            cardHintRef.current();
+            break;
+          case 'card-close':
+            toggleCardRef.current(false);
+            break;
+          case 'card-open':
+            toggleCardRef.current(true);
+            break;
         }
         interactionSystem.setSelected(id);
       },
@@ -778,12 +940,16 @@ export default function GeometryMathsLabViewer() {
     const strafeDirection = new THREE.Vector3();
     const worldUp = new THREE.Vector3(0, 1, 0);
     const backLatches = [false, false];
-    const xLatches = [false, false];
+    let narrationRetryId: number | null = null;
     const clock = new THREE.Clock();
     renderer.xr.addEventListener('sessionstart', () => {
       void ensureAudioReady().then(audio => {
         playTone(audio, 430, 0.12, 'triangle');
-        speak(STAGES[stageRef.current].narration, stageRef.current);
+        stopSimulationNarration();
+        if (narrationRetryId !== null) window.clearTimeout(narrationRetryId);
+        narrationRetryId = window.setTimeout(() => {
+          speak(`${STAGES[stageRef.current].narration} ${STAGES[stageRef.current].focus}`, stageRef.current);
+        }, 280);
       });
     });
 
@@ -816,11 +982,6 @@ export default function GeometryMathsLabViewer() {
             if (stageRef.current > 0) setStageState(stageRef.current - 1);
             else void session?.end();
           }
-          const xButton = updateButtonLatch(Boolean(gamepad.buttons[4]?.pressed), xLatches[index]);
-          xLatches[index] = xButton.latched;
-          if (xButton.pressed) {
-            setShapeSelection((selectedShapeRef.current + 1) % SHAPES.length);
-          }
         });
       }
       displayRing.rotation.z = elapsed * 0.22;
@@ -842,6 +1003,7 @@ export default function GeometryMathsLabViewer() {
     return () => {
       renderer.setAnimationLoop(null);
       window.removeEventListener('resize', onResize);
+      if (narrationRetryId !== null) window.clearTimeout(narrationRetryId);
       interactionSystem.dispose();
       guidedCamera.dispose();
       audioRef.current?.oscillators.forEach(oscillator => oscillator.stop());
@@ -911,6 +1073,8 @@ export default function GeometryMathsLabViewer() {
             <div style={panelStyle}><strong>{stage.title}</strong><span style={{ color: '#7dd3fc', marginLeft: 10 }}>{selectedShape.title}</span></div>
             <div style={{ display: 'flex', gap: 8, pointerEvents: 'auto' }}>
               <button type="button" onClick={() => setMuted(value => { if (!value) stopSimulationNarration(); return !value; })} style={utilityButtonStyle}>{muted ? 'Voice off' : 'Voice on'}</button>
+              <button type="button" onClick={() => toggleCardRef.current(!cardVisible)} style={utilityButtonStyle}>{cardVisible ? 'Hide card' : 'Show card'}</button>
+              <button type="button" onClick={() => cardHintRef.current()} style={utilityButtonStyle}>Hint</button>
               <button type="button" onClick={() => stageChangeRef.current(Math.max(0, stageIndex - 1))} style={utilityButtonStyle}>Back</button>
               <button type="button" onClick={() => stageChangeRef.current(Math.min(STAGES.length - 1, stageIndex + 1))} style={utilityButtonStyle}>Next</button>
             </div>

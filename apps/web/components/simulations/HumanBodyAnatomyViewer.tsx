@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { playSimulationNarration, stopSimulationNarration } from '@/lib/simulationAudio';
+import { isQuestBackPressed, updateButtonLatch } from '@/lib/xrNavigation';
 import { createGuidedCamera } from '@/lib/world-builder/guidedCamera';
 import { createInteractionSystem } from '@/lib/world-builder/interactionSystem';
 
@@ -59,6 +60,58 @@ type AudioState = {
   oscillators: OscillatorNode[];
 };
 
+function addBox(
+  parent: THREE.Object3D,
+  name: string,
+  size: [number, number, number],
+  position: [number, number, number],
+  color: number,
+  options: { roughness?: number; metalness?: number; opacity?: number } = {},
+) {
+  const material = new THREE.MeshStandardMaterial({
+    color,
+    roughness: options.roughness ?? 0.55,
+    metalness: options.metalness ?? 0.05,
+    transparent: options.opacity !== undefined,
+    opacity: options.opacity ?? 1,
+  });
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
+  mesh.name = name;
+  mesh.position.set(...position);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  parent.add(mesh);
+  return mesh;
+}
+
+function addCylinder(
+  parent: THREE.Object3D,
+  name: string,
+  radiusTop: number,
+  radiusBottom: number,
+  height: number,
+  position: [number, number, number],
+  color: number,
+  options: { opacity?: number; radialSegments?: number } = {},
+) {
+  const mesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(radiusTop, radiusBottom, height, options.radialSegments ?? 32),
+    new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.38,
+      metalness: 0.08,
+      transparent: options.opacity !== undefined,
+      opacity: options.opacity ?? 1,
+    }),
+  );
+  mesh.name = name;
+  mesh.position.set(...position);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  parent.add(mesh);
+  return mesh;
+}
+
 function createAudioState() {
   const AudioContextCtor =
     window.AudioContext ||
@@ -67,15 +120,15 @@ function createAudioState() {
 
   const context = new AudioContextCtor();
   const masterGain = context.createGain();
-  masterGain.gain.value = 0.15;
+  masterGain.gain.value = 0.12;
   masterGain.connect(context.destination);
 
   const ambientGain = context.createGain();
-  ambientGain.gain.value = 0.13;
+  ambientGain.gain.value = 0.08;
   ambientGain.connect(masterGain);
 
   const musicGain = context.createGain();
-  musicGain.gain.value = 0.05;
+  musicGain.gain.value = 0.03;
   musicGain.connect(masterGain);
 
   const roomHum = context.createOscillator();
@@ -175,6 +228,86 @@ function makePanel(title: string, body: string, accent = '#fca5a5') {
       depthTest: false,
     }),
   );
+}
+
+function addBioLabInterior(scene: THREE.Object3D) {
+  const lab = new THREE.Group();
+  lab.name = 'human-body-biology-laboratory-interior';
+  scene.add(lab);
+
+  addBox(lab, 'bio-lab-floor', [9.4, 0.08, 8.8], [0, -0.04, -0.8], 0xdbe4ea, { roughness: 0.8 });
+  addBox(lab, 'bio-lab-rear-wall', [9.4, 3.6, 0.12], [0, 1.78, -4.85], 0xe8f0f5, { roughness: 0.74 });
+  addBox(lab, 'bio-lab-left-wall', [0.12, 3.6, 8.8], [-4.7, 1.78, -0.8], 0xdce7ee, { roughness: 0.74 });
+  addBox(lab, 'bio-lab-right-wall', [0.12, 3.6, 8.8], [4.7, 1.78, -0.8], 0xdce7ee, { roughness: 0.74 });
+  addBox(lab, 'bio-lab-ceiling', [9.4, 0.08, 8.8], [0, 3.56, -0.8], 0xf8fafc, { roughness: 0.68 });
+
+  for (let i = 0; i < 4; i += 1) {
+    const light = addBox(lab, `bio-lab-light-${i + 1}`, [1.24, 0.04, 0.32], [-2.75 + i * 1.82, 3.48, -1.25], 0xffffff);
+    (light.material as THREE.MeshStandardMaterial).emissive.setHex(0xffffff);
+    (light.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.88;
+  }
+
+  for (let i = 0; i < 3; i += 1) {
+    addBox(lab, `bio-lab-window-glass-${i + 1}`, [1.08, 1.18, 0.05], [-3 + i * 1.24, 2.1, -4.78], 0x93c5fd, { opacity: 0.42, roughness: 0.18 });
+    addBox(lab, `bio-lab-window-top-${i + 1}`, [1.2, 0.06, 0.08], [-3 + i * 1.24, 2.7, -4.73], 0xf8fafc);
+    addBox(lab, `bio-lab-window-bottom-${i + 1}`, [1.2, 0.06, 0.08], [-3 + i * 1.24, 1.48, -4.73], 0xf8fafc);
+  }
+
+  [-2.7, 0, 2.7].forEach((x, index) => {
+    addBox(lab, `bio-lab-bench-${index + 1}`, [1.92, 0.14, 0.94], [x, 0.78, -0.62], 0x334155, { roughness: 0.44 });
+    addBox(lab, `bio-lab-bench-leg-a-${index + 1}`, [0.08, 0.72, 0.08], [x - 0.81, 0.38, -0.97], 0x94a3b8, { metalness: 0.35 });
+    addBox(lab, `bio-lab-bench-leg-b-${index + 1}`, [0.08, 0.72, 0.08], [x + 0.81, 0.38, -0.97], 0x94a3b8, { metalness: 0.35 });
+  });
+
+  [-3.82, 3.82].forEach((x, side) => {
+    addBox(lab, `bio-lab-cabinet-body-${side + 1}`, [1.28, 1.82, 0.5], [x, 1.08, -4.15], 0x64748b, { roughness: 0.5 });
+    addBox(lab, `bio-lab-cabinet-door-${side + 1}`, [1.16, 1.54, 0.04], [x, 1.18, -3.88], 0xbae6fd, { opacity: 0.32, roughness: 0.16 });
+    for (let row = 0; row < 3; row += 1) {
+      addBox(lab, `bio-lab-cabinet-shelf-${side + 1}-${row + 1}`, [1.12, 0.035, 0.38], [x, 0.62 + row * 0.48, -3.92], 0xdbeafe, { opacity: 0.45 });
+    }
+  });
+
+  for (let i = 0; i < 8; i += 1) {
+    const bottle = addCylinder(lab, `bio-lab-specimen-bottle-${i + 1}`, 0.055, 0.06, 0.28, [-4 + (i % 4) * 0.24, 0.66 + Math.floor(i / 4) * 0.52, -3.58], i % 2 ? 0x86efac : 0xfca5a5, { opacity: 0.68 });
+    addBox(bottle, `bio-lab-bottle-label-${i + 1}`, [0.1, 0.045, 0.01], [0, -0.02, 0.057], 0xf8fafc);
+  }
+
+  for (let i = 0; i < 6; i += 1) {
+    const tube = addCylinder(lab, `bio-lab-test-tube-${i + 1}`, 0.03, 0.035, 0.36, [2.95 + (i % 3) * 0.22, 0.66 + Math.floor(i / 3) * 0.5, -3.56], i % 2 ? 0x93c5fd : 0xfde68a, { opacity: 0.72, radialSegments: 18 });
+    tube.rotation.z = i % 2 ? 0.1 : -0.1;
+  }
+
+  for (let i = 0; i < 4; i += 1) {
+    addCylinder(lab, `bio-lab-beaker-${i + 1}`, 0.1, 0.11, 0.28, [1.82 + i * 0.22, 0.92, -0.44], 0xbfdbfe, { opacity: 0.48 });
+  }
+  for (let i = 0; i < 3; i += 1) {
+    const pipette = addCylinder(lab, `bio-lab-pipette-${i + 1}`, 0.012, 0.018, 0.55, [2.72 + i * 0.12, 0.96, -0.62], 0xf8fafc, { opacity: 0.72, radialSegments: 12 });
+    pipette.rotation.z = Math.PI / 2.4;
+  }
+  for (let i = 0; i < 5; i += 1) {
+    const slide = addBox(lab, `bio-lab-slide-${i + 1}`, [0.32, 0.014, 0.12], [-0.55 + i * 0.22, 0.865, -0.28], 0xe0f2fe, { opacity: 0.68, roughness: 0.15 });
+    addBox(slide, `bio-lab-slide-stain-${i + 1}`, [0.08, 0.016, 0.05], [0, 0.008, 0], i % 2 ? 0xfca5a5 : 0x93c5fd, { opacity: 0.75 });
+  }
+  for (let i = 0; i < 4; i += 1) {
+    addCylinder(lab, `bio-lab-petri-dish-${i + 1}`, 0.13, 0.13, 0.035, [-3 + i * 0.2, 0.89, -0.56], 0xdbeafe, { opacity: 0.56 });
+  }
+
+  addBox(lab, 'bio-lab-notebook', [0.54, 0.035, 0.4], [-2.02, 0.89, -0.38], 0xf8fafc);
+  addBox(lab, 'bio-lab-notebook-cover', [0.58, 0.03, 0.44], [-2.06, 0.87, -0.38], 0x2563eb);
+  addCylinder(lab, 'bio-lab-sanitizer', 0.055, 0.07, 0.32, [3.28, 0.95, -0.42], 0xbfdbfe, { opacity: 0.72 });
+  addBox(lab, 'bio-lab-first-aid', [0.34, 0.22, 0.2], [3.58, 0.95, -0.42], 0xf8fafc);
+  addBox(lab, 'bio-lab-first-aid-cross-h', [0.18, 0.035, 0.01], [3.58, 0.98, -0.315], 0xef4444);
+  addBox(lab, 'bio-lab-first-aid-cross-v', [0.035, 0.16, 0.01], [3.58, 0.98, -0.31], 0xef4444);
+
+  ['BODY SYSTEMS', 'SKELETAL SUPPORT', 'ORGANS AND FUNCTION'].forEach((label, index) => {
+    const poster = makePanel(label, 'Observe - Learn - Connect', '#7dd3fc');
+    poster.position.set(-1.3 + index * 1.3, 2.42, -4.76);
+    poster.scale.set(0.4, 0.48, 1);
+    poster.name = `bio-lab-poster-${index + 1}`;
+    lab.add(poster);
+  });
+
+  return lab;
 }
 
 function addVideoScreen(root: THREE.Object3D) {
@@ -309,6 +442,7 @@ export default function HumanBodyAnatomyViewer() {
     const worldRoot = new THREE.Group();
     worldRoot.name = 'free-movable-human-body-anatomy-world';
     scene.add(worldRoot);
+    addBioLabInterior(worldRoot);
 
     const videoStage = addVideoScreen(worldRoot);
     videoRef.current = videoStage.video;
@@ -326,7 +460,7 @@ export default function HumanBodyAnatomyViewer() {
     platform.position.set(0, 0.56, -1.45);
     worldRoot.add(platform);
 
-    const ringGeometry = new THREE.TorusGeometry(1.6, 0.03, 18, 84);
+    const ringGeometry = new THREE.TorusGeometry(1.18, 0.024, 18, 84);
     const ringMaterial = new THREE.MeshStandardMaterial({
       color: 0xfca5a5,
       emissive: 0xdc2626,
@@ -392,12 +526,17 @@ export default function HumanBodyAnatomyViewer() {
     const moveDirection = new THREE.Vector3();
     const strafeDirection = new THREE.Vector3();
     const worldUp = new THREE.Vector3(0, 1, 0);
+    const backLatches = [false, false];
+    let narrationRetryId: number | null = null;
     let elapsed = 0;
-    let lastNavAt = 0;
     renderer.xr.addEventListener('sessionstart', () => {
       void ensureAudioReady().then(audio => {
         playTone(audio, 430, 0.12, 'triangle');
-        speak(HUMAN_BODY_STAGES[stageIndexRef.current].narration, stageIndexRef.current);
+        stopSimulationNarration();
+        if (narrationRetryId !== null) window.clearTimeout(narrationRetryId);
+        narrationRetryId = window.setTimeout(() => {
+          speak(HUMAN_BODY_STAGES[stageIndexRef.current].narration, stageIndexRef.current);
+        }, 320);
       });
     });
 
@@ -406,7 +545,7 @@ export default function HumanBodyAnatomyViewer() {
       elapsed += delta;
       if (!renderer.xr.isPresenting) guidedCamera.update(delta);
       else {
-        for (const source of renderer.xr.getSession()?.inputSources ?? []) {
+        for (const [index, source] of (renderer.xr.getSession()?.inputSources ?? []).entries()) {
           const gamepad = source.gamepad;
           if (!gamepad) continue;
           const horizontal = gamepad.axes[2] ?? gamepad.axes[0] ?? 0;
@@ -422,13 +561,14 @@ export default function HumanBodyAnatomyViewer() {
             if (Math.abs(vertical) > 0.16) worldRoot.position.addScaledVector(moveDirection, vertical * delta * 1.15);
             if (Math.abs(horizontal) > 0.16) worldRoot.position.addScaledVector(strafeDirection, horizontal * delta * 1.15);
           }
-          const buttons = gamepad.buttons;
-          const previousPressed =
-            (source.handedness === 'right' && buttons[1]?.pressed) ||
-            (source.handedness === 'left' && buttons[3]?.pressed);
-          if (previousPressed && elapsed - lastNavAt > 0.45) {
-            lastNavAt = elapsed;
-            goToStageRef.current(stageIndexRef.current - 1);
+          const back = updateButtonLatch(
+            isQuestBackPressed(gamepad.buttons, source.handedness),
+            backLatches[index],
+          );
+          backLatches[index] = back.latched;
+          if (back.pressed) {
+            if (stageIndexRef.current > 0) goToStageRef.current(stageIndexRef.current - 1);
+            else void renderer.xr.getSession()?.end();
           }
         }
       }
@@ -450,6 +590,7 @@ export default function HumanBodyAnatomyViewer() {
       window.removeEventListener('resize', onResize);
       videoStage.video.pause();
       videoRef.current = null;
+      if (narrationRetryId !== null) window.clearTimeout(narrationRetryId);
       interactionSystem.dispose();
       guidedCamera.dispose();
       scene.traverse(object => {
