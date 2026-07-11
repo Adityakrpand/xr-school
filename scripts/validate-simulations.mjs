@@ -70,6 +70,7 @@ const viewerNameMap = {
   'explore-our-galaxy': 'ExploreOurGalaxyViewer',
   'c10-ch07-a02-microscopic-life-observation': 'MicroscopicLifeObservationViewer',
   'human-body-anatomy': 'HumanBodyAnatomyViewer',
+  'c6-math-geometry-maths-lab': 'GeometryMathsLabViewer',
 };
 
 for (const slug of slugs) {

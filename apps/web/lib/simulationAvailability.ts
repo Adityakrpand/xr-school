@@ -13,6 +13,7 @@ export const IMPLEMENTED_SIMULATION_SLUGS = [
   'explore-our-galaxy',
   'c10-ch07-a02-microscopic-life-observation',
   'human-body-anatomy',
+  'c6-math-geometry-maths-lab',
 ] as const;
 
 type ImplementedSlug = (typeof IMPLEMENTED_SIMULATION_SLUGS)[number];
@@ -150,6 +151,16 @@ const EXTRA_IMPLEMENTED: Record<ImplementedSlug, Omit<CatalogCard, 'releaseMatur
     topic: 'Body parts, organs, and systems',
     archetype: 'immersive VR',
     minutes: 8,
+  },
+  'c6-math-geometry-maths-lab': {
+    slug: 'c6-math-geometry-maths-lab',
+    color: '#38bdf8',
+    subject: 'mathematics, geometry',
+    grade: 'Class 6',
+    title: 'Geometry Maths Lab',
+    topic: '2D and 3D shapes',
+    archetype: 'immersive VR',
+    minutes: 10,
   },
 };
 

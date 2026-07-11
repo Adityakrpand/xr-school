@@ -37,6 +37,7 @@ describe('simulation availability routing', () => {
         'c2-english-ch01-prepositions',
         'c8-10-science-solar-system',
         'human-body-anatomy',
+        'c6-math-geometry-maths-lab',
       ]),
     );
   });

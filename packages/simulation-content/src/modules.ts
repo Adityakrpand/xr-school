@@ -144,6 +144,18 @@ Ask students which parts give the body support, which parts help movement, and w
 REVISION TRIGGER
 One week later, show a blank human outline and ask students to place the heart, lungs, stomach, and major bones in the correct body regions.`;
 
+const geometryMathsLabScript = `SETUP
+Ask students to name shapes they notice in the classroom and separate flat shapes from solid objects. Non-headset students prepare a two-column list for 2D and 3D examples.
+
+DURING HEADSET BATCH
+Guide students through the geometry lab: welcome, 2D shape zone, 3D shape zone, comparison station, real-world matching station, challenge zone, and recap. Pause often so students describe sides, corners, faces, edges, and curved surfaces aloud.
+
+DEBRIEF
+Review how circle, triangle, square, and rectangle are flat shapes, while cube, cuboid, cylinder, and sphere are solid shapes. Compare square with rectangle and cube with cuboid so students can explain why shapes may look similar but still have different properties.
+
+REVISION TRIGGER
+One week later, show a mixed set of classroom objects and ask students to identify the best-matching geometric shape and one property that proves their answer.`;
+
 export const POLLINATION_MODULE: SimulationModuleRecord = {
   id: 'sim-pollination-001',
   slug: 'pollination',
@@ -675,6 +687,49 @@ export const HUMAN_BODY_ANATOMY_MODULE: SimulationModuleRecord = {
   status: 'released',
 };
 
+export const GEOMETRY_MATHS_LAB_MODULE: SimulationModuleRecord = {
+  id: 'sim-c6-math-geometry-maths-lab',
+  slug: 'c6-math-geometry-maths-lab',
+  title: 'Geometry Maths Lab',
+  summary: 'Step into an immersive Class 6 maths lab to explore 2D and 3D shapes, compare their properties, and match them with real-world objects.',
+  gradeBands: ['class6To8'],
+  subjects: ['mathematics'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c6-geometry-maths-lab'],
+  conceptIds: ['concept-geometry-basics', 'concept-2d-shapes', 'concept-3d-shapes', 'concept-shape-properties'],
+  simulationFormat: 'immersiveVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Geometry becomes easier to understand when students can stand inside a spatial maths lab, inspect shapes from different angles, and compare 2D diagrams with 3D solids through direct interaction.',
+  learningObjective: 'Students will identify important 2D and 3D shapes, describe their properties, compare similar shapes, and connect geometry to everyday objects.',
+  scientificConceptExplanation: 'Geometry helps describe the structure of shapes. Flat 2D shapes can be classified by sides, corners, and curved boundaries, while solid 3D shapes can be classified by faces, edges, vertices, and curved surfaces. Comparing these properties helps students distinguish similar-looking forms and apply geometry in daily life.',
+  misconceptionsAddressed: [
+    'A square and rectangle are completely unrelated shapes.',
+    'A circle and sphere are the same because both are round.',
+    'All solid shapes have corners and flat faces.',
+  ],
+  visualizationStrategy: 'Use a bright virtual maths lab with a central hero display, comparison stations, real-world object pedestals, stage prompts, and richly colored shape models that can be inspected in VR.',
+  interactionStrategy: 'Students select shapes, inspect rotating models, compare pairs, match real objects to geometry, and answer challenge questions using clearly labeled interactive controls.',
+  imaginationHelperStrategy: 'Abstract geometry vocabulary is grounded in visual comparison, object matching, and a stable lab environment that makes shape properties easier to notice and discuss.',
+  practicalUseCase: 'Connects textbook geometry to classroom objects, packaging, sports equipment, design, and observation of shapes in the built environment.',
+  cueCardIds: ['cue-geometry-2d-001', 'cue-geometry-3d-002', 'cue-geometry-compare-003'],
+  revisionCardIds: ['rev-geometry-properties-001'],
+  assessmentHookIds: ['assess-geometry-pre-001', 'assess-geometry-post-001'],
+  instructorScript: geometryMathsLabScript,
+  batchActivityPrompt: 'Create a table with shape name, 2D or 3D, key property, and one real-life example. Then compare square with rectangle and cube with cuboid in two sentences each.',
+  expectedDurationMinutes: 10,
+  maxSessionDurationMinutes: 12,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use smooth but slow movement in the lab.', 'Keep the learner facing the main display during explanations.'],
+  offlineContentPackId: 'pack-math-geometry-maths-lab-v1',
+  estimatedPackageSizeMb: 95,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 7,
+  status: 'released',
+};
+
 export const SIMULATION_MODULES = [
   POLLINATION_MODULE,
   CIRCUIT_MODULE,
@@ -688,4 +743,5 @@ export const SIMULATION_MODULES = [
   EXPLORE_OUR_GALAXY_MODULE,
   MICROSCOPIC_LIFE_OBSERVATION_MODULE,
   HUMAN_BODY_ANATOMY_MODULE,
+  GEOMETRY_MATHS_LAB_MODULE,
 ] as const;

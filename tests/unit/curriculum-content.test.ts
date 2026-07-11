@@ -9,9 +9,9 @@ import { validateCurriculumGraph } from '../../packages/simulation-schema/src/in
 
 describe('canonical curriculum content', () => {
   it('defines typed courses, chapters, and concepts for every working simulation', () => {
-    expect(COURSES).toHaveLength(9);
-    expect(CURRICULUM_CHAPTERS).toHaveLength(10);
-    expect(LEARNING_CONCEPTS.length).toBeGreaterThanOrEqual(35);
+    expect(COURSES).toHaveLength(10);
+    expect(CURRICULUM_CHAPTERS).toHaveLength(11);
+    expect(LEARNING_CONCEPTS.length).toBeGreaterThanOrEqual(39);
 
     const linkedSimulationIds = new Set(COURSES.flatMap(course => course.simulationIds));
     for (const simulation of SIMULATION_MODULES) {
@@ -57,6 +57,7 @@ describe('canonical curriculum content', () => {
       'sim-explore-our-galaxy',
       'sim-c10-ch07-a02-microscopic-life-observation',
       'sim-human-body-anatomy',
+      'sim-c6-math-geometry-maths-lab',
     ]) {
       expect(linkedSimulationIds.has(simulationId)).toBe(true);
     }
@@ -73,6 +74,9 @@ describe('canonical curriculum content', () => {
     expect(CURRICULUM_CHAPTERS.find(
       item => item.id === 'chapter-cbse-c10-life-processes',
     )?.simulationIds).toEqual(['sim-c10-ch07-a02-microscopic-life-observation']);
+    expect(CURRICULUM_CHAPTERS.find(
+      item => item.id === 'chapter-cbse-c6-geometry',
+    )?.simulationIds).toEqual(['sim-c6-math-geometry-maths-lab']);
     expect(CURRICULUM_CHAPTERS.find(
       item => item.id === 'chapter-cbse-c5-from-tasting-to-digesting',
     )?.simulationIds).toEqual(['sim-c05-ch03-a02-introduction-of-digestive-system', 'sim-human-body-anatomy']);
