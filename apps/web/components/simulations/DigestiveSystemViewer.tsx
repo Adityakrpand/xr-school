@@ -85,6 +85,14 @@ type DigestiveAssetSlot = {
 
 const DIGESTIVE_GLTF_ASSET_SLOTS: readonly DigestiveAssetSlot[] = [
   {
+    id: 'taste-kingdom-food-islands',
+    stageId: 'welcome',
+    src: '/assets/digestive/taste-kingdom-food-islands.glb',
+    label: 'Five floating taste islands with sweet, sour, salty, bitter, and umami food props',
+    position: [0, 0, 0],
+    scale: 1,
+  },
+  {
     id: 'teacher-guide-rig',
     stageId: 'welcome',
     src: '/assets/digestive/teacher-guide-rig.glb',
@@ -201,6 +209,15 @@ const ACTION_LABELS: Record<string, string> = {
   'sort-water-healthy': 'Water -> Healthy',
   'sort-soft-drink-unhealthy': 'Soft Drink -> Limit Often',
 };
+
+const TASTE_DETECTIVE_CHALLENGES = [
+  { food: 'Chocolate', taste: 'Sweet', fact: 'Sweet foods are often rich in natural or added sugars.' },
+  { food: 'Lemon', taste: 'Sour', fact: 'Lemon tastes sour because it contains natural citric acid.' },
+  { food: 'Popcorn with salt', taste: 'Salty', fact: 'Salt creates the salty taste.' },
+  { food: 'Bitter gourd', taste: 'Bitter', fact: 'Some nutritious foods have a naturally bitter taste.' },
+  { food: 'Mushroom soup', taste: 'Umami', fact: 'Umami is a savory taste found in mushrooms, tomato, cheese, and soup.' },
+] as const;
+const BASIC_TASTES = ['Sweet', 'Sour', 'Salty', 'Bitter', 'Umami'] as const;
 
 const ACTION_FEEDBACK: Record<string, string> = {
   'start-journey': 'The digestive pathway is glowing. First stop: the mouth!',
@@ -1175,6 +1192,9 @@ export default function DigestiveSystemViewer() {
   }>({});
 
   const [started, setStarted] = useState(false);
+  const [tastePrelude, setTastePrelude] = useState(false);
+  const [tasteChallengeIndex, setTasteChallengeIndex] = useState(0);
+  const [tasteFeedback, setTasteFeedback] = useState('Choose the taste that best matches this food.');
   const [vrSupported, setVrSupported] = useState(false);
   const [stageIndex, setStageIndex] = useState(0);
   const [progress, setProgress] = useState<DigestiveProgress>(() => createDigestiveProgress());
@@ -1613,6 +1633,22 @@ export default function DigestiveSystemViewer() {
     speak(DIGESTIVE_STAGES[0].teacherNarration, 0);
   }, [speak]);
 
+  const answerTasteChallenge = useCallback((taste: (typeof BASIC_TASTES)[number]) => {
+    const challenge = TASTE_DETECTIVE_CHALLENGES[tasteChallengeIndex];
+    if (taste !== challenge.taste) {
+      setTasteFeedback('Try again. Imagine the food on your tongue and compare the five tastes.');
+      return;
+    }
+    setTasteFeedback(`Correct! ${challenge.fact}`);
+    speak(`${challenge.food} is ${challenge.taste.toLowerCase()}. ${challenge.fact}`, 30 + tasteChallengeIndex);
+    if (tasteChallengeIndex < TASTE_DETECTIVE_CHALLENGES.length - 1) {
+      window.setTimeout(() => {
+        setTasteChallengeIndex(index => index + 1);
+        setTasteFeedback('Excellent. Classify the next food.');
+      }, 550);
+    }
+  }, [speak, tasteChallengeIndex]);
+
   const enterVR = useCallback(async () => {
     if (!rendererRef.current) return;
     setStarted(true);
@@ -1683,7 +1719,7 @@ export default function DigestiveSystemViewer() {
         </div>
       )}
 
-      {!started && (
+      {!started && !tastePrelude && (
         <div style={{
           position: 'absolute',
           inset: 0,
@@ -1732,7 +1768,10 @@ export default function DigestiveSystemViewer() {
             <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
               <button
                 type="button"
-                onClick={startBrowserLesson}
+                onClick={() => {
+                  setTastePrelude(true);
+                  speak('Welcome, Food Detective! First explore sweet, sour, salty, bitter, and umami tastes.', 29);
+                }}
                 style={{
                   padding: '14px 22px',
                   borderRadius: 12,
@@ -1743,7 +1782,7 @@ export default function DigestiveSystemViewer() {
                   cursor: 'pointer',
                 }}
               >
-                Open Lesson
+                Start Taste Detective
               </button>
               {vrSupported && (
                 <button
@@ -1763,6 +1802,29 @@ export default function DigestiveSystemViewer() {
                 </button>
               )}
             </div>
+          </section>
+        </div>
+      )}
+
+      {!started && tastePrelude && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 21, display: 'grid', placeItems: 'center', padding: 24,
+          background: 'radial-gradient(circle at 50% 30%, rgba(124,58,237,.76), rgba(3,13,27,.94) 72%)',
+        }}>
+          <section style={{ width: 'min(760px, 100%)', color: '#f8fafc', textAlign: 'center' }}>
+            <div style={{ color: '#fde68a', fontWeight: 900, letterSpacing: '.14em' }}>ACTIVITY 1 · TASTE KINGDOM</div>
+            <h1 style={{ margin: '12px 0 4px', fontSize: 'clamp(2rem,6vw,4rem)' }}>Which taste is it?</h1>
+            <p style={{ color: '#ddd6fe' }}>Challenge {tasteChallengeIndex + 1} / {TASTE_DETECTIVE_CHALLENGES.length}</p>
+            <div style={{ margin: '18px auto', padding: 24, maxWidth: 500, borderRadius: 22, background: 'rgba(15,23,42,.78)', border: '1px solid rgba(253,230,138,.45)' }}>
+              <div style={{ fontSize: 'clamp(2rem,8vw,4.8rem)', fontWeight: 950 }}>{TASTE_DETECTIVE_CHALLENGES[tasteChallengeIndex].food}</div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 10 }}>
+              {BASIC_TASTES.map(taste => <button key={taste} type="button" onClick={() => answerTasteChallenge(taste)} style={{ padding: '12px 18px', borderRadius: 999, border: '1px solid #c4b5fd', background: '#4c1d95', color: 'white', fontWeight: 900, cursor: 'pointer' }}>{taste}</button>)}
+            </div>
+            <p style={{ minHeight: 48, color: '#fef3c7', fontWeight: 800 }}>{tasteFeedback}</p>
+            {tasteChallengeIndex === TASTE_DETECTIVE_CHALLENGES.length - 1 && tasteFeedback.startsWith('Correct') && (
+              <button type="button" onClick={startBrowserLesson} style={{ padding: '14px 22px', borderRadius: 12, border: '1px solid #67e8f9', background: 'linear-gradient(135deg,#0891b2,#2563eb)', color: 'white', fontWeight: 900, cursor: 'pointer' }}>Enter the Digestive System</button>
+            )}
           </section>
         </div>
       )}

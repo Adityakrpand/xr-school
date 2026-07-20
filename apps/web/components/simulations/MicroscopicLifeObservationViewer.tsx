@@ -416,6 +416,7 @@ export default function MicroscopicLifeObservationViewer() {
     video.loop = true;
     video.muted = true;
     video.playsInline = true;
+    video.preload = 'metadata';
     video.crossOrigin = 'anonymous';
     videoRef.current = video;
     const videoTexture = new THREE.VideoTexture(video);

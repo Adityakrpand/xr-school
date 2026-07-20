@@ -181,7 +181,7 @@ function addVideoSky(root: THREE.Object3D) {
   video.loop = true;
   video.muted = true;
   video.playsInline = true;
-  video.preload = 'auto';
+  video.preload = 'metadata';
 
   const texture = new THREE.VideoTexture(video);
   texture.colorSpace = THREE.SRGBColorSpace;

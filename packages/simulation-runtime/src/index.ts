@@ -83,12 +83,18 @@ export type {
   PollinationModel,
   PollinationSnapshot,
 } from './models/pollinationModel';
+export { createFoodExplorerModel, FOOD_EXPLORER_ZONES, FOOD_JOURNEY, FOOD_SOURCES, PLANT_PARTS, ANIMAL_DIETS } from './models/foodExplorerModel';
+export type { FoodExplorerModel, FoodExplorerSnapshot, FoodExplorerZone, FoodSource, PlantPart, DietType } from './models/foodExplorerModel';
 export { evaluateCircuit } from './models/circuitModel';
 export type {
   CircuitInput,
   CircuitOutput,
 } from './models/circuitModel';
 export { evaluateMatterState } from './models/matterStateModel';
+export { FOOD_SAMPLES, CONTROL_TRIALS, createCarbohydrateTest, prepareSample, addIodineDrop, interpretCarbohydrateTest } from './models/carbohydrateTestModel';
+export type { FoodSample, FoodSampleId, CarbohydrateTestState } from './models/carbohydrateTestModel';
+export { PROTEIN_SAMPLES, PROTEIN_CONTROL_TRIALS, createProteinTest, prepareProteinSample, addCopperSulphate, addSodiumHydroxide, mixProteinTest, interpretProteinTest } from './models/proteinTestModel';
+export type { ProteinSample, ProteinSampleId, ProteinTestState } from './models/proteinTestModel';
 export type {
   MatterPhase,
   MatterStateOutput,

@@ -1,5 +1,6 @@
 let simulationAudioContext: AudioContext | null = null;
 let currentNarrationAudio: HTMLAudioElement | null = null;
+let currentNarrationUtterance: SpeechSynthesisUtterance | null = null;
 
 function getSpeechSynthesis() {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
@@ -43,14 +44,26 @@ function speakText(text: string) {
 
   speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.87;
-  utterance.pitch = 1.02;
+  currentNarrationUtterance = utterance;
+  utterance.lang = 'en-IN';
+  utterance.rate = 0.9;
+  utterance.pitch = 1.06;
   utterance.volume = 1.0;
+  utterance.onend = () => {
+    if (currentNarrationUtterance === utterance) currentNarrationUtterance = null;
+  };
+  utterance.onerror = () => {
+    if (currentNarrationUtterance === utterance) currentNarrationUtterance = null;
+  };
 
   const trySpeak = () => {
     const voices = speechSynthesis.getVoices();
     if (voices.length) {
       const voice =
+        voices.find(v => v.lang === 'en-IN' && v.localService) ||
+        voices.find(v => v.lang === 'en-IN') ||
+        voices.find(v => v.name.includes('Microsoft Neerja')) ||
+        voices.find(v => v.name.includes('Google हिन्दी')) ||
         voices.find(v => v.name === 'Samantha') ||
         voices.find(v => v.name.includes('Google US English')) ||
         voices.find(v => v.name.includes('Karen')) ||
@@ -59,11 +72,15 @@ function speakText(text: string) {
         voices.find(v => v.lang.startsWith('en'));
       if (voice) utterance.voice = voice;
     }
+    // Some Quest/Chromium builds pause synthesis after the page is backgrounded.
+    // Resume before every lesson cue so controller-triggered narration remains reliable.
+    speechSynthesis.resume();
     speechSynthesis.speak(utterance);
   };
 
-  if (speechSynthesis.getVoices().length > 0) trySpeak();
-  else speechSynthesis.addEventListener('voiceschanged', trySpeak, { once: true });
+  // Speak immediately with the browser default even when the voice list is empty.
+  // `voiceschanged` is not guaranteed to fire on standalone Quest browsers.
+  trySpeak();
 }
 
 async function playAudioFile(audioUrl: string) {
@@ -93,4 +110,5 @@ export function stopSimulationNarration() {
   currentNarrationAudio?.pause();
   currentNarrationAudio = null;
   getSpeechSynthesis()?.cancel();
+  currentNarrationUtterance = null;
 }

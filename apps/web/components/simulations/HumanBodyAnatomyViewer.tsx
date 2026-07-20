@@ -316,7 +316,9 @@ function addVideoScreen(root: THREE.Object3D) {
   video.loop = true;
   video.muted = true;
   video.playsInline = true;
-  video.preload = 'auto';
+  // Keep the 26 MB lesson video out of the initial page download. Playback is
+  // already initiated by the learner, so metadata is enough for scene setup.
+  video.preload = 'metadata';
 
   const texture = new THREE.VideoTexture(video);
   texture.colorSpace = THREE.SRGBColorSpace;
