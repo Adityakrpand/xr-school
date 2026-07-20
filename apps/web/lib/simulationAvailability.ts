@@ -1,0 +1,256 @@
+import type { ScienceSimulationCatalogItem } from './scienceCatalog.generated';
+
+export const IMPLEMENTED_SIMULATION_SLUGS = [
+  'pollination',
+  'circuit',
+  'c9-ch01-a02-states-of-matter',
+  'c6-ch01-a01-sources-of-food',
+  'c5-ch07-a03-soluble-and-insoluble-substances',
+  'c5-ch03-a02-introduction-of-digestive-system',
+  'c1-math-ch01-introduction-to-money',
+  'c2-english-ch01-prepositions',
+  'c8-10-science-solar-system',
+  'explore-our-galaxy',
+  'c10-ch07-a02-microscopic-life-observation',
+  'human-body-anatomy',
+  'c6-math-geometry-maths-lab',
+  'c10-chemical-reactions-laboratory',
+  'c5-ch02-a01-snakes-and-their-types',
+  'c5-photosynthesis-plant-food-journey',
+  'c6-ch02-a01-test-the-presence-of-carbohydrates',
+  'c6-ch02-a02-test-the-presence-of-proteins',
+] as const;
+
+type ImplementedSlug = (typeof IMPLEMENTED_SIMULATION_SLUGS)[number];
+
+export type CatalogCard = {
+  slug: string;
+  title: string;
+  topic: string;
+  subject: string;
+  grade: string;
+  archetype: string;
+  minutes: number;
+  color: string;
+  releaseMaturity: 'catalogued' | 'inDevelopment' | 'internalQA' | 'pilotReady' | 'schoolValidated';
+  href?: string;
+};
+
+const EXTRA_IMPLEMENTED: Record<ImplementedSlug, Omit<CatalogCard, 'releaseMaturity' | 'href'>> = {
+  pollination: {
+    slug: 'pollination',
+    color: '#34d399',
+    subject: 'biology, environmental science',
+    grade: 'Class 6-10',
+    title: 'Plant Pollination & Growth Cycle',
+    topic: 'Plant reproduction',
+    archetype: 'immersive VR',
+    minutes: 10,
+  },
+  circuit: {
+    slug: 'circuit',
+    color: '#fbbf24',
+    subject: 'physics',
+    grade: 'Class 6-10',
+    title: "Electric Circuits & Resistance (Ohm's Law)",
+    topic: 'Electricity',
+    archetype: 'interactive 3D',
+    minutes: 8,
+  },
+  'c9-ch01-a02-states-of-matter': {
+    slug: 'c9-ch01-a02-states-of-matter',
+    color: '#38bdf8',
+    subject: 'chemistry, physics',
+    grade: 'Class 9',
+    title: 'States of Matter Particle Lab',
+    topic: 'Matter in Our Surroundings',
+    archetype: 'interactive3d',
+    minutes: 10,
+  },
+  'c6-ch01-a01-sources-of-food': {
+    slug: 'c6-ch01-a01-sources-of-food',
+    color: '#4ade80',
+    subject: 'science, biology',
+    grade: 'Class 6',
+    title: 'Young Food Explorer',
+    topic: 'Food Sources & Animal Diets',
+    archetype: 'immersive VR field trip',
+    minutes: 16,
+  },
+  'c5-ch07-a03-soluble-and-insoluble-substances': {
+    slug: 'c5-ch07-a03-soluble-and-insoluble-substances',
+    color: '#67e8f9',
+    subject: 'environmentalScience, science',
+    grade: 'Class 5',
+    title: 'Soluble and Insoluble Substances Lab',
+    topic: 'Experiments with Water',
+    archetype: 'experimentBench',
+    minutes: 8,
+  },
+  'c5-ch03-a02-introduction-of-digestive-system': {
+    slug: 'c5-ch03-a02-introduction-of-digestive-system',
+    color: '#fb7185',
+    subject: 'environmentalScience, biology',
+    grade: 'Class 5',
+    title: 'Introduction to the Digestive System',
+    topic: 'From Tasting to Digesting',
+    archetype: 'immersive VR',
+    minutes: 10,
+  },
+  'c1-math-ch01-introduction-to-money': {
+    slug: 'c1-math-ch01-introduction-to-money',
+    color: '#f59e0b',
+    subject: 'mathematics',
+    grade: 'Class 1',
+    title: 'Introduction to Money',
+    topic: 'Money values and shopping',
+    archetype: 'interactive 3D',
+    minutes: 9,
+  },
+  'c2-english-ch01-prepositions': {
+    slug: 'c2-english-ch01-prepositions',
+    color: '#22c55e',
+    subject: 'english',
+    grade: 'Class 2',
+    title: 'Preposition Adventure',
+    topic: 'Position words',
+    archetype: 'immersive VR',
+    minutes: 9,
+  },
+  'c8-10-science-solar-system': {
+    slug: 'c8-10-science-solar-system',
+    color: '#60a5fa',
+    subject: 'science, physics, geography',
+    grade: 'Class 8-10',
+    title: 'Exploring Our Solar System',
+    topic: 'Stars and the Solar System',
+    archetype: 'immersive VR',
+    minutes: 10,
+  },
+  'explore-our-galaxy': {
+    slug: 'explore-our-galaxy',
+    color: '#93c5fd',
+    subject: 'science, astronomy',
+    grade: 'Class 8-10',
+    title: 'Explore Our Galaxy',
+    topic: 'Stars, planets, and the Milky Way',
+    archetype: 'immersive VR',
+    minutes: 8,
+  },
+  'c10-ch07-a02-microscopic-life-observation': {
+    slug: 'c10-ch07-a02-microscopic-life-observation',
+    color: '#6ee7b7',
+    subject: 'biology, science',
+    grade: 'Class 10',
+    title: 'Microscopic Life Observation Lab',
+    topic: 'Life Processes',
+    archetype: 'immersive VR',
+    minutes: 8,
+  },
+  'human-body-anatomy': {
+    slug: 'human-body-anatomy',
+    color: '#fca5a5',
+    subject: 'biology, environmental science',
+    grade: 'Class 5',
+    title: 'Human Body Anatomy',
+    topic: 'Body parts, organs, and systems',
+    archetype: 'immersive VR',
+    minutes: 8,
+  },
+  'c6-math-geometry-maths-lab': {
+    slug: 'c6-math-geometry-maths-lab',
+    color: '#38bdf8',
+    subject: 'mathematics, geometry',
+    grade: 'Class 6',
+    title: 'Geometry Maths Lab',
+    topic: '2D and 3D shapes',
+    archetype: 'immersive VR',
+    minutes: 10,
+  },
+  'c10-chemical-reactions-laboratory': {
+    slug: 'c10-chemical-reactions-laboratory',
+    color: '#22d3ee',
+    subject: 'chemistry, science',
+    grade: 'Class 10',
+    title: 'Chemical Reactions Laboratory',
+    topic: 'Chemical Reactions and Equations',
+    archetype: 'immersive practical lab',
+    minutes: 25,
+  },
+  'c5-ch02-a01-snakes-and-their-types': {
+    slug: 'c5-ch02-a01-snakes-and-their-types',
+    color: '#65a30d',
+    subject: 'environmental science, wildlife',
+    grade: 'Class 5',
+    title: 'Snakes and Their Types',
+    topic: "A Snake Charmer's Story",
+    archetype: 'immersive wildlife story',
+    minutes: 10,
+  },
+  'c5-photosynthesis-plant-food-journey': {
+    slug: 'c5-photosynthesis-plant-food-journey',
+    color: '#22c55e',
+    subject: 'science, biology',
+    grade: 'Class 5',
+    title: 'Photosynthesis: How Plants Make Food',
+    topic: 'Plants and life on Earth',
+    archetype: 'immersive microscopic journey',
+    minutes: 12,
+  },
+  'c6-ch02-a01-test-the-presence-of-carbohydrates': {
+    slug: 'c6-ch02-a01-test-the-presence-of-carbohydrates',
+    color: '#0e7490',
+    subject: 'science, biology',
+    grade: 'Class 6',
+    title: 'Test the Presence of Carbohydrates',
+    topic: 'Components of Food',
+    archetype: 'controlled practical lab',
+    minutes: 10,
+  },
+  'c6-ch02-a02-test-the-presence-of-proteins': {
+    slug: 'c6-ch02-a02-test-the-presence-of-proteins', color: '#7c3aed', subject: 'science, biology', grade: 'Class 6', title: 'Test the Presence of Proteins', topic: 'Components of Food', archetype: 'controlled practical lab', minutes: 10,
+  },
+};
+
+const COLORS: Record<string, string> = {
+  modelInspection: '#38bdf8',
+  scenario: '#fb7185',
+  sortingBoard: '#4ade80',
+  guidedTour: '#a78bfa',
+  experimentBench: '#67e8f9',
+  processTimeline: '#fb923c',
+  measurementGraph: '#f472b6',
+  systemMap: '#2dd4bf',
+};
+
+const implementedSet = new Set<string>(IMPLEMENTED_SIMULATION_SLUGS);
+
+function toCataloguedCard(item: ScienceSimulationCatalogItem): CatalogCard {
+  return {
+    slug: item.slug,
+    color: COLORS[item.primaryArchetype] ?? '#38bdf8',
+    subject: item.subject,
+    grade: `Class ${item.classLevel}`,
+    title: item.title,
+    topic: item.topic,
+    archetype: item.primaryArchetype,
+    minutes: item.expectedDurationMinutes,
+    releaseMaturity: item.releaseMaturity,
+  };
+}
+
+export function getSimulationCatalogSections(catalog: readonly ScienceSimulationCatalogItem[]) {
+  const launchable = IMPLEMENTED_SIMULATION_SLUGS.map(slug => ({
+    ...EXTRA_IMPLEMENTED[slug],
+    releaseMaturity: 'internalQA' as const,
+    href: `/simulations/${slug}`,
+  }));
+  const catalogued = catalog
+    .filter(item => !implementedSet.has(item.slug))
+    .map(toCataloguedCard);
+
+  return {
+    launchable,
+    catalogued,
+  };
+}

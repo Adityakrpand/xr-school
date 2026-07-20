@@ -9,9 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # ── Build & validate before deploying ─────────────────────────────────────
-  build:
-    name: Build web
+  verify:
+    name: Verify release candidate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,30 +18,26 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "23"
+          node-version: "22"
           cache: "npm"
-          cache-dependency-path: apps/web/package-lock.json
 
       - name: Install dependencies
-        run: npm install
-        working-directory: apps/web
+        run: npm ci
 
-      - name: TypeScript check
-        run: ./node_modules/.bin/tsc --noEmit
-        working-directory: apps/web
+      - name: Run strict verification
+        run: npm run verify
 
-      - name: Validate simulations
-        run: node scripts/validate-simulations.mjs
+      - name: Verify generated sources are current
+        run: |
+          git diff --exit-code -- \
+            generated/openapi/openapi.json \
+            apps/web/lib/scienceCatalog.generated.ts \
+            apps/web/lib/curriculumSearch.generated.ts
 
-      - name: Next.js build
-        run: npm run build
-        working-directory: apps/web
-
-  # ── Deploy to Vercel (production) ─────────────────────────────────────────
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    needs: build
+    needs: verify
     environment:
       name: production
       url: ${{ steps.deploy.outputs.url }}
@@ -67,8 +62,8 @@ jobs:
       - name: Deploy prebuilt artifact
         id: deploy
         run: |
-          URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
-          echo "url=$URL" >> $GITHUB_OUTPUT
+          URL=$(vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "Deployed to: $URL"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

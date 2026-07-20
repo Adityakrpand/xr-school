@@ -1,0 +1,747 @@
+import type { SimulationModuleRecord } from '../../simulation-schema/src/index';
+
+const pollinationScript = `SETUP
+Ask the class why flowers are brightly coloured and what might move pollen between plants. Non-headset students sketch a flower and predict where pollen travels.
+
+DURING HEADSET BATCH
+Guide students through the garden stages: flower parts, pollen, pollinator arrival, cross-pollination, fertilisation, seed formation, germination, and new plant growth. Pause when pollination and fertilisation are contrasted.
+
+DEBRIEF
+Ask students to sequence the process and explain why pollination is not the same as fertilisation. Connect the VR stages to the textbook flower diagram.
+
+REVISION TRIGGER
+One week later, show a flower diagram and ask students to identify the stage where pollen transfer happens and the stage where seed formation begins.`;
+
+const circuitScript = `SETUP
+Show a simple circuit diagram and ask students to predict what happens when the switch opens and closes. Non-headset students calculate current for 9V with 10 ohm, 50 ohm, and 200 ohm resistors.
+
+DURING HEADSET BATCH
+Have students toggle the switch, observe electron flow, change resistance, and compare current with bulb brightness. Pause at each resistor change for a predict-observe-explain prompt.
+
+DEBRIEF
+Ask why the bulb becomes dimmer when resistance increases. Connect the visible electron flow to Ohm's Law, V = I x R.
+
+REVISION TRIGGER
+In the next session, give one new resistor value and ask students to predict current and relative brightness before calculating.`;
+
+const statesOfMatterScript = `SETUP
+Ask students what changes when ice becomes water and water becomes vapour. Non-headset students predict how particle spacing and speed differ in solids, liquids, and gases.
+
+DURING HEADSET BATCH
+Guide students through solid, liquid, gas, and phase-change stages. Ask them to adjust heat and observe particle motion, spacing, shape, and container behaviour.
+
+DEBRIEF
+Compare the three particle arrangements and ask why gases fill the container while solids keep their shape. Connect observations to kinetic particle theory.
+
+REVISION TRIGGER
+One week later, show particle diagrams and ask students to identify the state and explain what heating or cooling would do next.`;
+
+const sourcesOfFoodScript = `SETUP
+Ask students to name foods from their last meal and predict whether each came mainly from a plant, an animal, or fungi. Non-headset students prepare a three-column sorting table.
+
+DURING HEADSET BATCH
+Guide students through the pantry, farm, dairy, and market stations. Ask them to inspect each food token, place it on the correct source platform, and explain the visible clue before confirming.
+
+DEBRIEF
+Review any misplaced foods and separate everyday food names from biological source categories. Connect grains, pulses, fruits, milk, eggs, honey, and mushrooms to their living sources.
+
+REVISION TRIGGER
+One week later, give a mixed meal and ask students to classify every ingredient by source and justify one tricky example.`;
+
+const solubilityScript = `SETUP
+Place salt, sugar, sand, chalk powder, and oil on a table and ask students to predict which will dissolve in water. Non-headset students prepare a predict-observe-explain table.
+
+DURING HEADSET BATCH
+Guide students through each safe virtual trial. Ask them to choose a substance, make a prediction, add it to water, stir, and observe whether the mixture becomes clear, cloudy, settled, or separated.
+
+DEBRIEF
+Compare soluble and insoluble substances and separate dissolving from melting, floating, and simply disappearing. Ask students why sand remains visible while salt does not.
+
+REVISION TRIGGER
+One week later, show a new material and ask students to predict solubility, state the evidence they would look for, and describe a fair test.`;
+
+const digestiveSystemScript = `SETUP
+Ask students where a bite of food goes after they swallow it. Non-headset students draw a simple body outline and predict the order of the organs.
+
+DURING HEADSET BATCH
+Guide students through the ten stages from the mouth to waste removal. Pause at each interaction so students connect the visible action—chewing, muscle waves, churning, absorption, and water recovery—to the organ's function.
+
+DEBRIEF
+Ask students to sequence Mouth, Esophagus, Stomach, Small Intestine, Large Intestine, Rectum, and Anus. Review how the liver, gallbladder, and pancreas support the pathway without food passing through them.
+
+REVISION TRIGGER
+One week later, show an unlabeled digestive-system pathway and ask students to label the organs, name where nutrients and water are absorbed, and explain one healthy digestion habit.`;
+
+const moneyTownScript = `SETUP
+Show Indian coins and notes and ask students to name where they have seen them used. Non-headset students prepare a simple shop table with item prices.
+
+DURING HEADSET BATCH
+Guide students through Magic Money Town. Ask them to inspect coins and notes, identify values, buy simple items, and match money to prices using playful shop interactions.
+
+DEBRIEF
+Ask students to separate coins from notes, name the values, and explain why we count money carefully before buying.
+
+REVISION TRIGGER
+One week later, show mixed coin and note pictures and ask students to identify each value and choose enough money for one simple item.`;
+
+const prepositionAdventureScript = `SETUP
+Place a toy, box, table, and chair in front of the class. Ask students to describe where the toy is using words such as in, on, under, behind, and between.
+
+DURING HEADSET BATCH
+Guide students through a child-friendly adventure where they place objects in different positions and hear the correct preposition in context after each action.
+
+DEBRIEF
+Ask students to act out each preposition with classroom objects, then speak one sentence using the target word.
+
+REVISION TRIGGER
+One week later, show three position pictures and ask students to choose the matching preposition and say a complete sentence.`;
+
+const solarSystemMissionScript = `SETUP
+Ask students to name planets they know and predict why planets look different. Non-headset students prepare a planet-order strip from Mercury to Neptune.
+
+DURING HEADSET BATCH
+Guide students from a spacecraft cockpit through the Sun, rocky planets, asteroid belt, gas giants, ice giants, dwarf planets, and comet paths. Pause for scale, orbit, and feature scans.
+
+DEBRIEF
+Ask students to sequence the eight planets, compare inner and outer planets, and explain one reason Earth is special for life.
+
+REVISION TRIGGER
+One week later, show planet feature cards and ask students to match each clue to the correct planet or region of the solar system.`;
+
+const exploreOurGalaxyScript = `SETUP
+Ask students what they think a galaxy contains. Non-headset students list stars, planets, dust, gas, and any objects they expect to see in deep space.
+
+DURING HEADSET BATCH
+Guide students through the separate galaxy video tour. Ask them to look around slowly, compare stars with planets, notice glowing gas and dust, and connect the Solar System to the larger Milky Way.
+
+DEBRIEF
+Ask students to explain the difference between a star, a planet, a solar system, and a galaxy. Emphasize that the Solar System is only a tiny part of the Milky Way.
+
+REVISION TRIGGER
+One week later, show a space image and ask students to identify whether the clue describes a planet, star, solar system, or galaxy.`;
+
+const microscopicLifeObservationScript = `SETUP
+Show students a clear water sample and ask what might be living inside even if the water looks empty. Non-headset students prepare an observation table with shape, colour, and movement columns.
+
+DURING HEADSET BATCH
+Guide students through the microscope theatre. Ask them to watch the video field, identify oval protists, green algae-like forms, and ciliated cells, then separate direct observations from guesses.
+
+DEBRIEF
+Ask students why a microscope is needed to study microorganisms. Review how motion, shape, internal colour, and repeated observation help students describe microscopic life responsibly.
+
+REVISION TRIGGER
+One week later, show a still microscope image and ask students to write three observations and one careful inference about the living organisms shown.`;
+
+const humanBodyAnatomyScript = `SETUP
+Ask students to name body parts they already know and predict which internal organs are protected inside the chest and abdomen. Non-headset students sketch a simple body outline and label the parts they can remember.
+
+DURING HEADSET BATCH
+Guide students through the anatomy tour: full body view, skeleton, muscles, internal organs, and body systems working together. Pause at each stage to connect visible structure with function.
+
+DEBRIEF
+Ask students which parts give the body support, which parts help movement, and which organs carry out breathing, circulation, and digestion. Reinforce that body systems work together rather than separately.
+
+REVISION TRIGGER
+One week later, show a blank human outline and ask students to place the heart, lungs, stomach, and major bones in the correct body regions.`;
+
+const geometryMathsLabScript = `SETUP
+Ask students to name shapes they notice in the classroom and separate flat shapes from solid objects. Non-headset students prepare a two-column list for 2D and 3D examples.
+
+DURING HEADSET BATCH
+Guide students through the geometry lab: welcome, 2D shape zone, 3D shape zone, comparison station, real-world matching station, challenge zone, and recap. Pause often so students describe sides, corners, faces, edges, and curved surfaces aloud.
+
+DEBRIEF
+Review how circle, triangle, square, and rectangle are flat shapes, while cube, cuboid, cylinder, and sphere are solid shapes. Compare square with rectangle and cube with cuboid so students can explain why shapes may look similar but still have different properties.
+
+REVISION TRIGGER
+One week later, show a mixed set of classroom objects and ask students to identify the best-matching geometric shape and one property that proves their answer.`;
+
+export const POLLINATION_MODULE: SimulationModuleRecord = {
+  id: 'sim-pollination-001',
+  slug: 'pollination',
+  title: 'Plant Pollination & Growth Cycle',
+  summary: 'Walk through a flowering garden. Watch pollen transfer, seed formation, germination, and a full plant life cycle unfold in immersive VR.',
+  gradeBands: ['class6To8', 'class9To10'],
+  subjects: ['biology', 'environmentalScience'],
+  applicableBoards: ['cbse', 'icse'],
+  curriculumMapIds: ['cm-biology-pollination-class6to8', 'cm-biology-plant-reproduction-class9to10'],
+  conceptIds: ['concept-flower-structure', 'concept-pollination', 'concept-fertilisation', 'concept-seed-germination'],
+  simulationFormat: 'immersiveVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Pollination occurs at a scale and speed students cannot witness directly in class. VR lets them stand inside a living garden, follow pollen transfer spatially, and see the hidden transition from pollination to fertilisation and seed formation.',
+  learningObjective: 'Students will be able to sequence the 8 stages of plant reproduction from pollen production through germination.',
+  scientificConceptExplanation: 'Flowering plants reproduce when pollen from the stamen reaches a stigma, enabling fertilisation inside the ovary. The fertilised ovule becomes a seed, and the seed can germinate into a new plant when conditions are suitable.',
+  misconceptionsAddressed: ['Pollination and fertilisation are the same event.', 'A seed appears as soon as pollen touches a flower.', 'Pollinators help only animals, not plants.'],
+  visualizationStrategy: 'Use a 360-degree garden with enlarged pollen particles, a close pollinator path, and progressive underground seed and seedling stages.',
+  interactionStrategy: 'Students advance through eight guided stages, inspect flowers from inside the garden, and use cue cards to compare pollination, fertilisation, seed formation, and germination.',
+  imaginationHelperStrategy: 'Invisible pollen transfer is rendered as visible golden particles moving between flower structures.',
+  cueCardIds: ['cue-pollination-001', 'cue-pollination-002', 'cue-pollination-003', 'cue-pollination-004', 'cue-pollination-005', 'cue-pollination-006', 'cue-pollination-007', 'cue-pollination-008'],
+  revisionCardIds: ['rev-pollination-sequence-001'],
+  assessmentHookIds: ['assess-pollination-pre-001', 'assess-pollination-post-001', 'assess-pollination-misconception-001'],
+  instructorScript: pollinationScript,
+  batchActivityPrompt: 'Draw and label a flower, then mark where pollen starts, where it lands, and where the seed begins forming.',
+  expectedDurationMinutes: 10,
+  maxSessionDurationMinutes: 12,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use seated or stationary play.', 'Ask students to pause if the close pollinator movement feels uncomfortable.'],
+  offlineContentPackId: 'pack-science-plant-reproduction-v1',
+  estimatedPackageSizeMb: 260,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 8,
+  status: 'released',
+};
+
+export const CIRCUIT_MODULE: SimulationModuleRecord = {
+  id: 'sim-circuit-001',
+  slug: 'circuit',
+  title: "Electric Circuits & Resistance (Ohm's Law)",
+  summary: 'Toggle a switch, swap resistors, and watch electrons flow in real time. Discover V=IR through direct interaction with a 3D circuit.',
+  gradeBands: ['class6To8', 'class9To10'],
+  subjects: ['physics'],
+  applicableBoards: ['cbse', 'icse'],
+  curriculumMapIds: ['cm-physics-electricity-class6to8', 'cm-physics-ohms-law-class9to10'],
+  conceptIds: ['concept-electric-current', 'concept-closed-circuit', 'concept-resistance', 'concept-ohms-law'],
+  simulationFormat: 'interactive3d',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Electric current is invisible in classroom circuits, so students often memorize symbols without understanding flow. VR renders current as visible moving particles and gives immediate feedback between resistance, current, and bulb brightness.',
+  learningObjective: "Students will apply Ohm's Law (V=IR) to predict how changing resistance affects current and explain observations in a series circuit.",
+  scientificConceptExplanation: 'A closed circuit provides a complete path for charge flow. For a fixed voltage source, current decreases as resistance increases according to I = V / R, reducing the energy delivered to the bulb filament.',
+  misconceptionsAddressed: ['Current is used up by the bulb.', 'A switch creates current instead of completing a path.', 'Higher resistance makes current move faster.'],
+  visualizationStrategy: 'Use a workbench circuit where electrons, switch state, resistor values, bulb brightness, and the Ohm calculation are visible at the same time.',
+  interactionStrategy: 'Students toggle a switch and select resistor values while observing the resulting current, bulb brightness, and equation update.',
+  imaginationHelperStrategy: 'Invisible electron flow is rendered as moving blue particles around the circuit loop.',
+  practicalUseCase: 'Connects textbook circuit diagrams to torches, chargers, household wiring, and safe troubleshooting.',
+  cueCardIds: ['cue-circuit-001', 'cue-circuit-002', 'cue-circuit-003', 'cue-circuit-004'],
+  revisionCardIds: ['rev-circuit-ohms-law-001'],
+  assessmentHookIds: ['assess-circuit-pre-001', 'assess-circuit-post-001', 'assess-circuit-misconception-001'],
+  instructorScript: circuitScript,
+  batchActivityPrompt: 'Complete a circuit table for three resistor values: predict current, observe brightness, and explain the trend.',
+  expectedDurationMinutes: 8,
+  maxSessionDurationMinutes: 10,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use stationary workbench mode.', 'Remind students this is a conceptual circuit model, not permission to handle live mains electricity.'],
+  offlineContentPackId: 'pack-science-electricity-v1',
+  estimatedPackageSizeMb: 220,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 4,
+  status: 'released',
+};
+
+export const STATES_OF_MATTER_MODULE: SimulationModuleRecord = {
+  id: 'sim-c09-ch01-a02-states-of-matter',
+  slug: 'c9-ch01-a02-states-of-matter',
+  title: 'States of Matter Particle Lab',
+  summary: 'Manipulate heat in a particle chamber and watch solids, liquids, and gases change motion, spacing, shape, and volume.',
+  gradeBands: ['class9To10'],
+  subjects: ['chemistry', 'physics'],
+  applicableBoards: ['cbse', 'icse'],
+  curriculumMapIds: ['cm-cbse-c9-ch01-states-of-matter'],
+  conceptIds: ['concept-states-of-matter', 'concept-particle-motion', 'concept-phase-change'],
+  simulationFormat: 'interactive3d',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Particle motion and spacing are invisible in ordinary classroom demonstrations, so students often memorize state properties without a mental model. A VR particle chamber makes microscopic motion visible and lets students connect heating, cooling, shape, volume, and phase change in one manipulable scene.',
+  learningObjective: 'Students will compare solid, liquid, and gas particle behaviour and predict how heating or cooling changes state.',
+  scientificConceptExplanation: 'Matter is made of particles whose arrangement and kinetic energy determine observable state. Solids have tightly packed particles vibrating in place, liquids have nearby particles that flow past one another, and gases have fast particles spread far apart.',
+  misconceptionsAddressed: ['Particles in solids do not move.', 'Heating creates new particles instead of increasing kinetic energy.', 'Gas particles float upward because they are weightless.'],
+  visualizationStrategy: 'Use a transparent chamber with animated particles, a heat slider, state labels, and side-by-side particle spacing cues.',
+  interactionStrategy: 'Students switch between guided stages and adjust heating or cooling to observe particle speed, spacing, and container behaviour.',
+  imaginationHelperStrategy: 'Microscopic particles are enlarged and colour-coded so students can see motion patterns that are normally invisible.',
+  practicalUseCase: 'Connects melting, boiling, condensation, evaporation, weather, cooking, and storage of materials.',
+  cueCardIds: ['cue-states-matter-001', 'cue-states-matter-002', 'cue-states-matter-003', 'cue-states-matter-004'],
+  revisionCardIds: ['rev-states-matter-particles-001'],
+  assessmentHookIds: ['assess-states-matter-pre-001', 'assess-states-matter-post-001', 'assess-states-matter-misconception-001'],
+  instructorScript: statesOfMatterScript,
+  batchActivityPrompt: 'Draw three particle boxes for solid, liquid, and gas, then write what happens to speed and spacing when heat is added.',
+  expectedDurationMinutes: 10,
+  maxSessionDurationMinutes: 12,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use stationary chamber mode.', 'Avoid rapid camera movement; particles move inside the chamber while the student remains still.'],
+  offlineContentPackId: 'pack-science-matter-class9-v1',
+  estimatedPackageSizeMb: 240,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 4,
+  status: 'released',
+};
+
+export const SOURCES_OF_FOOD_MODULE: SimulationModuleRecord = {
+  id: 'sim-c06-ch01-a01-sources-of-food',
+  slug: 'c6-ch01-a01-sources-of-food',
+  title: 'Sources of Food Sorting Lab',
+  summary: 'Sort common foods by source in a 3D pantry and learn how plant, animal, and fungal sources appear in everyday meals.',
+  gradeBands: ['class6To8'],
+  subjects: ['science', 'biology'],
+  applicableBoards: ['cbse', 'icse'],
+  curriculumMapIds: ['cm-cbse-c6-ch01-food-sources'],
+  conceptIds: ['concept-food-sources', 'concept-plant-products', 'concept-animal-products', 'concept-edible-fungi'],
+  simulationFormat: 'interactive3d',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Students often memorize examples without seeing that meals are made from ingredients with different biological origins. A spatial sorting board lets them inspect food tokens, group them by source, and immediately correct common confusions such as mushroom, honey, milk, and grain sources.',
+  learningObjective: 'Students will classify everyday foods by plant, animal, or fungal source and justify the classification using observable clues.',
+  scientificConceptExplanation: 'Food materials come from living sources. Plant sources include grains, pulses, fruits, vegetables, oils, and spices; animal sources include milk, eggs, meat, fish, and honey; fungi such as mushrooms form a separate living group often used as food.',
+  misconceptionsAddressed: ['All non-green foods come from animals.', 'Milk and honey come from plants because they are sold with other groceries.', 'Mushrooms are plants.'],
+  visualizationStrategy: 'Use a 3D market table with source platforms, enlarged food tokens, source icons, and feedback beams that connect each item to its origin.',
+  interactionStrategy: 'Students inspect each item, choose a source platform, receive immediate feedback, and repeat until all foods are classified with a final misconception review.',
+  imaginationHelperStrategy: 'Invisible origin information is made visible by showing each food token beside its source environment: field, dairy/animal, or fungal growth patch.',
+  practicalUseCase: 'Connects textbook food-source classification to meals, shopping, farming, nutrition discussions, and ingredient labels.',
+  cueCardIds: ['cue-food-sources-001', 'cue-food-sources-002', 'cue-food-sources-003', 'cue-food-sources-004'],
+  revisionCardIds: ['rev-food-sources-classify-meal-001'],
+  assessmentHookIds: ['assess-food-sources-pre-001', 'assess-food-sources-post-001', 'assess-food-sources-misconception-001'],
+  instructorScript: sourcesOfFoodScript,
+  batchActivityPrompt: 'Sort ingredients from a lunch plate into plant, animal, and fungal sources, then explain one item that was difficult.',
+  expectedDurationMinutes: 9,
+  maxSessionDurationMinutes: 10,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use stationary table mode.', 'Keep feedback visual and audio-light so students can discuss decisions with the instructor.'],
+  offlineContentPackId: 'pack-science-food-sources-class6-v1',
+  estimatedPackageSizeMb: 140,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 4,
+  status: 'released',
+};
+
+export const SOLUBLE_INSOLUBLE_MODULE: SimulationModuleRecord = {
+  id: 'sim-c05-ch07-a03-soluble-and-insoluble-substances',
+  slug: 'c5-ch07-a03-soluble-and-insoluble-substances',
+  title: 'Soluble and Insoluble Substances Lab',
+  summary: 'Run safe virtual water-mixing trials and observe which everyday substances dissolve, settle, cloud, or separate.',
+  gradeBands: ['class3To5'],
+  subjects: ['environmentalScience', 'science'],
+  applicableBoards: ['cbse', 'icse'],
+  curriculumMapIds: ['cm-cbse-c5-ch07-water-experiments'],
+  conceptIds: ['concept-solubility', 'concept-solution', 'concept-mixture-observation'],
+  simulationFormat: 'practicalLabSimulation',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Solubility is easy to demonstrate, but students often miss particle-level evidence and confuse dissolving with melting or disappearing. A resettable XR bench makes repeated trials fast, safe, visible, and discussion-friendly while showing magnified particle behaviour inside the beaker.',
+  learningObjective: 'Students will distinguish soluble and insoluble substances in water using prediction, observation, and evidence from repeated trials.',
+  scientificConceptExplanation: 'A soluble substance dissolves when its particles spread evenly through water to form a solution. Insoluble substances do not dissolve; they may settle, remain suspended, float, or form a separate layer depending on their properties.',
+  misconceptionsAddressed: ['Dissolving means a substance disappears.', 'Any powder will dissolve in water.', 'Floating and dissolving are the same observation.'],
+  visualizationStrategy: 'Use a virtual beaker with visible stirring, magnified particle trails, clarity changes, sediment, and separate oil layers for comparison.',
+  interactionStrategy: 'Students choose a substance, predict an outcome, run the trial, observe the beaker state, and compare the result with the prediction before resetting.',
+  imaginationHelperStrategy: 'Invisible dissolved particles are shown as tiny coloured dots spreading through water while insoluble particles remain visible and settle.',
+  practicalUseCase: 'Connects classroom water experiments to cooking, washing, soil, river water, filters, and separating mixtures.',
+  cueCardIds: ['cue-solubility-001', 'cue-solubility-002', 'cue-solubility-003', 'cue-solubility-004'],
+  revisionCardIds: ['rev-solubility-fair-test-001'],
+  assessmentHookIds: ['assess-solubility-pre-001', 'assess-solubility-post-001', 'assess-solubility-misconception-001'],
+  instructorScript: solubilityScript,
+  batchActivityPrompt: 'Complete a predict-observe-explain table for five substances and write one sentence explaining how dissolving differs from disappearing.',
+  expectedDurationMinutes: 8,
+  maxSessionDurationMinutes: 10,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use stationary lab bench mode.', 'Reinforce that real experiments should use teacher-approved materials only.'],
+  offlineContentPackId: 'pack-evs-water-experiments-class5-v1',
+  estimatedPackageSizeMb: 135,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 4,
+  status: 'released',
+};
+
+export const DIGESTIVE_SYSTEM_MODULE: SimulationModuleRecord = {
+  id: 'sim-c05-ch03-a02-introduction-of-digestive-system',
+  slug: 'c5-ch03-a02-introduction-of-digestive-system',
+  title: 'Introduction to the Digestive System',
+  summary: 'Travel with food from the mouth through the digestive tract, activate each organ, absorb nutrients and water, and finish with a healthy-habits challenge.',
+  gradeBands: ['class3To5'],
+  subjects: ['environmentalScience', 'biology'],
+  applicableBoards: ['cbse', 'icse'],
+  curriculumMapIds: ['cm-cbse-c5-ch03-digestive-system'],
+  conceptIds: [
+    'concept-digestive-system',
+    'concept-food-journey',
+    'concept-nutrient-absorption',
+    'concept-digestive-health',
+  ],
+  simulationFormat: 'immersiveVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Digestion happens inside the body and cannot be observed directly. A stationary VR cutaway makes the hidden pathway, organ relationships, muscle waves, churning, and absorption spatially visible.',
+  learningObjective: 'Students will identify the main digestive organs, sequence the journey of food, explain each organ function, and choose habits that support healthy digestion.',
+  scientificConceptExplanation: 'Digestion begins in the mouth, continues through the esophagus and stomach, and is completed in the small intestine where nutrients enter the blood. The large intestine absorbs water before waste is stored in the rectum and removed through the anus.',
+  misconceptionsAddressed: [
+    'Digestion begins in the stomach.',
+    'Food passes through the liver and pancreas.',
+    'The large intestine absorbs most nutrients.',
+    'The gallbladder produces bile.',
+  ],
+  visualizationStrategy: 'Use a child-friendly translucent torso with a glowing food pathway, animated peristalsis and churning, enlarged villi, nutrient particles, water droplets, and clearly separated supporting organs.',
+  interactionStrategy: 'Students place food in the mouth, trigger esophagus waves, turn a stomach mixer, inspect helper organs, transfer nutrients and water, sort healthy habits, and answer a five-question recap.',
+  imaginationHelperStrategy: 'Hidden muscle movement, digestive juices, nutrients, and absorbed water are enlarged and color-coded so students can connect invisible processes to each organ.',
+  practicalUseCase: 'Connects body-system knowledge to chewing, hydration, varied foods, exercise, hand washing, and everyday digestive health.',
+  cueCardIds: [
+    'cue-digestion-mouth-001',
+    'cue-digestion-peristalsis-002',
+    'cue-digestion-stomach-003',
+    'cue-digestion-absorption-004',
+    'cue-digestion-health-005',
+  ],
+  revisionCardIds: ['rev-digestive-pathway-001'],
+  assessmentHookIds: [
+    'assess-digestive-pre-001',
+    'assess-digestive-post-001',
+    'assess-digestive-misconception-001',
+  ],
+  instructorScript: digestiveSystemScript,
+  batchActivityPrompt: 'Draw the food pathway in order, add the three supporting organs beside it, and explain where nutrients and water enter the body.',
+  expectedDurationMinutes: 10,
+  maxSessionDurationMinutes: 12,
+  comfortRiskLevel: 'low',
+  safetyNotes: [
+    'Use stationary or seated play with no forced camera movement.',
+    'Use a simple non-graphic cutaway for waste storage and removal.',
+  ],
+  offlineContentPackId: 'pack-evs-digestive-system-class5-v1',
+  estimatedPackageSizeMb: 180,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 10,
+  status: 'released',
+};
+
+export const MONEY_TOWN_MODULE: SimulationModuleRecord = {
+  id: 'sim-c1-math-ch01-introduction-to-money',
+  slug: 'c1-math-ch01-introduction-to-money',
+  title: 'Introduction to Money',
+  summary: 'Explore Magic Money Town, identify Indian coins and notes, buy simple items, and earn a careful shopper badge.',
+  gradeBands: ['class1To2'],
+  subjects: ['mathematics'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c1-math-money'],
+  conceptIds: ['concept-money-values', 'concept-indian-coins-notes', 'concept-simple-shopping'],
+  simulationFormat: 'interactive3d',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Young learners understand money better when they can pick up, compare, and use coins and notes in a safe pretend shop instead of only seeing flat textbook pictures.',
+  learningObjective: 'Students will identify common Indian coins and notes, compare their values, and choose suitable money for simple purchases.',
+  scientificConceptExplanation: 'Money is a standard medium of exchange. Coins and notes carry values that can be counted, compared, combined, and exchanged for goods in everyday transactions.',
+  misconceptionsAddressed: [
+    'All coins have the same value.',
+    'A bigger note picture always means a larger physical size.',
+    'Buying does not require matching price and value.',
+  ],
+  visualizationStrategy: 'Use a colourful town market with oversized coins, notes, price tags, shop counters, and reward feedback that makes value comparison visible.',
+  interactionStrategy: 'Students inspect money tokens, sort coins and notes, match values, buy items, and complete a memory check through large Quest-friendly targets.',
+  imaginationHelperStrategy: 'Abstract value is represented with glowing number labels, item price beams, and coin-note comparison trays.',
+  practicalUseCase: 'Connects classroom counting to shops, pocket money, saving, and careful everyday transactions.',
+  cueCardIds: ['cue-money-coin-001', 'cue-money-note-002', 'cue-money-price-003', 'cue-money-shopping-004'],
+  revisionCardIds: ['rev-money-values-001'],
+  assessmentHookIds: ['assess-money-pre-001', 'assess-money-post-001', 'assess-money-misconception-001'],
+  instructorScript: moneyTownScript,
+  batchActivityPrompt: 'Draw two coins and two notes, write their values, and choose money for one pretend shop item.',
+  expectedDurationMinutes: 9,
+  maxSessionDurationMinutes: 10,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use stationary shop mode.', 'Keep all targets large, slow, and reachable for Class 1 learners.'],
+  offlineContentPackId: 'pack-math-money-class1-v1',
+  estimatedPackageSizeMb: 150,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 5,
+  status: 'released',
+};
+
+export const PREPOSITION_ADVENTURE_MODULE: SimulationModuleRecord = {
+  id: 'sim-c2-english-ch01-prepositions',
+  slug: 'c2-english-ch01-prepositions',
+  title: 'Preposition Adventure',
+  summary: 'Move objects through a playful world and learn position words such as in, on, under, behind, near, and between.',
+  gradeBands: ['class1To2'],
+  subjects: ['english'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c2-english-prepositions'],
+  conceptIds: ['concept-position-words', 'concept-spatial-sentences', 'concept-preposition-use'],
+  simulationFormat: 'immersiveVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Prepositions describe spatial relationships, so students benefit from seeing and changing object positions directly instead of only memorizing word lists.',
+  learningObjective: 'Students will understand common prepositions by placing objects in correct positions and speaking simple sentences that describe location.',
+  scientificConceptExplanation: 'Prepositions are words that show relationships between nouns or pronouns and other words, often describing position, direction, or place.',
+  misconceptionsAddressed: [
+    'In and on can be used for the same position.',
+    'Under and behind mean the same thing.',
+    'A preposition can be learned without noticing the object relationship.',
+  ],
+  visualizationStrategy: 'Use a storybook playroom with large objects, animated position cues, friendly rewards, and clear before-after placement scenes.',
+  interactionStrategy: 'Students select an object, place it in the requested spatial relationship, hear the sentence aloud, and complete memory checks.',
+  imaginationHelperStrategy: 'Invisible grammar relationships become visible through arrows, glow zones, and object-position snapshots.',
+  practicalUseCase: 'Supports everyday classroom instructions, reading comprehension, and speaking complete location sentences.',
+  cueCardIds: ['cue-preposition-in-001', 'cue-preposition-on-002', 'cue-preposition-under-003', 'cue-preposition-between-004'],
+  revisionCardIds: ['rev-preposition-picture-match-001'],
+  assessmentHookIds: ['assess-preposition-pre-001', 'assess-preposition-post-001', 'assess-preposition-misconception-001'],
+  instructorScript: prepositionAdventureScript,
+  batchActivityPrompt: 'Use a pencil and book to make three positions, then say one sentence for each preposition.',
+  expectedDurationMinutes: 9,
+  maxSessionDurationMinutes: 10,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use stationary playroom mode.', 'Avoid fast object movement and keep all placement zones close to the learner.'],
+  offlineContentPackId: 'pack-english-prepositions-class2-v1',
+  estimatedPackageSizeMb: 160,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 5,
+  status: 'released',
+};
+
+export const SOLAR_SYSTEM_MISSION_MODULE: SimulationModuleRecord = {
+  id: 'sim-c8-10-science-solar-system',
+  slug: 'c8-10-science-solar-system',
+  title: 'Exploring Our Solar System',
+  summary: 'Pilot a spacecraft through the Sun, planets, moons, asteroids, comets, and dwarf planets while scanning key features.',
+  gradeBands: ['class6To8', 'class9To10'],
+  subjects: ['science', 'physics', 'geography'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c8-science-solar-system'],
+  conceptIds: ['concept-solar-system', 'concept-planet-order', 'concept-orbits-gravity', 'concept-planet-features'],
+  simulationFormat: 'immersiveVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'The solar system is too large, distant, and dynamic to experience in a classroom. VR lets students compare scale, order, motion, and surface features from a guided spacecraft viewpoint.',
+  learningObjective: 'Students will sequence the eight planets, compare rocky planets and gas/ice giants, and explain important solar-system objects and motions.',
+  scientificConceptExplanation: 'The solar system contains the Sun, eight planets, dwarf planets, moons, asteroids, and comets. Gravity keeps planets in orbit, and each planet has distinct size, composition, atmosphere, and motion.',
+  misconceptionsAddressed: [
+    'Planets are equally spaced from the Sun.',
+    'The asteroid belt is a dense wall of rocks.',
+    'All planets have solid surfaces like Earth.',
+    'Pluto is one of the eight main planets.',
+  ],
+  visualizationStrategy: 'Use a cockpit mission with realistic procedural planet materials, orbit paths, scale comparison panels, comet trails, Saturn ring particles, and deep-space lighting.',
+  interactionStrategy: 'Students scan each planet, trigger comparison modes, arrange planets in order, inspect special features, and complete planet matching challenges.',
+  imaginationHelperStrategy: 'Large distances, gravity, and invisible orbital paths are represented with guided routes, holographic scale lines, and scan overlays.',
+  practicalUseCase: 'Connects astronomy lessons to night-sky observation, seasons, space missions, satellites, and scientific modelling.',
+  cueCardIds: ['cue-solar-sun-001', 'cue-solar-rocky-002', 'cue-solar-gas-giants-003', 'cue-solar-orbits-004'],
+  revisionCardIds: ['rev-solar-planet-order-001'],
+  assessmentHookIds: ['assess-solar-pre-001', 'assess-solar-post-001', 'assess-solar-misconception-001'],
+  instructorScript: solarSystemMissionScript,
+  batchActivityPrompt: 'Build a planet-order strip, mark rocky planets and gas or ice giants, and write one unique feature for three planets.',
+  expectedDurationMinutes: 10,
+  maxSessionDurationMinutes: 12,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use cockpit comfort mode.', 'Keep transitions cinematic but stationary to reduce motion discomfort.'],
+  offlineContentPackId: 'pack-science-solar-system-v1',
+  estimatedPackageSizeMb: 280,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 8,
+  status: 'released',
+};
+
+export const EXPLORE_OUR_GALAXY_MODULE: SimulationModuleRecord = {
+  id: 'sim-explore-our-galaxy',
+  slug: 'explore-our-galaxy',
+  title: 'Explore Our Galaxy',
+  summary: 'Enter a separate immersive galaxy video tour to compare stars, planets, deep-space clouds, and the Milky Way.',
+  gradeBands: ['class6To8', 'class9To10'],
+  subjects: ['science', 'physics', 'geography'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c8-science-solar-system'],
+  conceptIds: ['concept-solar-system', 'concept-planet-order', 'concept-orbits-gravity', 'concept-planet-features'],
+  simulationFormat: 'threeSixtyVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'A galaxy is too large and distant for students to experience directly. A separate VR video tour lets students look around deep space, distinguish stars from planets, and place the Solar System inside the larger Milky Way.',
+  learningObjective: 'Students will distinguish stars, planets, solar systems, and galaxies, and explain that our Solar System is a small part of the Milky Way.',
+  scientificConceptExplanation: 'A galaxy is a huge system containing billions of stars along with gas, dust, planets, and other objects. Our Sun is one star in the Milky Way galaxy, and Earth is one planet in the Solar System around that star.',
+  misconceptionsAddressed: [
+    'The Solar System and the galaxy are the same thing.',
+    'Planets produce their own light like stars.',
+    'Space between stars is completely empty.',
+  ],
+  visualizationStrategy: 'Use the supplied 360-style space video as an immersive sky with a low observation platform, teacher explanation panels, and clear stage buttons.',
+  interactionStrategy: 'Students select guided stages, listen to teacher narration, move freely with the Quest left stick, rotate with the right stick, and use controller buttons to go back.',
+  imaginationHelperStrategy: 'Abstract scale is made visible by placing familiar Solar System ideas inside a wider deep-space tour.',
+  practicalUseCase: 'Connects astronomy vocabulary to sky observation, space videos, planetarium visits, and science discussions about the Milky Way.',
+  cueCardIds: ['cue-galaxy-stars-001', 'cue-galaxy-planets-002', 'cue-galaxy-milky-way-003'],
+  revisionCardIds: ['rev-galaxy-vocabulary-001'],
+  assessmentHookIds: ['assess-galaxy-pre-001', 'assess-galaxy-post-001'],
+  instructorScript: exploreOurGalaxyScript,
+  batchActivityPrompt: 'Draw four labelled circles: planet, star, solar system, and galaxy. Write one sentence explaining how they are related.',
+  expectedDurationMinutes: 8,
+  maxSessionDurationMinutes: 10,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use stationary or seated play.', 'Encourage slow head movement and avoid forced camera motion.'],
+  offlineContentPackId: 'pack-science-explore-our-galaxy-v1',
+  estimatedPackageSizeMb: 120,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 5,
+  status: 'released',
+};
+
+export const MICROSCOPIC_LIFE_OBSERVATION_MODULE: SimulationModuleRecord = {
+  id: 'sim-c10-ch07-a02-microscopic-life-observation',
+  slug: 'c10-ch07-a02-microscopic-life-observation',
+  title: 'Microscopic Life Observation Lab',
+  summary: 'Step into a stationary microscope theatre, watch real water-sample footage, and identify microorganisms by shape, colour, and motion.',
+  gradeBands: ['class9To10'],
+  subjects: ['biology', 'science'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c10-ch07-life-processes'],
+  conceptIds: [
+    'concept-microscopic-life',
+    'concept-microscope-observation',
+    'concept-protist-movement',
+  ],
+  simulationFormat: 'immersiveVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Microorganisms are too small to inspect directly, and a single classroom microscope limits participation. VR lets students observe enlarged real microscope footage together, pause around key forms, and discuss evidence from a stable seated viewpoint.',
+  learningObjective: 'Students will observe microscopic organisms, compare visible features, and explain how microscopes reveal living forms that are invisible to the unaided eye.',
+  scientificConceptExplanation: 'Many water samples contain microscopic living organisms such as protists and algae-like cells. Under magnification, students can observe shape, colour, internal structures, and movement patterns that support careful biological description.',
+  misconceptionsAddressed: [
+    'Clear water cannot contain living organisms.',
+    'All microorganisms have the same shape and movement.',
+    'A microscope image is just a picture and does not require evidence-based observation.',
+  ],
+  visualizationStrategy: 'Use the supplied microscope video as a large immersive screen with labeled observation markers, stage prompts, and a stationary lab environment for Quest comfort.',
+  interactionStrategy: 'Students start the microscope feed, select observation stages, inspect organism markers, and describe evidence using shape, colour, and movement prompts.',
+  imaginationHelperStrategy: 'Tiny living forms are enlarged into an immersive microscope theatre so students can notice motion and structure without needing a physical microscope for every learner.',
+  practicalUseCase: 'Connects biology lessons to pond water, hygiene, microscopes, scientific observation, and evidence-based descriptions of living systems.',
+  cueCardIds: [
+    'cue-micro-life-observe-001',
+    'cue-micro-life-compare-002',
+    'cue-micro-life-microscope-003',
+    'cue-micro-life-evidence-004',
+  ],
+  revisionCardIds: ['rev-micro-life-observation-001'],
+  assessmentHookIds: [
+    'assess-micro-life-pre-001',
+    'assess-micro-life-post-001',
+    'assess-micro-life-misconception-001',
+  ],
+  instructorScript: microscopicLifeObservationScript,
+  batchActivityPrompt: 'Draw one organism from the microscope video, label shape, colour, and movement, then write one careful inference.',
+  expectedDurationMinutes: 8,
+  maxSessionDurationMinutes: 10,
+  comfortRiskLevel: 'low',
+  safetyNotes: [
+    'Use stationary microscope theatre mode.',
+    'Keep the video screen fixed in front of the learner to avoid motion discomfort.',
+  ],
+  offlineContentPackId: 'pack-biology-microscopic-life-class10-v1',
+  estimatedPackageSizeMb: 80,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 4,
+  status: 'released',
+};
+
+export const HUMAN_BODY_ANATOMY_MODULE: SimulationModuleRecord = {
+  id: 'sim-human-body-anatomy',
+  slug: 'human-body-anatomy',
+  title: 'Human Body Anatomy',
+  summary: 'Enter a separate immersive body-anatomy video tour to study bones, muscles, major organs, and whole-body systems.',
+  gradeBands: ['class3To5'],
+  subjects: ['biology', 'environmentalScience', 'science'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c5-ch03-digestive-system'],
+  conceptIds: ['concept-digestive-system', 'concept-food-journey', 'concept-digestive-health'],
+  simulationFormat: 'threeSixtyVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Human anatomy includes invisible internal structures that are difficult to visualize from textbook diagrams alone. A separate VR body tour lets students look around the full body, connect visible regions to organs, and place individual systems inside one organized whole.',
+  learningObjective: 'Students will identify major body structures, distinguish support, movement, and organ functions, and explain that body systems work together.',
+  scientificConceptExplanation: 'Human anatomy studies the structure of the body. Bones provide support and protection, muscles enable movement, and organs such as the heart, lungs, and digestive structures carry out specialized life processes inside broader body systems.',
+  misconceptionsAddressed: [
+    'Body parts work independently without forming systems.',
+    'Bones only give shape and do not protect organs.',
+    'Internal organs are randomly placed inside the body.',
+  ],
+  visualizationStrategy: 'Use the supplied anatomy video as an immersive sky with a low observation platform, guided explanation panels, and stage buttons for each major body view.',
+  interactionStrategy: 'Students select guided stages, listen to teacher narration, move freely with the Quest left stick, rotate with the right stick, and use controller buttons to step back through the lesson.',
+  imaginationHelperStrategy: 'Internal body structure becomes easier to imagine when students can stand inside a full-body tour and compare regions, systems, and organ roles in one view.',
+  practicalUseCase: 'Connects textbook body lessons to health education, organ diagrams, posture awareness, and early science discussions about how body systems work together.',
+  cueCardIds: ['cue-body-support-001', 'cue-body-muscles-002', 'cue-body-organs-003'],
+  revisionCardIds: ['rev-body-regions-001'],
+  assessmentHookIds: ['assess-body-pre-001', 'assess-body-post-001'],
+  instructorScript: humanBodyAnatomyScript,
+  batchActivityPrompt: 'Draw a human outline and label one bone, one muscle group, and three organs. Write one sentence about how two body systems work together.',
+  expectedDurationMinutes: 8,
+  maxSessionDurationMinutes: 10,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use stationary or seated play.', 'Encourage slow head movement during the tour.'],
+  offlineContentPackId: 'pack-science-human-body-anatomy-v1',
+  estimatedPackageSizeMb: 110,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 5,
+  status: 'released',
+};
+
+export const GEOMETRY_MATHS_LAB_MODULE: SimulationModuleRecord = {
+  id: 'sim-c6-math-geometry-maths-lab',
+  slug: 'c6-math-geometry-maths-lab',
+  title: 'Geometry Maths Lab',
+  summary: 'Step into an immersive Class 6 maths lab to explore 2D and 3D shapes, compare their properties, and match them with real-world objects.',
+  gradeBands: ['class6To8'],
+  subjects: ['mathematics'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c6-geometry-maths-lab'],
+  conceptIds: ['concept-geometry-basics', 'concept-2d-shapes', 'concept-3d-shapes', 'concept-shape-properties'],
+  simulationFormat: 'immersiveVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'Geometry becomes easier to understand when students can stand inside a spatial maths lab, inspect shapes from different angles, and compare 2D diagrams with 3D solids through direct interaction.',
+  learningObjective: 'Students will identify important 2D and 3D shapes, describe their properties, compare similar shapes, and connect geometry to everyday objects.',
+  scientificConceptExplanation: 'Geometry helps describe the structure of shapes. Flat 2D shapes can be classified by sides, corners, and curved boundaries, while solid 3D shapes can be classified by faces, edges, vertices, and curved surfaces. Comparing these properties helps students distinguish similar-looking forms and apply geometry in daily life.',
+  misconceptionsAddressed: [
+    'A square and rectangle are completely unrelated shapes.',
+    'A circle and sphere are the same because both are round.',
+    'All solid shapes have corners and flat faces.',
+  ],
+  visualizationStrategy: 'Use a bright virtual maths lab with a central hero display, comparison stations, real-world object pedestals, stage prompts, and richly colored shape models that can be inspected in VR.',
+  interactionStrategy: 'Students select shapes, inspect rotating models, compare pairs, match real objects to geometry, and answer challenge questions using clearly labeled interactive controls.',
+  imaginationHelperStrategy: 'Abstract geometry vocabulary is grounded in visual comparison, object matching, and a stable lab environment that makes shape properties easier to notice and discuss.',
+  practicalUseCase: 'Connects textbook geometry to classroom objects, packaging, sports equipment, design, and observation of shapes in the built environment.',
+  cueCardIds: ['cue-geometry-2d-001', 'cue-geometry-3d-002', 'cue-geometry-compare-003'],
+  revisionCardIds: ['rev-geometry-properties-001'],
+  assessmentHookIds: ['assess-geometry-pre-001', 'assess-geometry-post-001'],
+  instructorScript: geometryMathsLabScript,
+  batchActivityPrompt: 'Create a table with shape name, 2D or 3D, key property, and one real-life example. Then compare square with rectangle and cube with cuboid in two sentences each.',
+  expectedDurationMinutes: 10,
+  maxSessionDurationMinutes: 12,
+  comfortRiskLevel: 'low',
+  safetyNotes: ['Use smooth but slow movement in the lab.', 'Keep the learner facing the main display during explanations.'],
+  offlineContentPackId: 'pack-math-geometry-maths-lab-v1',
+  estimatedPackageSizeMb: 95,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 7,
+  status: 'released',
+};
+
+export const SIMULATION_MODULES = [
+  POLLINATION_MODULE,
+  CIRCUIT_MODULE,
+  STATES_OF_MATTER_MODULE,
+  SOURCES_OF_FOOD_MODULE,
+  SOLUBLE_INSOLUBLE_MODULE,
+  DIGESTIVE_SYSTEM_MODULE,
+  MONEY_TOWN_MODULE,
+  PREPOSITION_ADVENTURE_MODULE,
+  SOLAR_SYSTEM_MISSION_MODULE,
+  EXPLORE_OUR_GALAXY_MODULE,
+  MICROSCOPIC_LIFE_OBSERVATION_MODULE,
+  HUMAN_BODY_ANATOMY_MODULE,
+  GEOMETRY_MATHS_LAB_MODULE,
+] as const;

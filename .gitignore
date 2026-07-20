@@ -1,6 +1,9 @@
 node_modules/
 .next/
 dist/
+**/tsconfig.tsbuildinfo
+apps/*/package-lock.json
+packages/*/package-lock.json
 *.log
 .env*
 !.env.example
@@ -8,3 +11,7 @@ coverage/
 playwright-report/
 test-results/
 certificates/
+.DS_Store
+**/.DS_Store
+.superpowers/
+.vercel
