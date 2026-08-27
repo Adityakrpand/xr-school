@@ -1,10 +1,12 @@
 'use client';
 
 import {
+  createElement,
   useCallback,
   useEffect,
   useRef,
   useState,
+  type ComponentType,
 } from 'react';
 import { createLessonSession } from '@xr-school/simulation-runtime';
 import {
@@ -31,6 +33,7 @@ import {
 export interface GuidedSimulationViewerProps {
   definition: GuidedSimulationDefinition;
   sceneAdapter: SimulationSceneAdapter;
+  experienceComponent?: ComponentType;
 }
 
 const DEFAULT_PREFERENCES: ExperiencePreferences = {
@@ -44,7 +47,19 @@ const DEFAULT_PREFERENCES: ExperiencePreferences = {
 export default function GuidedSimulationViewer({
   definition,
   sceneAdapter,
+  experienceComponent,
 }: GuidedSimulationViewerProps) {
+  if (experienceComponent) return createElement(experienceComponent);
+  return createElement(ManagedGuidedSimulationViewer, {
+    definition,
+    sceneAdapter,
+  });
+}
+
+function ManagedGuidedSimulationViewer({
+  definition,
+  sceneAdapter,
+}: Omit<GuidedSimulationViewerProps, 'experienceComponent'>) {
   const record = findImplementedSimulation(definition.moduleId);
   if (!record || record.kind !== 'guided') {
     throw new Error(`Missing guided simulation record ${definition.moduleId}`);
