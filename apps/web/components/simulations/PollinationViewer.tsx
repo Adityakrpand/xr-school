@@ -1,642 +1,904 @@
 'use client';
-import { useEffect, useRef, useState, useCallback } from 'react';
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import type {
+  NormalizedInputSource,
+} from '@xr-school/simulation-schema';
+import {
+  createScientificModelRegistry,
+} from '@xr-school/simulation-runtime';
+import {
+  pollinationSnapshotForStage,
+} from '@xr-school/simulation-runtime';
+import type {
+  LessonSnapshot,
+} from '@xr-school/simulation-runtime';
+import SimulationExperienceShell, {
+  type ExperiencePreferences,
+} from '@/components/simulation-experience/SimulationExperienceShell';
+import SimulationCanvasHost from '@/components/simulation-experience/SimulationCanvasHost';
+import { playSimulationNarration, stopSimulationNarration } from '@/lib/simulationAudio';
+import { createVrHudPanel, type VrHudContent } from '@/lib/vr/vrHudPanel';
+import { createVrLocomotion } from '@/lib/vr/vrLocomotion';
+import { createVrPlayerRig } from '@/lib/vr/vrPlayerRig';
+import { createEnvironment } from '@/lib/world-builder/environmentFactory';
+import { createMaterialFactory } from '@/lib/world-builder/materialFactory';
+import {
+  createPollinationExperience,
+  type PollinationExperience,
+} from '@/lib/world-builder/pollinationExperience';
+import {
+  createPollinationScene,
+  type PollinationScene,
+  type PollinationSceneMaterials,
+} from '@/lib/world-builder/pollinationScene';
+import { POLLINATION_WORLD } from '@/lib/world-builder/pollinationWorld';
+import {
+  createScaleTransition,
+  type ScaleTransition,
+} from '@/lib/world-builder/scaleTransition';
+import {
+  resolveFocusGuide,
+  type FocusGuideVisibility,
+} from '@/lib/world-builder/focusGuidance';
+import { createToolInteraction } from '@/lib/world-builder/toolInteraction';
+import {
+  createWebSimulationRuntime,
+  type WebSimulationRuntime,
+  type WebSimulationUpdates,
+} from '@/lib/world-builder/webSimulationRuntime';
+import {
+  computeFocusFrame,
+  createGuidedCamera,
+  type CameraFrame,
+} from '@/lib/world-builder/guidedCamera';
+import { createInteractionSystem } from '@/lib/world-builder/interactionSystem';
 
 const NARRATIONS = [
-  "Welcome to the flower garden. Look all around you — you are standing inside a living garden. Flowers are structures designed for reproduction. Each flower has petals to attract pollinators, stamens that produce pollen, and a pistil that receives it.",
-  "Pollen production. The stamens at the center of each flower produce tiny pollen grains. Each grain contains male genetic material. The golden particles you can see drifting around you are pollen gathering on the anthers.",
-  "The pollinator arrives. A bee is approaching! Bees are attracted by bright colours, distinct shapes, and the sweet scent of nectar. Watch it fly close to you — this is a crucial moment in plant reproduction.",
-  "Cross-pollination. As the bee moves from flower to flower collecting nectar, pollen sticks to its fuzzy body and is carried to the stigma of another flower. This transfer of pollen between two plants is called cross-pollination.",
-  "Fertilisation. A pollen tube grows down through the style to reach the ovule deep inside the flower. The male nucleus travels down this tube and fuses with the egg cell. This is fertilisation — the beginning of a new seed.",
-  "Seed and fruit formation. The fertilised ovule becomes a seed. The ovary wall swells and becomes fruit, protecting the seed inside. The petals fall away — their job is done. The fruit will help disperse the seeds.",
-  "Germination. Look at the ground. Underground, the seed absorbs water and begins to sprout. The radicle grows downward as the first root, while the plumule pushes upward toward light. This process is called germination.",
-  "The cycle completes. The seedling grows into a new plant which will one day flower and produce its own pollen. You are surrounded by the result of countless successful pollinations. This is how plant populations grow and evolve.",
+  'You are the field biologist for this school pollinator garden. Inspect the experimental flower and identify the petals, pollen-bearing anthers, and receptive stigma.',
+  'Collect a pollen sample. Draw the soft brush across a mature anther and look for golden grains on the bristles.',
+  'Observe the visiting bee. Notice how flower colour, scent, and nectar bring the pollinator into contact with the anthers.',
+  'Transfer your pollen sample to the experimental flower’s stigma. The second flower remains untouched as the control.',
+  'Pollination is complete, but fertilisation happens later. Enter the enlarged cutaway and trace the pollen tube through the style to an ovule.',
+  'Advance biological time and compare both flowers. Only the pollinated treatment develops a fruit; the untouched control does not.',
+  'Open the fruit, choose a seed, plant it, cover it with soil, and add enough water to begin germination.',
+  'Inspect the enlarged soil window. The radicle emerges first and grows down; the plumule grows upward. Return to the garden to complete the cycle.',
 ];
 
-const STAGES = [
-  { title: '🌸 The Flower Garden', cue: 'Flowers are structures designed to enable reproduction. Look around — you\'re standing in a living garden.', detail: 'Each flower has petals (to attract pollinators), stamens (male parts that make pollen), and a pistil (female part that receives pollen).', instructor: 'Ask students: Why are flowers brightly coloured? Why do they smell sweet?' },
-  { title: '🟡 Pollen Production', cue: 'The stamens produce pollen grains — each contains male genetic material.', detail: 'Watch the yellow pollen particles gathering on the anthers at the tip of each stamen.', instructor: 'Ask: What do you notice about where the pollen is concentrated?' },
-  { title: '🐝 The Pollinator Arrives', cue: 'A bee is approaching! Bees are attracted by colour, shape, and nectar scent.', detail: 'As the bee lands to collect nectar, pollen grains stick to its fuzzy body — especially its legs and abdomen.', instructor: 'Ask: How does the flower benefit from the bee? How does the bee benefit from the flower?' },
-  { title: '🌼 Cross-Pollination', cue: 'Pollen travels from one flower\'s stamen to another flower\'s stigma.', detail: 'The sticky stigma (top of the pistil) captures pollen from the bee. This mixes genetic material from two plants.', instructor: 'Ask: Why is mixing genes from two different plants beneficial?' },
-  { title: '🌱 Fertilisation', cue: 'Pollen grows a tube down through the style to reach the ovule.', detail: 'A pollen tube grows down to the ovary. The male nucleus travels down this tube and fuses with the egg cell — this is fertilisation.', instructor: 'Misconception: Pollination is NOT the same as fertilisation. Pollination leads to fertilisation.' },
-  { title: '🍎 Seed & Fruit Formation', cue: 'The fertilised ovule becomes a seed. The ovary wall becomes the fruit.', detail: 'The petals drop away. The ovary swells and becomes fruit that protects the seeds and aids in their dispersal.', instructor: 'Ask: Can you name 5 fruits? What seed is inside each one?' },
-  { title: '🌧️ Germination', cue: 'Seeds need water, warmth, and oxygen to begin germination. Look at the ground.', detail: 'Underground: the seed coat splits open. The radicle (root) grows downward. The plumule (shoot) pushes upward toward light.', instructor: 'Ask: What would happen if you planted a seed upside-down?' },
-  { title: '🌳 The Cycle Completes', cue: 'The new plant grows, flowers, and the entire cycle begins again. You are surrounded by the result.', detail: 'One successful pollination can lead to hundreds of seeds — and hundreds of new plants.', instructor: 'Recap: Flower → Pollen → Pollinator → Cross-pollination → Fertilisation → Seed → Germination → New plant.' },
+const NARRATION_AUDIO_URLS = Array.from(
+  { length: 8 },
+  (_, index) => `/audio/pollination/stage-${String(index + 1).padStart(2, '0')}.mp3`,
+);
+
+const ACTION_LABELS: Record<string, string> = {
+  'inspect-flower': 'Inspect flower anatomy',
+  'collect-pollen': 'Brush the anther',
+  'observe-pollinator': 'Observe the visiting bee',
+  'transfer-pollen': 'Brush the stigma',
+  'trace-pollen-tube': 'Trace pollen tube to ovule',
+  'advance-time-lapse': 'Advance biological time',
+  'compare-control': 'Compare treatment and control',
+  'open-fruit': 'Open the fruit',
+  'plant-seed': 'Plant one seed',
+  'cover-seed': 'Cover the seed with soil',
+  'water-seed': 'Water the planted seed',
+  'inspect-germination': 'Inspect radicle and plumule',
+};
+
+const ACTION_BY_TARGET: Record<string, string> = {
+  'treatment-flower': 'inspect-flower',
+  'treatment-flower-head': 'inspect-flower',
+  'anther-target': 'collect-pollen',
+  'pollinator-bee': 'observe-pollinator',
+  'stigma-target': 'transfer-pollen',
+  'ovary-cutaway': 'trace-pollen-tube',
+  'target-ovule': 'trace-pollen-tube',
+  'time-lapse-dial': 'advance-time-lapse',
+  'time-lapse-knob': 'advance-time-lapse',
+  'control-flower': 'compare-control',
+  'control-flower-head': 'compare-control',
+  'fruit-and-seed': 'open-fruit',
+  'fruit-halves': 'open-fruit',
+  'plantable-seed': 'plant-seed',
+  trowel: 'cover-seed',
+  'watering-can': 'water-seed',
+  'soil-observation-window': 'inspect-germination',
+  'germination-specimen': 'inspect-germination',
+  radicle: 'inspect-germination',
+  plumule: 'inspect-germination',
+};
+
+const TARGET_BY_ACTION: Record<string, string> = {
+  'inspect-flower': 'treatment-flower-head',
+  'collect-pollen': 'anther-target',
+  'observe-pollinator': 'pollinator-bee',
+  'transfer-pollen': 'stigma-target',
+  'trace-pollen-tube': 'target-ovule',
+  'advance-time-lapse': 'time-lapse-knob',
+  'compare-control': 'control-flower-head',
+  'open-fruit': 'fruit-halves',
+  'plant-seed': 'plantable-seed',
+  'cover-seed': 'trowel',
+  'water-seed': 'watering-can',
+  'inspect-germination': 'germination-specimen',
+};
+
+const EVIDENCE_LABELS: Record<string, string> = {
+  'flower-parts-identified': 'Petals, anthers, and stigma identified',
+  'pollen-collected-on-brush': 'Golden pollen adhered to the brush',
+  'bee-flower-visit-observed': 'Bee contacted anthers while collecting nectar',
+  'pollen-on-stigma-observed': 'Pollen transferred to the treatment stigma',
+  'fertilisation-route-observed': 'Pollen tube reached an ovule after pollination',
+  'treatment-control-difference-observed': 'Only the pollinated treatment formed fruit',
+  'germination-conditions-provided': 'Seed was planted, covered, and watered',
+  'cycle-completion-observed': 'Radicle and plumule emerged in opposite directions',
+};
+
+const DEFAULT_PREFERENCES: ExperiencePreferences = {
+  audio: true,
+  subtitles: true,
+  comfort: true,
+  seated: false,
+  reducedMotion: false,
+};
+
+function playNarration(stageIndex: number, enabled: boolean) {
+  if (!enabled) return;
+  void playSimulationNarration(
+    NARRATIONS[stageIndex],
+    stageIndex,
+    NARRATION_AUDIO_URLS[stageIndex],
+  );
+}
+
+function actionForObject(object?: THREE.Object3D) {
+  let candidate = object;
+  while (candidate) {
+    const action = ACTION_BY_TARGET[candidate.name];
+    if (action) return action;
+    candidate = candidate.parent ?? undefined;
+  }
+  return undefined;
+}
+
+function advanceAfterObjectAction(
+  source: NormalizedInputSource,
+  snapshot: LessonSnapshot,
+) {
+  return (
+    isObjectActionSource(source)
+    && snapshot.stageComplete
+    && !snapshot.lessonComplete
+  );
+}
+
+function isObjectActionSource(source: NormalizedInputSource) {
+  return source === 'xr-controller' || source === 'mouse';
+}
+
+const DEFAULT_POLLINATION_FRAME: CameraFrame = {
+  position: new THREE.Vector3(0, 1.55, 3.15),
+  target: new THREE.Vector3(0, 1.02, -0.92),
+};
+
+// Feet on the garden path a couple of metres south of the flower beds,
+// facing the experimental flower — standing height comes from the headset.
+const VR_SPAWN = {
+  position: new THREE.Vector3(0, 0, 2.4),
+  lookAt: new THREE.Vector3(0, 1.0, -0.9),
+};
+
+interface StageCameraFocus {
+  /** Object(s) to frame together. Multiple names fit all of them in one shot. */
+  names: string[];
+  fitPadding: number;
+  /**
+   * World point to approach the subject from. computeFocusFrame() defaults
+   * this to the camera's current position, which for a fresh stage overview
+   * is really just "wherever the previous stage's shot happened to leave
+   * the camera" — an arbitrary angle, not a composed one. Stages that union
+   * widely-separated objects need an explicit vantage so the shot looks
+   * deliberately composed instead of orbiting in from whatever direction
+   * the last stage's subject happened to be.
+   */
+  approachFrom?: THREE.Vector3;
+}
+
+// One explicit shot per stage — deliberately NOT derived from
+// TARGET_BY_ACTION (which exists for the continuous arrow/beacon guidance,
+// a different concern: "what's the very next clickable thing" vs "what's
+// this whole stage about"). Deriving the stage shot from the first
+// required action's target used to send the camera to whatever object
+// that action happened to touch — for stage 5 that was a tool on the far
+// field table, when the stage is actually about comparing the two
+// flowers. Each stage's shot is authored here instead, so it's obvious at
+// a glance what the learner sees when a stage begins.
+const SOUTH_OF_BEDS = new THREE.Vector3(0, 1.6, 3.2);
+const STAGE_CAMERA_FOCUS: StageCameraFocus[] = [
+  { names: ['treatment-flower'], fitPadding: 3.2 }, // 0: inspect the flower
+  { names: ['anther-target'], fitPadding: 4.5 }, // 1: collect pollen
+  { names: ['pollinator-bee'], fitPadding: 4.5 }, // 2: observe the pollinator
+  { names: ['stigma-target'], fitPadding: 4.5 }, // 3: transfer pollen
+  { names: ['enlarged-pistil-cutaway'], fitPadding: 1.7 }, // 4: trace the pollen tube
+  // The two flowers sit 4.7m apart, so their combined bounding sphere is far
+  // larger than a single flower's. A tighter padding keeps this a "stand
+  // between the two beds" shot, and an explicit south-facing approachFrom
+  // (matching the spawn view) stops it inheriting stage 4's leftover
+  // off-to-the-side angle, which used to sweep the shot wide enough to
+  // reveal the whole garden and field table behind the flowers.
+  { names: ['treatment-flower', 'control-flower'], fitPadding: 1.25, approachFrom: SOUTH_OF_BEDS }, // 5: compare both flowers
+  { names: ['fruit-halves'], fitPadding: 4.2 }, // 6: open the fruit, plant a seed
+  { names: ['enlarged-germination-cutaway'], fitPadding: 1.7 }, // 7: inspect germination
 ];
 
-function speakText(text: string) {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.87; utterance.pitch = 1.02; utterance.volume = 1.0;
-  const trySpeak = () => {
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length) {
-      const voice =
-        voices.find(v => v.name === 'Samantha') ||
-        voices.find(v => v.name.includes('Google US English')) ||
-        voices.find(v => v.name.includes('Karen')) ||
-        voices.find(v => v.lang === 'en-US' && v.localService) ||
-        voices.find(v => v.lang.startsWith('en-US')) ||
-        voices.find(v => v.lang.startsWith('en'));
-      if (voice) utterance.voice = voice;
-    }
-    window.speechSynthesis.speak(utterance);
-  };
-  if (window.speechSynthesis.getVoices().length > 0) trySpeak();
-  else window.speechSynthesis.addEventListener('voiceschanged', trySpeak, { once: true });
+/** Moves the camera once per real stage transition — an explicit, occasional
+ * move (like Circuit's), not a per-substep nudge that would fight the
+ * learner's own free look-around. */
+function focusStageOverview(
+  stageIndex: number,
+  guidedCamera: ReturnType<typeof createGuidedCamera>,
+  camera: THREE.PerspectiveCamera,
+  world: PollinationScene,
+) {
+  const focus = STAGE_CAMERA_FOCUS[stageIndex];
+  const objects = focus?.names
+    .map(name => world.root.getObjectByName(name))
+    .filter((object): object is THREE.Object3D => Boolean(object)) ?? [];
+  const frame = objects.length > 0
+    ? computeFocusFrame(objects, camera, {
+      fitPadding: focus.fitPadding,
+      approachFrom: focus.approachFrom,
+    })
+    : DEFAULT_POLLINATION_FRAME;
+  guidedCamera.focusOn(frame);
 }
 
-function buildFlower(petalHex: number, x: number, z: number, scale = 1): THREE.Group {
-  const g = new THREE.Group();
-  g.position.set(x, 0, z);
-  g.scale.setScalar(scale);
-  const stemMat = new THREE.MeshStandardMaterial({ color: 0x2d7a3a, roughness: 0.9 });
-  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.06, 1.5, 8), stemMat);
-  stem.position.y = 0.75;
-  g.add(stem);
-  const leafShape = new THREE.Shape();
-  leafShape.moveTo(0, 0); leafShape.bezierCurveTo(0.35, 0.08, 0.4, 0.35, 0, 0.55); leafShape.bezierCurveTo(-0.4, 0.35, -0.35, 0.08, 0, 0);
-  const leafGeo = new THREE.ShapeGeometry(leafShape);
-  const leafMat = new THREE.MeshStandardMaterial({ color: 0x2d7a3a, side: THREE.DoubleSide, roughness: 0.85 });
-  [-1, 1].forEach(side => {
-    const leaf = new THREE.Mesh(leafGeo, leafMat);
-    leaf.position.set(side * 0.06, 0.5, 0);
-    leaf.rotation.set(Math.PI / 5, side * (Math.PI / 3.5), 0);
-    g.add(leaf);
-  });
-  const head = new THREE.Group();
-  head.position.y = 1.55;
-  g.add(head);
-  const petalShape = new THREE.Shape();
-  petalShape.moveTo(0, 0); petalShape.bezierCurveTo(0.18, 0.04, 0.22, 0.22, 0.18, 0.4); petalShape.bezierCurveTo(0.14, 0.55, 0, 0.62, 0, 0.62); petalShape.bezierCurveTo(0, 0.62, -0.14, 0.55, -0.18, 0.4); petalShape.bezierCurveTo(-0.22, 0.22, -0.18, 0.04, 0, 0);
-  const petalGeo = new THREE.ShapeGeometry(petalShape, 8);
-  const petalMat = new THREE.MeshStandardMaterial({ color: petalHex, side: THREE.DoubleSide, roughness: 0.55 });
-  for (let i = 0; i < 6; i++) {
-    const petal = new THREE.Mesh(petalGeo, petalMat);
-    const a = (i / 6) * Math.PI * 2;
-    petal.position.set(Math.cos(a) * 0.16, 0, Math.sin(a) * 0.16);
-    petal.rotation.y = -a; petal.rotation.x = Math.PI / 2 - 0.3;
-    head.add(petal);
-  }
-  const center = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.08, 16), new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.4, emissive: 0xd97706, emissiveIntensity: 0.3 }));
-  head.add(center);
-  const antherMat = new THREE.MeshStandardMaterial({ color: 0xfde68a, emissive: 0xfbbf24, emissiveIntensity: 0.6 });
-  for (let i = 0; i < 10; i++) {
-    const a = (i / 10) * Math.PI * 2;
-    const fil = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.12, 4), new THREE.MeshStandardMaterial({ color: 0xfef3c7 }));
-    fil.position.set(Math.cos(a) * 0.09, 0.1, Math.sin(a) * 0.09);
-    const anther = new THREE.Mesh(new THREE.SphereGeometry(0.022, 8, 8), antherMat);
-    anther.position.set(Math.cos(a) * 0.09, 0.18, Math.sin(a) * 0.09);
-    head.add(fil, anther);
-  }
-  return g;
+// Stage 4 swaps the whole garden for the enlarged pistil cutaway — worth a
+// heads-up on arrival. Every other stage transition stays silent (see the
+// scale-note removal rationale above the `scaleDisclosure` state).
+function scaleDisclosureForStage(stageIndex: number) {
+  return stageIndex === 4
+    ? 'The next view enlarges the internal flower structures.'
+    : '';
 }
 
-function buildBee(): THREE.Group {
-  const g = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 12), new THREE.MeshStandardMaterial({ color: 0xf59e0b }));
-  body.scale.z = 1.6;
-  g.add(body);
-  // Stripes
-  for (let i = 0; i < 3; i++) {
-    const stripe = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.018, 4, 16), new THREE.MeshStandardMaterial({ color: 0x1c1917 }));
-    stripe.position.z = -0.05 + i * 0.06;
-    stripe.rotation.x = Math.PI / 2;
-    g.add(stripe);
-  }
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 10), new THREE.MeshStandardMaterial({ color: 0x1c1917 }));
-  head.position.z = 0.19;
-  g.add(head);
-  const wingMat = new THREE.MeshStandardMaterial({ color: 0xbfdbfe, transparent: true, opacity: 0.6, side: THREE.DoubleSide });
-  [[1, 0.12], [-1, 0.12]].forEach(([side, y]) => {
-    const wg = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.22), wingMat);
-    wg.position.set(side * 0.18, y as number, 0);
-    wg.rotation.set(-0.3, (side as number) * 0.2, 0);
-    g.add(wg);
-  });
-  // Pollen bags on legs
-  const pollenBagMat = new THREE.MeshStandardMaterial({ color: 0xfde68a, emissive: 0xfbbf24, emissiveIntensity: 0.4 });
-  [-1, 1].forEach(side => {
-    const bag = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 6), pollenBagMat);
-    bag.position.set(side * 0.1, -0.1, 0);
-    g.add(bag);
-  });
-  return g;
-}
-
-function drawCueCard(canvas: HTMLCanvasElement, stage: typeof STAGES[0], num: number, total: number) {
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  const w = canvas.width, h = canvas.height;
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = '#040a16';
-  ctx.fillRect(4, 4, w - 8, h - 8);
-  ctx.strokeStyle = 'rgba(52,211,153,0.6)';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.rect(4, 4, w - 8, h - 8);
-  ctx.stroke();
-  ctx.font = 'bold 18px sans-serif';
-  ctx.fillStyle = '#34d399';
-  ctx.fillText(`Stage ${num} of ${total}  ·  🌸 Pollination`, 20, 38);
-  ctx.fillStyle = 'rgba(52,211,153,0.3)';
-  ctx.fillRect(20, 46, w - 40, 1);
-  ctx.font = 'bold 24px sans-serif';
-  ctx.fillStyle = '#ffffff';
-  const titleLines = wrapText(ctx, stage.title, 20, 72, w - 40, 30);
-  ctx.font = '20px sans-serif';
-  ctx.fillStyle = '#d1d5db';
-  wrapText(ctx, stage.cue, 20, titleLines + 10, w - 40, 26);
-}
-
-function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxW: number, lh: number): number {
-  const words = text.split(' ');
-  let line = '', cy = y;
-  for (const word of words) {
-    const test = line + word + ' ';
-    if (ctx.measureText(test).width > maxW && line) { ctx.fillText(line.trimEnd(), x, cy); line = word + ' '; cy += lh; }
-    else line = test;
-  }
-  if (line.trim()) { ctx.fillText(line.trimEnd(), x, cy); cy += lh; }
-  return cy;
+function createDerivedMaterial(
+  source: THREE.MeshStandardMaterial,
+  parameters: THREE.MeshStandardMaterialParameters,
+) {
+  const material = source.clone();
+  material.setValues(parameters);
+  material.needsUpdate = true;
+  return material;
 }
 
 export default function PollinationViewer() {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const controlsRef = useRef<OrbitControls | null>(null);
-  const cueNeedsUpdateRef = useRef(true);
-  const cueCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const cueTextureRef = useRef<THREE.CanvasTexture | null>(null);
-  const beeRef = useRef<THREE.Group | null>(null);
-  const pollenParentRef = useRef<THREE.Group | null>(null);
-  const pollenRef = useRef<{ points: THREE.Points; positions: Float32Array } | null>(null);
-  const seedRef = useRef<THREE.Mesh | null>(null);
-  const seedlingRef = useRef<THREE.Group | null>(null);
-  const seedlingGrowthRef = useRef(0);
-  const stageRef = useRef(0);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const guidedCameraRef = useRef<ReturnType<typeof createGuidedCamera> | null>(null);
+  const playerRigRef = useRef<THREE.Group | null>(null);
+  const sceneApiRef = useRef<PollinationScene | null>(null);
+  const experienceRef = useRef<PollinationExperience>(createPollinationExperience());
+  const transitionRef = useRef<ScaleTransition>(createScaleTransition());
+  const snapshotRef = useRef<LessonSnapshot>(experienceRef.current.snapshot());
+  const performRef = useRef<(actionId: string, source: NormalizedInputSource, target?: string) => void>(() => {});
+  const previousRef = useRef<() => void>(() => {});
+  const nextRef = useRef<() => void>(() => {});
+  const replayRef = useRef<() => void>(() => {});
+  const completedRef = useRef(false);
+  const evidenceRef = useRef<string[]>([]);
+  const focusActionRef = useRef<string | undefined>(undefined);
 
+  const [snapshot, setSnapshot] = useState(snapshotRef.current);
+  const [preferences, setPreferences] = useState(DEFAULT_PREFERENCES);
   const [started, setStarted] = useState(false);
+  const [completed, setCompleted] = useState(false);
   const [vrSupported, setVrSupported] = useState(false);
-  const [stage, setStage] = useState(0);
+  const [runtimeError, setRuntimeError] = useState('');
+  const [evidence, setEvidence] = useState<string[]>([]);
+  // Empty by default: the scale note only has something worth saying right
+  // around a cutaway transition, not for the ordinary life-size garden.
+  const [scaleDisclosure, setScaleDisclosure] = useState('');
+  const [focusVisibility, setFocusVisibility] = useState<FocusGuideVisibility>({
+    direction: 'forward',
+    visible: false,
+  });
+  const focusVisibilityRef = useRef(focusVisibility);
+
+  // Mirrored into refs so the render loop (which drives the VR HUD panel)
+  // reads current values without re-subscribing the effect.
+  useEffect(() => { completedRef.current = completed; }, [completed]);
+  useEffect(() => { evidenceRef.current = evidence; }, [evidence]);
+
+  const experienceDefinition = POLLINATION_WORLD.experienceDefinitions![0];
+  const currentStage = experienceDefinition.stages[snapshot.stageIndex];
+  const remainingActions = useMemo(
+    () => currentStage.requiredActionIds.filter(
+      actionId => !snapshot.performedActionIds.includes(actionId),
+    ),
+    [currentStage, snapshot.performedActionIds],
+  );
+  focusActionRef.current = remainingActions[0];
+
+  const applyVisualAction = useCallback((actionId: string) => {
+    const world = sceneApiRef.current;
+    if (!world) return;
+    if (actionId === 'collect-pollen') {
+      world.pollen.visible = true;
+      world.brush.scale.setScalar(1.08);
+    }
+    if (actionId === 'transfer-pollen') {
+      world.stigmaTarget.scale.setScalar(1.22);
+      world.pollen.position.x += 1.08;
+    }
+    if (actionId === 'trace-pollen-tube') {
+      const transition = transitionRef.current.begin('flower', 'pistil-cutaway');
+      setScaleDisclosure(transition.scaleDisclosure);
+      world.treatmentFlower.ovaryCutaway.visible = true;
+    }
+    if (actionId === 'advance-time-lapse') {
+      world.fruit.root.visible = true;
+      world.fruit.root.scale.setScalar(1);
+    }
+    if (actionId === 'compare-control') {
+      world.controlFlower.root.scale.setScalar(0.96);
+      world.treatmentFlower.root.scale.setScalar(1.05);
+    }
+    if (actionId === 'open-fruit') {
+      world.fruit.halves.children.forEach((half, index) => {
+        half.position.x += index % 2 === 0 ? -0.1 : 0.1;
+      });
+    }
+    if (actionId === 'plant-seed') {
+      world.seed.visible = false;
+      world.germination.root.visible = true;
+      world.germination.seed.visible = true;
+    }
+    if (actionId === 'cover-seed') world.germination.seed.visible = false;
+    if (actionId === 'water-seed') {
+      world.germination.root.visible = true;
+      world.germination.radicle.visible = true;
+      world.germination.plumule.visible = true;
+    }
+    if (actionId === 'inspect-germination') {
+      const transition = transitionRef.current.begin('garden', 'germination-cutaway');
+      setScaleDisclosure(transition.scaleDisclosure);
+    }
+  }, []);
+
+  const moveCameraToStage = useCallback((stageIndex: number) => {
+    if (guidedCameraRef.current && cameraRef.current && sceneApiRef.current) {
+      focusStageOverview(stageIndex, guidedCameraRef.current, cameraRef.current, sceneApiRef.current);
+    }
+  }, []);
+
+  const performAction = useCallback((
+    actionId: string,
+    source: NormalizedInputSource,
+    targetEntityId = actionId,
+  ) => {
+    const before = experienceRef.current.snapshot();
+    if (!experienceDefinition.stages[before.stageIndex].requiredActionIds.includes(actionId)) {
+      return;
+    }
+    const interaction = createToolInteraction({
+      actionId,
+      toolId: `field-tool-${actionId}`,
+      home: [0, 0, 0],
+      validTargets: [targetEntityId],
+    });
+    interaction.pickUp(source);
+    const committed = interaction.release(
+      targetEntityId,
+      before.stageId,
+      typeof performance === 'undefined' ? 0 : performance.now(),
+    ).action;
+    if (!committed) return;
+
+    try {
+      let next = experienceRef.current.perform(committed.actionId);
+      applyVisualAction(actionId);
+      const authoredStage = experienceDefinition.stages[next.stageIndex];
+      if (
+        authoredStage.requiredActionIds.every(
+          required => next.performedActionIds.includes(required),
+        )
+        && !authoredStage.completionEvidenceIds.every(
+          id => next.recordedEvidenceIds.includes(id),
+        )
+      ) {
+        for (const evidenceId of authoredStage.completionEvidenceIds) {
+          next = experienceRef.current.observe(evidenceId);
+          setEvidence(values => values.includes(EVIDENCE_LABELS[evidenceId])
+            ? values
+            : [...values, EVIDENCE_LABELS[evidenceId]]);
+        }
+      }
+      snapshotRef.current = next;
+      setSnapshot(next);
+      if (next.lessonComplete && isObjectActionSource(source)) {
+        setCompleted(true);
+      } else if (advanceAfterObjectAction(source, next)) {
+        window.setTimeout(() => {
+          try {
+            const advanced = experienceRef.current.next();
+            snapshotRef.current = advanced;
+            setSnapshot(advanced);
+            sceneApiRef.current?.setStage(advanced.stageIndex);
+            moveCameraToStage(advanced.stageIndex);
+            transitionRef.current.reset();
+            setScaleDisclosure(scaleDisclosureForStage(advanced.stageIndex));
+            playNarration(advanced.stageIndex, preferences.audio);
+          } catch (error) {
+            setRuntimeError(error instanceof Error ? error.message : String(error));
+          }
+        }, 280);
+      }
+    } catch (error) {
+      setRuntimeError(error instanceof Error ? error.message : String(error));
+    }
+  }, [applyVisualAction, experienceDefinition, moveCameraToStage, preferences.audio]);
+  performRef.current = performAction;
+
+  const previous = useCallback(() => {
+    setCompleted(false);
+    const next = experienceRef.current.previous();
+    snapshotRef.current = next;
+    setSnapshot(next);
+    sceneApiRef.current?.setStage(next.stageIndex);
+    moveCameraToStage(next.stageIndex);
+    transitionRef.current.reset();
+    setScaleDisclosure(scaleDisclosureForStage(next.stageIndex));
+    playNarration(next.stageIndex, preferences.audio);
+  }, [moveCameraToStage, preferences.audio]);
+  previousRef.current = previous;
+
+  const next = useCallback(() => {
+    if (!snapshotRef.current.stageComplete) return;
+    if (snapshotRef.current.lessonComplete) {
+      setCompleted(true);
+      return;
+    }
+    try {
+      const nextSnapshot = experienceRef.current.next();
+      snapshotRef.current = nextSnapshot;
+      setSnapshot(nextSnapshot);
+      sceneApiRef.current?.setStage(nextSnapshot.stageIndex);
+      moveCameraToStage(nextSnapshot.stageIndex);
+      transitionRef.current.reset();
+      setScaleDisclosure(scaleDisclosureForStage(nextSnapshot.stageIndex));
+      playNarration(nextSnapshot.stageIndex, preferences.audio);
+    } catch (error) {
+      setRuntimeError(error instanceof Error ? error.message : String(error));
+    }
+  }, [moveCameraToStage, preferences.audio]);
+  nextRef.current = next;
+
+  const replay = useCallback(() => {
+    setCompleted(false);
+    setEvidence([]);
+    const fresh = experienceRef.current.restart();
+    snapshotRef.current = fresh;
+    setSnapshot(fresh);
+    sceneApiRef.current?.setStage(fresh.stageIndex);
+    moveCameraToStage(fresh.stageIndex);
+    transitionRef.current.reset();
+    setScaleDisclosure(scaleDisclosureForStage(fresh.stageIndex));
+    playNarration(fresh.stageIndex, preferences.audio);
+  }, [moveCameraToStage, preferences.audio]);
+  replayRef.current = replay;
+
+  const enterVr = useCallback(async () => {
+    if (!rendererRef.current || !('xr' in navigator)) return;
+    try {
+      const session = await (navigator as Navigator & {
+        xr: {
+          requestSession(
+            mode: string,
+            options: XRSessionInit,
+          ): Promise<XRSession>;
+        };
+      }).xr.requestSession('immersive-vr', {
+        requiredFeatures: ['local-floor'],
+        optionalFeatures: ['bounded-floor', 'hand-tracking'],
+      });
+      await rendererRef.current.xr.setSession(session);
+      setStarted(true);
+      playNarration(snapshotRef.current.stageIndex, preferences.audio);
+    } catch (error) {
+      setRuntimeError(error instanceof Error
+        ? error.message
+        : 'The headset could not start immersive mode.');
+    }
+  }, [preferences.audio]);
 
   useEffect(() => {
-    if (typeof navigator !== 'undefined' && 'xr' in navigator) {
-      setVrSupported(true);
+    if ('xr' in navigator) {
+      void (navigator as Navigator & {
+        xr: { isSessionSupported(mode: string): Promise<boolean> };
+      }).xr.isSessionSupported('immersive-vr').then(setVrSupported);
     }
   }, []);
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
+    const mountElement = mount;
+    let cancelled = false;
+    let host: WebSimulationRuntime | undefined;
+    let fixedUpdate: WebSimulationUpdates['fixedUpdate'];
+    let renderUpdate: WebSimulationUpdates['renderUpdate'];
 
-    // ── Renderer ──────────────────────────────────────────────────────────
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(mount.clientWidth, mount.clientHeight);
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.xr.enabled = true;
-    renderer.xr.setReferenceSpaceType('local-floor');
-    mount.appendChild(renderer.domElement);
-    rendererRef.current = renderer;
+    async function initialize() {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(58, 1, 0.04, 80);
+      camera.position.set(0, 1.55, 3.15);
+      camera.lookAt(0, 1.05, -0.8);
 
-    // ── Scene ─────────────────────────────────────────────────────────────
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0xc5e8f5, 0.022);
-
-    // ── Sky sphere (gradient: horizon pale blue → zenith deep blue) ───────
-    const skyGeo = new THREE.SphereGeometry(48, 32, 20);
-    const skyCols = new Float32Array(skyGeo.attributes.position.count * 3);
-    for (let i = 0; i < skyGeo.attributes.position.count; i++) {
-      const yy = (skyGeo.attributes.position.getY(i) + 48) / 96;
-      skyCols[i * 3 + 0] = THREE.MathUtils.lerp(0.84, 0.24, yy);
-      skyCols[i * 3 + 1] = THREE.MathUtils.lerp(0.93, 0.47, yy);
-      skyCols[i * 3 + 2] = THREE.MathUtils.lerp(1.00, 0.82, yy);
-    }
-    skyGeo.setAttribute('color', new THREE.Float32BufferAttribute(skyCols, 3));
-    scene.add(new THREE.Mesh(skyGeo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide })));
-
-    // ── Camera (for browser mode — VR uses headset) ───────────────────────
-    const camera = new THREE.PerspectiveCamera(72, mount.clientWidth / mount.clientHeight, 0.05, 100);
-    camera.position.set(0, 1.7, 3.5);
-    camera.lookAt(0, 1.5, 0);
-
-    // ── Lights ────────────────────────────────────────────────────────────
-    const hemi = new THREE.HemisphereLight(0x87ceeb, 0x3a7d44, 0.7);
-    scene.add(hemi);
-    const sun = new THREE.DirectionalLight(0xfff5d6, 1.6);
-    sun.position.set(8, 14, 5);
-    sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.camera.near = 0.5;
-    sun.shadow.camera.far = 50;
-    sun.shadow.camera.left = -15; sun.shadow.camera.right = 15;
-    sun.shadow.camera.top = 15; sun.shadow.camera.bottom = -15;
-    scene.add(sun);
-    // Sun glow fill
-    const fill = new THREE.DirectionalLight(0xffd6a5, 0.4);
-    fill.position.set(-5, 6, -8);
-    scene.add(fill);
-
-    // ── Ground ────────────────────────────────────────────────────────────
-    const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(60, 60),
-      new THREE.MeshStandardMaterial({ color: 0x3d8b47, roughness: 0.95 })
-    );
-    ground.rotation.x = -Math.PI / 2;
-    ground.receiveShadow = true;
-    scene.add(ground);
-    // Dirt patch (center stage)
-    const dirt = new THREE.Mesh(new THREE.CircleGeometry(1.2, 32), new THREE.MeshStandardMaterial({ color: 0x8b5e3c, roughness: 1 }));
-    dirt.rotation.x = -Math.PI / 2; dirt.position.y = 0.005;
-    scene.add(dirt);
-
-    // ── Clouds ────────────────────────────────────────────────────────────
-    const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, transparent: true, opacity: 0.92 });
-    const clouds: THREE.Group[] = [];
-    for (let c = 0; c < 5; c++) {
-      const cg = new THREE.Group();
-      const angle = (c / 5) * Math.PI * 2;
-      cg.position.set(Math.cos(angle) * (14 + c * 3), 11 + c * 1.2, Math.sin(angle) * (12 + c * 2));
-      for (let b = 0; b < 5; b++) {
-        const blob = new THREE.Mesh(new THREE.SphereGeometry(1.2 + Math.random(), 8, 6), cloudMat);
-        blob.position.set((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 1.5);
-        cg.add(blob);
-      }
-      scene.add(cg);
-      clouds.push(cg);
-    }
-
-    // ── 360° Flowers ─────────────────────────────────────────────────────
-    const PETAL_COLORS = [0xf472b6, 0xfbbf24, 0xa78bfa, 0xf87171, 0x86efac, 0xfb923c, 0xe879f9, 0x67e8f9];
-    const flowerPositions: {x:number,z:number,color:number,scale:number}[] = [];
-    // Inner ring (very close — almost touching distance in VR)
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2 + 0.2;
-      flowerPositions.push({ x: Math.cos(a) * (1.4 + Math.random() * 0.4), z: Math.sin(a) * (1.4 + Math.random() * 0.4), color: PETAL_COLORS[i % PETAL_COLORS.length], scale: 0.7 + Math.random() * 0.3 });
-    }
-    // Middle ring
-    for (let i = 0; i < 10; i++) {
-      const a = (i / 10) * Math.PI * 2 + 0.5;
-      flowerPositions.push({ x: Math.cos(a) * (3.5 + Math.random() * 0.8), z: Math.sin(a) * (3.5 + Math.random() * 0.8), color: PETAL_COLORS[(i + 3) % PETAL_COLORS.length], scale: 0.85 + Math.random() * 0.3 });
-    }
-    // Outer ring
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2 + 1.1;
-      flowerPositions.push({ x: Math.cos(a) * (5.5 + Math.random() * 1.5), z: Math.sin(a) * (5.5 + Math.random() * 1.5), color: PETAL_COLORS[(i + 5) % PETAL_COLORS.length], scale: 1.0 + Math.random() * 0.4 });
-    }
-    flowerPositions.forEach(({ x, z, color, scale }) => {
-      const f = buildFlower(color, x, z, scale);
-      f.traverse(m => { if ((m as THREE.Mesh).isMesh) { m.castShadow = true; m.receiveShadow = true; } });
-      scene.add(f);
-    });
-
-    // ── Trees (all 360°) ─────────────────────────────────────────────────
-    for (let i = 0; i < 12; i++) {
-      const a = (i / 12) * Math.PI * 2;
-      const r = 9 + Math.random() * 5;
-      const h = 3 + Math.random() * 2;
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.22, h, 7), new THREE.MeshStandardMaterial({ color: 0x6b3d14, roughness: 0.9 }));
-      trunk.position.set(Math.cos(a) * r, h / 2, Math.sin(a) * r);
-      trunk.castShadow = true;
-      scene.add(trunk);
-      const foliage = new THREE.Mesh(new THREE.SphereGeometry(1.5 + Math.random() * 0.8, 8, 6), new THREE.MeshStandardMaterial({ color: i % 3 === 0 ? 0x15803d : 0x166534, roughness: 0.9 }));
-      foliage.position.set(Math.cos(a) * r, h + 0.9, Math.sin(a) * r);
-      foliage.castShadow = true;
-      scene.add(foliage);
-    }
-
-    // ── Bee (large, flies very close to player at eye level) ─────────────
-    const bee = buildBee();
-    bee.scale.setScalar(1.6);
-    scene.add(bee);
-    beeRef.current = bee;
-
-    // ── Pollen particles (spread across the whole garden) ─────────────────
-    const POLLEN_COUNT = 200;
-    const pollenPositions = new Float32Array(POLLEN_COUNT * 3);
-    for (let i = 0; i < POLLEN_COUNT; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const r = Math.random() * 5;
-      pollenPositions[i * 3 + 0] = Math.cos(a) * r;
-      pollenPositions[i * 3 + 1] = 0.5 + Math.random() * 2.5;
-      pollenPositions[i * 3 + 2] = Math.sin(a) * r;
-    }
-    const pollenGeo = new THREE.BufferGeometry();
-    pollenGeo.setAttribute('position', new THREE.BufferAttribute(pollenPositions.slice(), 3));
-    const pollenMat = new THREE.PointsMaterial({ color: 0xfde68a, size: 0.06, transparent: true, opacity: 0.9, sizeAttenuation: true });
-    const pollenPoints = new THREE.Points(pollenGeo, pollenMat);
-    const pollenParent = new THREE.Group();
-    pollenParent.add(pollenPoints);
-    pollenParent.visible = false;
-    scene.add(pollenParent);
-    pollenParentRef.current = pollenParent;
-    pollenRef.current = { points: pollenPoints, positions: pollenPositions };
-
-    // ── Underground section (for stage 6-7) ──────────────────────────────
-    const pitGroup = new THREE.Group();
-    pitGroup.visible = false;
-    scene.add(pitGroup);
-    const soilWall = new THREE.Mesh(new THREE.BoxGeometry(2.5, 1.8, 0.1), new THREE.MeshStandardMaterial({ color: 0x7c5c3a }));
-    soilWall.position.set(0, -0.9, -0.5);
-    pitGroup.add(soilWall);
-    const rootMat = new THREE.MeshStandardMaterial({ color: 0xd4a574, roughness: 0.8 });
-    for (let i = 0; i < 5; i++) {
-      const root = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.01, 0.6 + Math.random() * 0.4, 4), rootMat);
-      root.position.set((Math.random() - 0.5) * 1.5, -1.3, -0.5);
-      root.rotation.z = (Math.random() - 0.5) * 0.8;
-      pitGroup.add(root);
-    }
-
-    const seed = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 12), new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.8 }));
-    seed.position.set(0, -0.55, 0);
-    seed.visible = false;
-    scene.add(seed);
-    seedRef.current = seed;
-
-    const seedling = new THREE.Group();
-    seedling.visible = false;
-    scene.add(seedling);
-    const sprout = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.03, 1, 6), new THREE.MeshStandardMaterial({ color: 0x4ade80 }));
-    sprout.position.y = 0.5;
-    seedling.add(sprout);
-    const sproutLeaf = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.25), new THREE.MeshStandardMaterial({ color: 0x22c55e, side: THREE.DoubleSide }));
-    sproutLeaf.position.set(0.2, 0.9, 0); sproutLeaf.rotation.z = 0.3;
-    seedling.add(sproutLeaf);
-    seedlingRef.current = seedling;
-
-    // ── 3D Cue card panel (visible in VR headset) ────────────────────────
-    const cueCanvas = document.createElement('canvas');
-    cueCanvas.width = 512; cueCanvas.height = 256;
-    cueCanvasRef.current = cueCanvas;
-    const cueTexture = new THREE.CanvasTexture(cueCanvas);
-    cueTextureRef.current = cueTexture;
-    const cueMesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.1, 0.55),
-      new THREE.MeshBasicMaterial({ map: cueTexture })
-    );
-    cueMesh.position.set(0, 1.62, -1.8);
-    scene.add(cueMesh);
-
-    // Stage nav buttons (VR — point and click)
-    const btnMat = (col: number) => new THREE.MeshStandardMaterial({ color: col, roughness: 0.4, emissive: col, emissiveIntensity: 0.25 });
-    const prevBtn = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.12, 0.04), btnMat(0x374151));
-    prevBtn.position.set(-0.25, 1.28, -1.8); prevBtn.name = 'btn-prev';
-    scene.add(prevBtn);
-    const nextBtn = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.12, 0.04), btnMat(0x16a34a));
-    nextBtn.position.set(0.25, 1.28, -1.8); nextBtn.name = 'btn-next';
-    scene.add(nextBtn);
-    const interactables = [prevBtn, nextBtn];
-
-    // ── XR Controllers ────────────────────────────────────────────────────
-    function buildControllerVisual() {
-      const g = new THREE.Group();
-      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.026, 0.1, 8), new THREE.MeshStandardMaterial({ color: 0x2d2d2d, metalness: 0.6 }));
-      g.add(body);
-      const ray = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.002, 0.002, 1.5, 4),
-        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35 })
-      );
-      ray.position.z = -0.75; ray.rotation.x = Math.PI / 2;
-      g.add(ray);
-      return g;
-    }
-    const ctrl0 = renderer.xr.getController(0);
-    const ctrl1 = renderer.xr.getController(1);
-    ctrl0.add(buildControllerVisual()); ctrl1.add(buildControllerVisual());
-    scene.add(ctrl0, ctrl1);
-
-    const ctrlRaycaster = new THREE.Raycaster();
-    const advanceStage = () => {
-      const next = Math.min(stageRef.current + 1, STAGES.length - 1);
-      stageRef.current = next; cueNeedsUpdateRef.current = true;
-      if (next === 7) seedlingGrowthRef.current = 0;
-      speakText(NARRATIONS[next]);
-      setStage(next);
-    };
-    const retreatStage = () => {
-      const next = Math.max(stageRef.current - 1, 0);
-      stageRef.current = next; cueNeedsUpdateRef.current = true;
-      speakText(NARRATIONS[next]);
-      setStage(next);
-    };
-    const onCtrlSelect = (event: Event) => {
-      const ctrl = event.target as unknown as THREE.XRTargetRaySpace;
-      ctrlRaycaster.ray.origin.setFromMatrixPosition(ctrl.matrixWorld);
-      ctrlRaycaster.ray.direction.set(0, 0, -1).applyQuaternion(ctrl.quaternion);
-      const hits = ctrlRaycaster.intersectObjects(interactables);
-      if (hits.length > 0) {
-        const name = hits[0].object.name;
-        if (name === 'btn-next') advanceStage();
-        else if (name === 'btn-prev') retreatStage();
-      } else {
-        advanceStage();
-      }
-    };
-    ctrl0.addEventListener('selectstart', onCtrlSelect as any);
-    ctrl1.addEventListener('selectstart', onCtrlSelect as any);
-
-    // ── OrbitControls (browser mode) ──────────────────────────────────────
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 1.5, 0);
-    controls.enableDamping = true; controls.dampingFactor = 0.06;
-    controls.minDistance = 0.3; controls.maxDistance = 20;
-    controls.minPolarAngle = 0.05; controls.maxPolarAngle = Math.PI * 0.88;
-    controlsRef.current = controls;
-
-    // ── Animation loop ─────────────────────────────────────────────────────
-    const clock = new THREE.Clock();
-    renderer.setAnimationLoop(() => {
-      const t = clock.getElapsedTime();
-      const s = stageRef.current;
-
-      // Update 3D cue card when stage changes
-      if (cueNeedsUpdateRef.current && cueCanvasRef.current) {
-        drawCueCard(cueCanvasRef.current, STAGES[stageRef.current], stageRef.current + 1, STAGES.length);
-        if (cueTextureRef.current) cueTextureRef.current.needsUpdate = true;
-        cueNeedsUpdateRef.current = false;
-      }
-
-      // Clouds drift slowly
-      clouds.forEach((cg, i) => { cg.position.x += 0.0015 * (i % 2 === 0 ? 1 : -1); });
-
-      // Bee: figure-8 pattern at eye level, very close to player
-      bee.visible = s >= 2 && s <= 4;
-      if (bee.visible) {
-        const bt = t * 0.65;
-        if (s === 2) {
-          bee.position.set(Math.sin(bt * 2) * 1.8, 1.55 + Math.sin(bt * 1.4) * 0.22, Math.sin(bt) * 2.2 - 0.5);
-        } else if (s === 3) {
-          bee.position.set(Math.cos(bt * 1.5) * 0.9, 1.6 + Math.sin(bt * 2.2) * 0.12, Math.sin(bt * 1.5) * 1.1 - 0.3);
-        } else {
-          bee.position.lerp(new THREE.Vector3(-12, 5, 0), 0.006);
-        }
-        const lookTarget = new THREE.Vector3(bee.position.x + Math.sin(t * 0.7), bee.position.y, bee.position.z - 0.5);
-        bee.lookAt(lookTarget);
-        bee.children.filter(c => (c as THREE.Mesh).isMesh && ((c as THREE.Mesh).material as THREE.MeshStandardMaterial)?.transparent)
-          .forEach((w, i) => { w.rotation.z = Math.sin(t * 20 + i * Math.PI) * 0.45; });
-      }
-
-      // Pollen: float and drift
-      pollenParent.visible = s >= 1 && s <= 4;
-      if (pollenParent.visible && pollenRef.current) {
-        const pos = pollenRef.current.points.geometry.attributes.position as THREE.BufferAttribute;
-        const orig = pollenRef.current.positions;
-        for (let i = 0; i < pos.count; i++) {
-          pos.setXYZ(i,
-            orig[i * 3] + Math.sin(t * 1.3 + i * 0.7) * 0.04,
-            orig[i * 3 + 1] + Math.cos(t * 0.9 + i * 0.4) * 0.05 + Math.sin(t * 0.3) * 0.02,
-            orig[i * 3 + 2] + Math.sin(t * 1.6 + i * 1.1) * 0.04
-          );
-        }
-        pos.needsUpdate = true;
-      }
-
-      // Underground / seed / seedling stages
-      const showUnderground = s === 6 || s === 7;
-      pitGroup.visible = showUnderground;
-      if (seedRef.current) {
-        seedRef.current.visible = s === 6;
-        if (s === 6) { seedRef.current.rotation.y = t; seedRef.current.scale.setScalar(1 + Math.sin(t * 2) * 0.06); }
-      }
-      if (seedlingRef.current) {
-        seedlingRef.current.visible = s === 7;
-        if (s === 7) { seedlingGrowthRef.current = Math.min(seedlingGrowthRef.current + 0.007, 1); seedlingRef.current.scale.setScalar(seedlingGrowthRef.current); }
-      }
-
-      // Cue card panel faces player
-      const cam = renderer.xr.isPresenting ? renderer.xr.getCamera() : camera;
-      cueMesh.lookAt(cam.position);
-      prevBtn.lookAt(cam.position);
-      nextBtn.lookAt(cam.position);
-
-      if (!renderer.xr.isPresenting) controls.update();
-      renderer.render(scene, camera);
-    });
-
-    // Initial cue card draw
-    drawCueCard(cueCanvas, STAGES[0], 1, STAGES.length);
-    cueTexture.needsUpdate = true;
-
-    const onResize = () => {
-      if (!mount) return;
-      camera.aspect = mount.clientWidth / mount.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(mount.clientWidth, mount.clientHeight);
-    };
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      renderer.setAnimationLoop(null);
-      renderer.dispose();
-      if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
-      window.removeEventListener('resize', onResize);
-      window.speechSynthesis?.cancel();
-    };
-  }, []);
-
-  const advance = useCallback(() => {
-    setStage(prev => {
-      const next = Math.min(prev + 1, STAGES.length - 1);
-      stageRef.current = next; cueNeedsUpdateRef.current = true;
-      if (next === 7) seedlingGrowthRef.current = 0;
-      speakText(NARRATIONS[next]);
-      return next;
-    });
-  }, []);
-
-  const goBack = useCallback(() => {
-    setStage(prev => {
-      const next = Math.max(prev - 1, 0);
-      stageRef.current = next; cueNeedsUpdateRef.current = true;
-      speakText(NARRATIONS[next]);
-      return next;
-    });
-  }, []);
-
-  const enterVR = useCallback(async () => {
-    if (!rendererRef.current) return;
-    try {
-      const session = await (navigator as any).xr.requestSession('immersive-vr', {
-        requiredFeatures: ['local-floor'],
-        optionalFeatures: ['bounded-floor', 'hand-tracking'],
+      host = createWebSimulationRuntime({
+        mount: mountElement,
+        scene,
+        camera,
+        updates: {
+          fixedUpdate(context) {
+            fixedUpdate?.(context);
+          },
+          renderUpdate(context) {
+            renderUpdate?.(context);
+          },
+        },
       });
-      rendererRef.current.xr.setSession(session);
-      setStarted(true);
-    } catch {
-      setStarted(true);
-    }
-  }, []);
+      rendererRef.current = host.renderer;
+      cameraRef.current = camera;
 
-  const info = STAGES[stage];
+      const vrRig = createVrPlayerRig({
+        renderer: host.renderer,
+        scene,
+        camera,
+        spawn: VR_SPAWN,
+        rayColor: '#d9f99d',
+      });
+      playerRigRef.current = vrRig.rig;
+      host.resources.register('pollination-player-rig', () => vrRig.dispose());
+
+      const materialFactory = createMaterialFactory({
+        assets: POLLINATION_WORLD.assetManifests[0],
+        materials: POLLINATION_WORLD.materials,
+        qualityProfileId: host.profile(),
+        maxAnisotropy: host.renderer.capabilities.getMaxAnisotropy(),
+      });
+      const definition = (id: string) => {
+        const value = POLLINATION_WORLD.materials.find(item => item.id === id);
+        if (!value) throw new Error(`Missing Pollination material ${id}`);
+        return value;
+      };
+      const ids = [
+        'soil', 'stem', 'leaf', 'petal-pink', 'petal-violet',
+        'bark', 'bee-yellow', 'bee-dark', 'bee-wing', 'pollen',
+      ];
+      const loaded = await Promise.all(
+        ids.map(id => materialFactory.create(definition(id))),
+      ) as THREE.MeshStandardMaterial[];
+      if (cancelled) {
+        materialFactory.dispose();
+        await host.dispose();
+        return;
+      }
+      const byId = Object.fromEntries(ids.map((id, index) => [id, loaded[index]]));
+      const supplementals: THREE.MeshStandardMaterial[] = [];
+      const derive = (
+        source: THREE.MeshStandardMaterial,
+        parameters: THREE.MeshStandardMaterialParameters,
+      ) => {
+        const result = createDerivedMaterial(source, parameters);
+        supplementals.push(result);
+        return result;
+      };
+      const materials: PollinationSceneMaterials = {
+        soil: byId.soil,
+        stem: byId.stem,
+        leaf: byId.leaf,
+        petalPrimary: byId['petal-pink'],
+        petalControl: byId['petal-violet'],
+        pollen: byId.pollen,
+        flowerCentre: byId.pollen,
+        beeYellow: byId['bee-yellow'],
+        beeDark: byId['bee-dark'],
+        beeWing: byId['bee-wing'],
+        fruitSkin: derive(byId['petal-pink'], { color: '#9f1239', roughness: 0.48 }),
+        fruitFlesh: derive(byId.pollen, { color: '#fde68a', roughness: 0.76 }),
+        seed: byId.bark,
+        root: derive(byId.pollen, { color: '#f5e7c8', roughness: 0.88 }),
+        path: derive(byId.soil, { color: '#b98b64', roughness: 0.96 }),
+        paintedWood: derive(byId.bark, {
+          color: '#d9e8d2',
+          roughness: 0.78,
+          map: null,
+          normalMap: null,
+          roughnessMap: null,
+        }),
+        naturalWood: byId.bark,
+        grass: derive(byId.leaf, { color: '#4d7c36', roughness: 0.92 }),
+        glass: derive(byId['bee-wing'], {
+          color: '#d8f3ef',
+          transparent: true,
+          opacity: 0.28,
+          roughness: 0.12,
+          depthWrite: false,
+          map: null,
+          normalMap: null,
+          roughnessMap: null,
+        }),
+        metal: derive(byId['bee-dark'], {
+          color: '#687076',
+          metalness: 0.78,
+          roughness: 0.3,
+        }),
+        wood: byId.bark,
+        bristle: byId.pollen,
+        paintedMetal: derive(byId['petal-violet'], {
+          color: '#315f67',
+          metalness: 0.35,
+          roughness: 0.38,
+        }),
+        rubber: derive(byId['bee-dark'], { color: '#14201d', roughness: 0.9 }),
+        paper: derive(byId['petal-pink'], { color: '#f7f4df', roughness: 0.94 }),
+        water: derive(byId['bee-wing'], {
+          color: '#7dd3fc',
+          transparent: true,
+          opacity: 0.58,
+          roughness: 0.18,
+          depthWrite: false,
+        }),
+      };
+      host.resources.register('pollination-materials', () => {
+        for (const material of supplementals) material.dispose();
+        materialFactory.dispose();
+      });
+
+      const environment = await createEnvironment({
+        renderer: host.renderer,
+        scene,
+        definition: POLLINATION_WORLD.environments[0],
+        assets: POLLINATION_WORLD.assetManifests[0],
+      });
+      host.resources.register('pollination-environment', () => environment.dispose());
+
+      const scientificModels = createScientificModelRegistry();
+      scientificModels.register({
+        manifest: POLLINATION_WORLD.scientificModels[0],
+        evaluate: input => pollinationSnapshotForStage(Number(input.completedStage)),
+      });
+      const modelFailures = scientificModels.verify('pollination-event-graph');
+      if (modelFailures.length > 0) throw new Error(modelFailures.join('; '));
+      host.resources.register('pollination-models', () => scientificModels.dispose());
+
+      const world = createPollinationScene({
+        scene,
+        materials,
+        profileId: host.profile(),
+      });
+      sceneApiRef.current = world;
+      host.resources.register('pollination-scene', () => world.dispose());
+
+      // ── Guided camera: moves once per real stage transition (mirroring
+      // Circuit), and closer still onto whatever the learner just selected.
+      // Rotation itself is always free — the off-screen arrow (below) is
+      // the only cue for "look over there", so the camera never fights the
+      // learner's own look-around input ──────────────────────────────────
+      const guidedCamera = createGuidedCamera(camera, host.renderer.domElement, {
+        transitionSeconds: 0.7,
+      });
+      guidedCamera.focusOn(DEFAULT_POLLINATION_FRAME, { animate: false });
+      guidedCameraRef.current = guidedCamera;
+      host.resources.register('pollination-camera', () => {
+        guidedCameraRef.current = null;
+        guidedCamera.dispose();
+      });
+
+      // ── Selection: one shared raycasting/highlight system for mouse + XR ─
+      const selectObject = (
+        object: THREE.Object3D | undefined,
+        source: NormalizedInputSource,
+      ) => {
+        const actionId = actionForObject(object);
+        const activeSnapshot = snapshotRef.current;
+        const activeStage = experienceDefinition.stages[activeSnapshot.stageIndex];
+        if (
+          actionId
+          && activeStage.requiredActionIds.includes(actionId)
+          && !activeSnapshot.performedActionIds.includes(actionId)
+        ) {
+          performRef.current(actionId, source, object?.name);
+        }
+      };
+
+      const hud = createVrHudPanel({ scene });
+      host.resources.register('pollination-vr-hud', () => hud.dispose());
+
+      const interactionSystem = createInteractionSystem({
+        camera,
+        domElement: host.renderer.domElement,
+        xrControllers: vrRig.controllers,
+        onSelect: (id, object, source) => {
+          const hudButton = hud.buttonIdFor(id);
+          if (hudButton) {
+            if (hudButton === 'previous') previousRef.current();
+            if (hudButton === 'next') nextRef.current();
+            if (hudButton === 'replay') replayRef.current();
+            if (hudButton === 'exit') void host!.renderer.xr.getSession()?.end();
+            return;
+          }
+          selectObject(object, source);
+          interactionSystem.setSelected(id);
+          guidedCamera.focusOn(computeFocusFrame(object, camera, { fitPadding: 2.1 }));
+        },
+      });
+      for (const mesh of Object.values(hud.buttons)) {
+        interactionSystem.register(mesh.name, mesh);
+      }
+      for (const targetName of Object.keys(ACTION_BY_TARGET)) {
+        const target = world.root.getObjectByName(targetName);
+        if (target) interactionSystem.register(targetName, target, { highlightColor: '#ffe08a' });
+      }
+      host.resources.register('pollination-interaction', () => interactionSystem.dispose());
+
+      const locomotion = createVrLocomotion({
+        renderer: host.renderer,
+        rig: vrRig.rig,
+        onBack: () => {
+          if (snapshotRef.current.stageIndex > 0) previousRef.current();
+          else void host!.renderer.xr.getSession()?.end();
+        },
+      });
+
+      const vrHudContent = (): VrHudContent => {
+        if (completedRef.current) {
+          return {
+            eyebrow: 'Lesson complete',
+            title: 'Today you learned',
+            body: 'Great field work! Review what your experiment proved.',
+            bullets: evidenceRef.current,
+            buttons: ['replay', 'exit'],
+          };
+        }
+        const active = snapshotRef.current;
+        const focusAction = focusActionRef.current;
+        return {
+          eyebrow: `Stage ${active.stageIndex + 1} / ${active.stageCount}`,
+          title: active.stageTitle,
+          body: active.cue,
+          hint: focusAction
+            ? `Do: ${ACTION_LABELS[focusAction]}`
+            : 'Stage complete — press Next ▶',
+          buttons: active.stageIndex > 0 ? ['previous', 'next'] : ['next'],
+        };
+      };
+
+      const projectedFocus = new THREE.Vector3();
+      renderUpdate = context => {
+        world.update(context.frameDeltaSeconds, context.elapsedSeconds);
+        transitionRef.current.update(context.frameDeltaSeconds * 1.8);
+
+        // The next required action's target pulses persistently — in both
+        // browser and VR — so there's always a positive "click this" cue,
+        // not just a reactive hover highlight or an off-screen arrow.
+        const suggestedTargetName = focusActionRef.current
+          ? TARGET_BY_ACTION[focusActionRef.current]
+          : undefined;
+        interactionSystem.setSuggested(suggestedTargetName);
+        interactionSystem.update(context.elapsedSeconds);
+
+        if (host!.renderer.xr.isPresenting) {
+          locomotion.update(context.frameDeltaSeconds);
+          interactionSystem.updateXrHover();
+          hud.setVisible(true);
+          hud.setContent(vrHudContent());
+          hud.update(host!.renderer.xr.getCamera(), context.frameDeltaSeconds);
+        } else {
+          hud.setVisible(false);
+          guidedCamera.update(context.frameDeltaSeconds);
+          const focusTarget = suggestedTargetName
+            ? world.root.getObjectByName(suggestedTargetName)
+            : undefined;
+          if (focusTarget) {
+            focusTarget.getWorldPosition(projectedFocus).project(camera);
+            const nextFocusVisibility = resolveFocusGuide(projectedFocus);
+            const currentFocusVisibility = focusVisibilityRef.current;
+            if (
+              nextFocusVisibility.visible !== currentFocusVisibility.visible
+              || nextFocusVisibility.direction !== currentFocusVisibility.direction
+            ) {
+              focusVisibilityRef.current = nextFocusVisibility;
+              setFocusVisibility(nextFocusVisibility);
+            }
+          }
+        }
+      };
+      fixedUpdate = () => {};
+      await host.initialize();
+    }
+
+    void initialize().catch(error => {
+      if (!cancelled) {
+        setRuntimeError(error instanceof Error ? error.message : String(error));
+      }
+      void host?.dispose();
+    });
+    return () => {
+      cancelled = true;
+      stopSimulationNarration();
+      sceneApiRef.current = null;
+      rendererRef.current = null;
+      cameraRef.current = null;
+      void host?.dispose();
+    };
+  }, []);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100vh', background: '#0a1f0a', overflow: 'hidden' }}>
-      <div ref={mountRef} style={{ width: '100%', height: '100%' }} />
-
-      {/* Intro overlay */}
-      {!started && (
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(ellipse at 50% 40%, #0d2e0d 0%, #030a03 100%)', zIndex: 10 }}>
-          <div style={{ textAlign: 'center', maxWidth: 520, padding: '0 24px' }}>
-            <div style={{ fontSize: 80, lineHeight: 1, marginBottom: 16, filter: 'drop-shadow(0 0 24px rgba(52,211,153,0.5))' }}>🌸</div>
-            <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#f9fafb', margin: '0 0 10px', letterSpacing: '-0.02em' }}>Plant Pollination</h1>
-            <p style={{ fontSize: '1.05rem', color: '#4ade80', fontWeight: 600, marginBottom: 8 }}>& Growth Cycle</p>
-            <p style={{ color: '#6b7280', fontSize: '0.92rem', lineHeight: 1.6, marginBottom: 32 }}>
-              Step into a living garden and witness the 8 stages of plant reproduction — from pollen production to germination.
-            </p>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-              {vrSupported && (
-                <button onClick={enterVR} style={{ padding: '14px 28px', borderRadius: 12, background: 'linear-gradient(135deg, #7c3aed, #4f46e5)', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 0 30px rgba(124,58,237,0.5)' }}>
-                  <span style={{ fontSize: 22 }}>🥽</span> Enter in VR
-                </button>
-              )}
-              <button onClick={() => { setStarted(true); speakText(NARRATIONS[0]); }} style={{ padding: '14px 28px', borderRadius: 12, background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.35)', color: '#34d399', cursor: 'pointer', fontWeight: 700, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 22 }}>💻</span> View in Browser
+    <SimulationExperienceShell
+      title="Pollinator Garden Field Study"
+      classContext="Class 6 Science · Reproduction in Plants"
+      objective="Prove how pollen transfer leads to fruit and seed formation by comparing a pollinated flower with an untouched control."
+      snapshot={snapshot}
+      started={started}
+      preferences={preferences}
+      onPreferencesChange={nextPreferences => {
+        setPreferences(nextPreferences);
+        transitionRef.current = createScaleTransition({
+          reducedMotion: nextPreferences.reducedMotion,
+        });
+      }}
+      onStartBrowser={() => {
+        setStarted(true);
+        playNarration(snapshot.stageIndex, preferences.audio);
+      }}
+      onEnterVr={vrSupported ? enterVr : undefined}
+      onPrevious={previous}
+      onNext={next}
+      evidence={evidence}
+      scaleNote={scaleDisclosure}
+      completed={completed}
+      focusGuide={{
+        direction: focusVisibility.direction,
+        label: remainingActions.length > 0
+          ? `Look toward: ${ACTION_LABELS[remainingActions[0]]}`
+          : 'Look toward the experiment result',
+        visible: started && !completed && focusVisibility.visible,
+      }}
+      error={runtimeError || undefined}
+    >
+      <SimulationCanvasHost
+        ref={mountRef}
+        className="pollination-world-mount"
+        ariaLabel="Pollination investigation world"
+      />
+      {started && remainingActions.length > 0 && (
+        <section
+          className="pollination-action-tray"
+          aria-label="Field experiment actions"
+        >
+          <span>Field action</span>
+          <strong>
+            {ACTION_LABELS[remainingActions[0]]}
+          </strong>
+          <div>
+            {remainingActions.map(actionId => (
+              <button
+                key={actionId}
+                type="button"
+                className="secondary"
+                onClick={() => performAction(actionId, 'keyboard')}
+              >
+                {ACTION_LABELS[actionId]}
               </button>
-            </div>
-            {!vrSupported && (
-              <p style={{ marginTop: 20, color: '#374151', fontSize: '0.8rem' }}>For immersive VR, open this page in Meta Quest Browser over your local network.</p>
-            )}
+            ))}
           </div>
-        </div>
+          {scaleDisclosure && <small>{scaleDisclosure}</small>}
+        </section>
       )}
-
-      {started && (
-        <>
-          <div style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(3,10,3,0.88)', borderRadius: 8, padding: '6px 14px', color: '#9ca3af', fontSize: '0.8rem', fontWeight: 600 }}>
-            {stage + 1} / {STAGES.length}
-          </div>
-
-          <div style={{ position: 'absolute', bottom: 100, left: '50%', transform: 'translateX(-50%)', width: 'min(580px, 92vw)', background: 'rgba(3,10,3,0.92)', borderRadius: 16, padding: '18px 22px', border: '1px solid rgba(52,211,153,0.2)', color: '#f9fafb' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#34d399', marginBottom: 8 }}>🌸 Pollination Cycle · Stage {stage + 1}</div>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f9fafb', marginBottom: 7, lineHeight: 1.25 }}>{info.title}</h3>
-            <p style={{ color: '#d1d5db', fontSize: '0.88rem', lineHeight: 1.65, marginBottom: 8 }}>{info.cue}</p>
-            <p style={{ color: '#6b7280', fontSize: '0.78rem', lineHeight: 1.5 }}>{info.detail}</p>
-            {info.instructor && (
-              <p style={{ marginTop: 10, padding: '7px 11px', borderRadius: 7, background: 'rgba(52,211,153,0.08)', color: '#34d399', fontSize: '0.76rem', lineHeight: 1.5, borderLeft: '2px solid #34d399' }}>
-                <strong>Instructor:</strong> {info.instructor}
-              </p>
-            )}
-          </div>
-
-          <div style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 10, alignItems: 'center' }}>
-            <button onClick={goBack} disabled={stage === 0} style={{ padding: '10px 20px', borderRadius: 8, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', color: stage === 0 ? '#374151' : '#e5e7eb', cursor: stage === 0 ? 'not-allowed' : 'pointer', fontWeight: 600, fontSize: '0.9rem' }}>
-              ← Prev
-            </button>
-            <button onClick={advance} disabled={stage === STAGES.length - 1} style={{ padding: '10px 24px', borderRadius: 8, background: '#16a34a', border: 'none', color: '#fff', cursor: stage === STAGES.length - 1 ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: '0.9rem', opacity: stage === STAGES.length - 1 ? 0.4 : 1 }}>
-              Next Stage →
-            </button>
-            {vrSupported && (
-              <button onClick={enterVR} style={{ padding: '10px 18px', borderRadius: 8, background: 'rgba(124,58,237,0.2)', border: '1px solid rgba(124,58,237,0.4)', color: '#a78bfa', cursor: 'pointer', fontWeight: 600, fontSize: '0.88rem' }}>
-                🥽 Enter VR
-              </button>
-            )}
-          </div>
-        </>
-      )}
-    </div>
+    </SimulationExperienceShell>
   );
 }

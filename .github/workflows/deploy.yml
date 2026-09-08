@@ -9,9 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # ── Build & validate before deploying ─────────────────────────────────────
-  build:
-    name: Build web
+  verify:
+    name: Verify release candidate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,30 +18,50 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "23"
+          node-version: "22"
           cache: "npm"
-          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Install dependencies
-        run: npm install
-        working-directory: apps/web
+        run: npm ci
 
-      - name: TypeScript check
-        run: ./node_modules/.bin/tsc --noEmit
-        working-directory: apps/web
+      - name: Install report dependencies
+        run: python -m pip install -r requirements-report.txt
 
-      - name: Validate simulations
-        run: node scripts/validate-simulations.mjs
+      - name: Install Poppler
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
 
-      - name: Next.js build
-        run: npm run build
-        working-directory: apps/web
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
 
-  # ── Deploy to Vercel (production) ─────────────────────────────────────────
+      - name: Run strict verification
+        run: npm run verify
+
+      - name: Verify generated sources are current
+        run: |
+          git diff --exit-code -- \
+            generated/openapi/openapi.json \
+            apps/web/lib/scienceCatalog.generated.ts \
+            apps/web/lib/curriculumSearch.generated.ts \
+            reports/data/implemented-simulation-quality-cards.json \
+            reports/data/implemented-simulation-quality-evidence.json \
+            reports/data/new-simulation-before-after-scorecard.json \
+            reports/data/simulation-quality-pdf-visual-qa.json \
+            output/pdf/xr-school-implemented-simulations-quality-report.md \
+            output/pdf/xr-school-implemented-simulations-quality-report.pdf \
+            output/pdf/xr-school-new-simulations-top-10-mistakes.md \
+            output/pdf/xr-school-new-simulations-top-10-mistakes.pdf \
+            output/pdf/aditya-contribution-improvement-report.md \
+            output/pdf/aditya-contribution-improvement-report.pdf
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    needs: build
+    needs: verify
     environment:
       name: production
       url: ${{ steps.deploy.outputs.url }}
@@ -67,8 +86,8 @@ jobs:
       - name: Deploy prebuilt artifact
         id: deploy
         run: |
-          URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
-          echo "url=$URL" >> $GITHUB_OUTPUT
+          URL=$(vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "Deployed to: $URL"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

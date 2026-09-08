@@ -207,3 +207,79 @@ Before a simulation is submitted for approval, the content manager must confirm:
 - [ ] Package size estimate provided
 - [ ] Curriculum map links confirmed (not hypothetical)
 - [ ] Batch activity companion activity described
+
+---
+
+## World Builder Rendering Standard
+
+### Quest Baseline
+
+Quest Baseline is the mandatory immersive profile: 72 FPS minimum, at most
+120 draw calls, 250,000 visible triangles, one 1024 px shadow map, 1024 px
+standard textures, and direct WebXR rendering. Full-screen post-processing is
+disabled. Browser Balanced and Browser Enhanced may add antialiasing, output
+conversion, ambient occlusion, or selective bloom within their declared
+budgets.
+
+Instructional meshes use physically based `MeshStandardMaterial` by default.
+`MeshPhysicalMaterial` is limited to a justified physical property and must
+declare a Quest-safe standard-material fallback. Base-color and emissive maps
+use sRGB; data maps do not. Every texture and environment asset records
+provenance, redistribution licence, dimensions, channels, compression, and a
+fallback.
+
+Worlds use one calibrated key light on Quest, non-shadowing fill/accent lights,
+tone mapping, explicit exposure, and a PMREM environment where available.
+Lighting must retain readable evidence when an environment asset falls back.
+
+### Hidden Scientific Models
+
+Equations, solver controls, units, assumptions, limitations, tolerances, and
+debugging data stay outside the normal student lesson. Every scientific model
+declares valid ranges and reference vectors. Invalid or non-finite state stops
+the interaction; it is never replaced by a plausible-looking animation.
+
+Students see only the variable they control, the evidence that changes, a
+clear comparison, concise narration, and an age-appropriate interpretation
+prompt.
+
+### Misconception and Transfer Evidence
+
+Mastery cannot be awarded from completion or one rehearsed answer. Every
+upgraded simulation must record independent evidence that the learner:
+
+1. observed the relevant result;
+2. resolved a named misconception; and
+3. transferred the idea to a new example.
+
+Incorrect responses point back to observable evidence and provide a retry.
+Evidence remains aggregate and batch-level; no student account or identity is
+created.
+
+### Runtime and release acceptance
+
+All worlds use the shared fixed `1 / 60` lifecycle, resource registry,
+adaptive presentation pipeline, canonical Rapier adapter where rigid-body
+physics is relevant, and domain-specific scientific models. A viewer may not
+own a duplicate physics implementation or private render loop.
+
+Automated browser and build checks are necessary but not sufficient. Each
+reference-world release remains `internalQA` until direct Quest acceptance
+records 72 FPS, controls, readability, comfort, lifecycle, complete learning
+flow, assets, memory, and device temperature.
+
+### Unblocked Discovery View
+
+The experiment and its observable evidence own the center of the student's
+view. Browser guidance stays in collapsible edge regions. Quest guidance uses
+a stable off-axis spatial bay and may not remain head-locked over the
+experiment. Students can summon, repeat, and dismiss a cue.
+
+Stages advance through direct manipulation and observation, not through a
+generic Next button. Mouse, touch, keyboard, and Quest controls must perform
+equivalent lesson actions.
+
+Every world declares whether its scale is literal or representational.
+Any representational scale is explained in grade-appropriate language. Eye height,
+reach, object dimensions, label angular size, movement bounds, and cue
+placement are acceptance data rather than visual guesses.

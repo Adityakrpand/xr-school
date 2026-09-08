@@ -1,0 +1,52 @@
+import { describe, expect, it } from 'vitest';
+import { CURRICULUM_SEARCH_DOCUMENTS } from '../../apps/web/lib/curriculumSearch.generated';
+import { searchCurriculum } from '../../apps/web/lib/curriculumSearch';
+
+describe('curriculum search', () => {
+  it.each([
+    ['fertilisation', 'pollination'],
+    ['electric current', 'circuit'],
+    ['particle motion', 'c9-ch01-a02-states-of-matter'],
+    ['solubility', 'c5-ch07-a03-soluble-and-insoluble-substances'],
+    ['food sources', 'c6-ch01-a01-sources-of-food'],
+    ['mycelium', 'c8-ch02-a03-fungi-and-its-development'],
+  ])('connects the concept “%s” to its working simulation', (query, slug) => {
+    const results = searchCurriculum(CURRICULUM_SEARCH_DOCUMENTS, query);
+
+    expect(results.some(result => result.kind === 'simulation' && result.href === `/simulations/${slug}`)).toBe(true);
+  });
+
+  it('ranks an exact canonical concept above broad keyword matches', () => {
+    const results = searchCurriculum(CURRICULUM_SEARCH_DOCUMENTS, 'solubility');
+
+    expect(results[0]).toMatchObject({
+      kind: 'concept',
+      title: 'Solubility',
+    });
+  });
+
+  it('filters after text matching by class, subject, and maturity', () => {
+    const results = searchCurriculum(CURRICULUM_SEARCH_DOCUMENTS, '', {
+      classLevel: 5,
+      subject: 'environmentalScience',
+      releaseMaturity: 'internalQA',
+    });
+
+    expect(results.map(result => result.href)).toEqual(expect.arrayContaining([
+      '/simulations/c5-ch03-a02-introduction-of-digestive-system',
+      '/simulations/c5-ch07-a03-soluble-and-insoluble-substances',
+    ]));
+    // The 17 integrated Class 5 guided classes expand this released filter
+    // beyond the two original simulations while preserving both originals.
+    expect(results).toHaveLength(18);
+    expect(results.every(result => result.releaseMaturity === 'internalQA')).toBe(true);
+  });
+
+  it('keeps catalogued candidates searchable without launch URLs', () => {
+    const results = searchCurriculum(CURRICULUM_SEARCH_DOCUMENTS, 'supersense of smell');
+    const candidate = results.find(result => result.title === 'Supersense of smell');
+
+    expect(candidate?.releaseMaturity).toBe('catalogued');
+    expect(candidate?.href).toBe('/simulations#c5-ch01-a01-supersense-of-smell');
+  });
+});
