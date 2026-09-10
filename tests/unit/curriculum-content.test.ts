@@ -10,7 +10,7 @@ import { validateCurriculumGraph } from '../../packages/simulation-schema/src/in
 describe('canonical curriculum content', () => {
   it('defines typed courses, chapters, and concepts for every working simulation', () => {
     expect(COURSES).toHaveLength(11);
-    expect(CURRICULUM_CHAPTERS).toHaveLength(23);
+    expect(CURRICULUM_CHAPTERS).toHaveLength(24);
     expect(LEARNING_CONCEPTS.length).toBeGreaterThanOrEqual(74);
 
     const linkedSimulationIds = new Set(COURSES.flatMap(course => course.simulationIds));
@@ -84,6 +84,7 @@ describe('canonical curriculum content', () => {
       'sim-c2-english-ch01-prepositions',
       'sim-c8-10-science-solar-system',
       'sim-c08-ch02-a03-fungi-and-its-development',
+      'sim-c08-ch01-a01-ploughing-preparation-of-soil',
     ]) {
       expect(linkedSimulationIds.has(simulationId)).toBe(true);
     }

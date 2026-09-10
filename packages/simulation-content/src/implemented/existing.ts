@@ -14,6 +14,7 @@ import {
   DIGESTIVE_SYSTEM_MODULE,
   FORCE_MOTION_MODULE,
   MONEY_TOWN_MODULE,
+  PLOUGHING_PREPARATION_MODULE,
   POLLINATION_MODULE,
   PREPOSITION_ADVENTURE_MODULE,
   SOLAR_SYSTEM_MISSION_MODULE,
@@ -196,6 +197,65 @@ const statesAssets = [
       : `XR School shared procedural ${fileName.split('-')[0]} PBR texture`,
   },
 ));
+
+const ploughingAssets: AssetDefinition[] = [
+  {
+    id: 'ploughing-farm-panorama',
+    url: '/images/ploughing-soil-preparation/farm-panorama.png',
+    kind: 'environment',
+    source: 'OpenAI image generation for the XR School Ploughing simulation',
+    license: 'OpenAI Terms of Use; XR School project asset',
+    author: 'XR School with OpenAI image generation',
+    width: 1774,
+    height: 887,
+    channels: ['baseColor'],
+    compression: 'PNG',
+    sha256: '882c5b48acc6e9cccc811b8cc4969d9ef32e00826b722412185f09edb5c145e1',
+    byteSize: 2302853,
+  },
+  {
+    id: 'ploughing-traditional-panorama',
+    url: '/images/ploughing-soil-preparation/traditional-ploughing-v2.jpg',
+    kind: 'environment',
+    source: 'OpenAI image generation for the XR School Ploughing simulation',
+    license: 'OpenAI Terms of Use; XR School project asset',
+    author: 'XR School with OpenAI image generation',
+    width: 2048,
+    height: 1024,
+    channels: ['baseColor'],
+    compression: 'JPEG',
+    sha256: '831b57b96a0ad4fd65670e63eb05b5e54c9055e6b302d5108a650bfee6de983f',
+    byteSize: 687803,
+  },
+  {
+    id: 'ploughing-modern-panorama',
+    url: '/images/ploughing-soil-preparation/modern-cultivator-v2.jpg',
+    kind: 'environment',
+    source: 'OpenAI image generation for the XR School Ploughing simulation',
+    license: 'OpenAI Terms of Use; XR School project asset',
+    author: 'XR School with OpenAI image generation',
+    width: 2048,
+    height: 1024,
+    channels: ['baseColor'],
+    compression: 'JPEG',
+    sha256: '9995d2cef536c2fca80c48d3f726666e2ab0f66f1b4d05078970d5df8868d63e',
+    byteSize: 691012,
+  },
+  {
+    id: 'ploughing-soil-albedo',
+    url: '/images/ploughing-soil-preparation/soil-albedo-v2.jpg',
+    kind: 'texture',
+    source: 'OpenAI image generation for the XR School Ploughing simulation',
+    license: 'OpenAI Terms of Use; XR School project asset',
+    author: 'XR School with OpenAI image generation',
+    width: 1024,
+    height: 1024,
+    channels: ['baseColor'],
+    compression: 'JPEG',
+    sha256: '1c4e42787a577f214d4446661919ebf83b24f45ecf062f7b7788c8f57256296b',
+    byteSize: 717309,
+  },
+];
 
 function smallestHonestAssessment(
   module: SimulationModuleRecord,
@@ -476,6 +536,17 @@ const forceStages = [
   stage('stage-compare', 'Compare the effects of force', 'Review how force changed motion and shape.', ['compare-motion-effects'], ['effects-compared']),
 ];
 
+const ploughingStages = [
+  stage('farm', 'Meet the field', 'Inspect the compact soil and speak with the farmer.', ['inspect-hard-soil', 'inspect-farmer'], ['farm-inspected'], 'Welcome to the farm. The previous crop has been harvested. Before new seeds are sown, the soil must be prepared. Inspect the soil and meet the farmer.', '/narration/ploughing-soil-preparation/farm.mp3'),
+  stage('hard-soil', 'Test the soil', 'Break open a clod and decide whether the hard field is ready for seeds.', ['inspect-soil-clod', 'answer-hard-soil'], ['hard-soil-evaluated'], 'The soil is hard, dry and uneven. Large lumps called clods leave little room for young roots, air or water. Examine a clod before you decide.', '/narration/ploughing-soil-preparation/hard-soil.mp3'),
+  stage('plough', 'Know the traditional tool', 'Inspect the plough, bullocks and turned soil.', ['inspect-plough', 'inspect-bullocks', 'inspect-turned-soil'], ['traditional-tool-inspected'], 'Ploughing means loosening and turning the soil before sowing. Traditionally, bullocks pull a plough. Its blade cuts the hard upper layer and turns it into smaller pieces.', '/narration/ploughing-soil-preparation/plough.mp3'),
+  stage('traditional', 'Make three furrows', 'Guide three plough passes and inspect the resulting furrow.', ['complete-three-furrows', 'inspect-furrow'], ['furrows-completed'], 'Guide the bullocks in straight lines. Each pass cuts and turns another strip of earth. The long narrow trench left by the plough is called a furrow.', '/narration/ploughing-soil-preparation/traditional.mp3'),
+  stage('modern', 'Compare modern cultivation', 'Inspect the tractor and cultivator, then identify the faster large-field method.', ['inspect-tractor', 'inspect-cultivator', 'compare-methods'], ['methods-compared'], 'On a large field, a tractor can pull a cultivator. Its metal tines loosen several rows at once, so the work is completed faster than with a bullock-drawn plough.', '/narration/ploughing-soil-preparation/modern.mp3'),
+  stage('underground', 'Look below the surface', 'Inspect roots, air spaces, an earthworm and mixed nutrients.', ['inspect-roots', 'inspect-air-spaces', 'inspect-earthworm', 'inspect-nutrients'], ['underground-effects-inspected'], 'Loose soil creates spaces for air and water. Roots can grow deeper, earthworms can move through the soil, and manure and nutrients can be mixed through the upper layer.', '/narration/ploughing-soil-preparation/underground.mp3'),
+  stage('levelling', 'Break clods and level', 'Break the remaining clods and drag the leveller over the seedbed.', ['break-clods', 'level-field'], ['field-levelled'], 'After ploughing, remaining clods are broken into smaller pieces. The field is then levelled so seeds can be sown evenly and irrigation water does not collect in one place.', '/narration/ploughing-soil-preparation/levelling.mp3'),
+  stage('ready', 'Prove the field is ready', 'Inspect the prepared soil and seed bag, then complete the assessment.', ['inspect-ready-soil', 'inspect-seed-bag', 'complete-assessment'], ['field-readiness-explained'], 'The field is now loose, even and ready for sowing. Complete the check to explain what ploughing changes and why those changes matter for a healthy crop.', '/narration/ploughing-soil-preparation/ready.mp3'),
+];
+
 const acidBaseStages = [
   stage('stage-test-acid', 'Test the acid with litmus', 'Dip red and blue litmus into the acidic solution and see which paper changes colour.', ['test-acid-litmus'], ['acid-identified']),
   stage('stage-test-base', 'Test the base with litmus', 'Switch to the basic solution and dip the litmus again.', ['test-base-litmus'], ['base-identified']),
@@ -622,6 +693,12 @@ export const EXISTING_IMPLEMENTED_SIMULATIONS: ImplementedSimulationDefinition[]
     experienceId: 'experience-force-motion',
     gradeTone: 'class6To8',
     stages: forceStages,
+  }),
+  createExistingDefinition(PLOUGHING_PREPARATION_MODULE, {
+    experienceId: 'experience-ploughing-preparation',
+    gradeTone: 'class6To8',
+    stages: ploughingStages,
+    assets: ploughingAssets,
   }),
   createExistingDefinition(ACID_BASE_MODULE, {
     experienceId: 'experience-acids-bases',

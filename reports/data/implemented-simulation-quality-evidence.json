@@ -1,16 +1,16 @@
 {
   "auditDate": "2026-08-01",
   "portfolio": {
-    "publiclyLaunchableSimulations": 36,
+    "publiclyLaunchableSimulations": 37,
     "evidenceMaturityDistribution": {
-      "internalQA": 36,
+      "internalQA": 37,
       "deviceVerified": 0,
       "classroomVerified": 0
     },
-    "narrationCues": 240,
-    "packagedNarrationClips": 240,
+    "narrationCues": 248,
+    "packagedNarrationClips": 248,
     "missingNarrationFiles": 0,
-    "assets": 102,
+    "assets": 106,
     "signedQuestAcceptanceRuns": 0,
     "classroomStudies": 0
   },
@@ -775,6 +775,116 @@
         },
         {
           "id": "c8-ch10-a02-the-effects-of-force-on-object-s-motion-and-shape:release-build",
+          "kind": "build",
+          "ref": "npm --workspace apps/web run build",
+          "finding": "The route is included in the static production build and canonical registry coverage gate.",
+          "dimensions": [
+            "stability",
+            "deployment"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "c8-ch01-a01-ploughing-preparation-of-soil",
+      "title": "Ploughing: Preparation of Soil",
+      "route": "/simulations/c8-ch01-a01-ploughing-preparation-of-soil",
+      "publicationStatus": "released",
+      "evidenceMaturity": "internalQA",
+      "legacyPaths": [],
+      "kind": "interactive",
+      "contribution": "existing",
+      "counts": {
+        "stages": 8,
+        "actions": 21,
+        "evidence": 8,
+        "assessmentPrompts": 2
+      },
+      "narration": {
+        "cues": 8,
+        "captions": 8,
+        "packagedAudio": 8,
+        "missingFiles": 0,
+        "hashValidated": 8,
+        "fallback": "browserTts"
+      },
+      "assets": {
+        "count": 4,
+        "visualSource": "manifest-assets",
+        "provenanceComplete": true,
+        "fallback": "not applicable: visuals are code-native",
+        "pathValidated": true,
+        "hashValidated": true
+      },
+      "tests": [
+        "c8-ch01-a01-ploughing-preparation-of-soil:behavior",
+        "implemented-registry:coverage",
+        "viewer-registry:coverage"
+      ],
+      "lastVerifiedCommand": "npm run verify",
+      "browserEvidence": {
+        "status": "build-and-contract-verified",
+        "finding": "Static production route generation and shared-host contract checks pass; final deployed browser acceptance is recorded in production release evidence."
+      },
+      "questDeviceEvidence": "not-run",
+      "classroomEvidence": "not-run",
+      "references": [
+        {
+          "id": "c8-ch01-a01-ploughing-preparation-of-soil:definition",
+          "kind": "source",
+          "ref": "packages/simulation-content/src/implemented/existing.ts",
+          "finding": "8 canonical stages, 2 assessment prompts, and release metadata are declared in the shared content contract.",
+          "dimensions": [
+            "education",
+            "integrity"
+          ]
+        },
+        {
+          "id": "c8-ch01-a01-ploughing-preparation-of-soil:behavior",
+          "kind": "test",
+          "ref": "tests/unit/implemented-simulation-registry.test.ts",
+          "finding": "Behavior tests execute declared actions, evidence gates, assessment behavior, or canonical registry resolution.",
+          "dimensions": [
+            "education",
+            "integrity",
+            "interactivity",
+            "usability",
+            "stability"
+          ]
+        },
+        {
+          "id": "c8-ch01-a01-ploughing-preparation-of-soil:assets",
+          "kind": "asset",
+          "ref": "ploughing-preparation-assets",
+          "finding": "4 declared assets; path, digest, and provenance validation passes.",
+          "dimensions": [
+            "visuals",
+            "stability"
+          ]
+        },
+        {
+          "id": "c8-ch01-a01-ploughing-preparation-of-soil:narration",
+          "kind": "narration",
+          "ref": "ploughing-preparation-narration",
+          "finding": "8 exact captions; 8 packaged clips; fallback browserTts.",
+          "dimensions": [
+            "audio",
+            "usability"
+          ]
+        },
+        {
+          "id": "c8-ch01-a01-ploughing-preparation-of-soil:browser-contract",
+          "kind": "browser",
+          "ref": "/simulations/c8-ch01-a01-ploughing-preparation-of-soil",
+          "finding": "The canonical route delegates to the shared experience shell and registered viewer; production observation remains separate from this contract evidence.",
+          "dimensions": [
+            "interactivity",
+            "usability",
+            "stability"
+          ]
+        },
+        {
+          "id": "c8-ch01-a01-ploughing-preparation-of-soil:release-build",
           "kind": "build",
           "ref": "npm --workspace apps/web run build",
           "finding": "The route is included in the static production build and canonical registry coverage gate.",

@@ -18,15 +18,17 @@ describe("catalog narration assets", () => {
       definition.narration.cues.map((cue) => ({ definition, cue })),
     );
 
-    expect(cues).toHaveLength(240);
+    expect(cues).toHaveLength(248);
     expect(cues.every(({ cue }) => Boolean(cue.audioUrl))).toBe(true);
     expect(
-      cues.filter(({ cue }) => cue.audioUrl?.startsWith("/narration/")),
+      cues.filter(({ cue }) => /^\/narration\/[^/]+\.mp3$/.test(cue.audioUrl ?? "")),
     ).toHaveLength(204);
 
     for (const { cue } of cues) {
-      if (!cue.audioUrl?.startsWith("/narration/")) continue;
-      expect(cue.audioUrl).toBe(packagedNarrationUrl(cue.text));
+      if (!cue.audioUrl) continue;
+      if (/^\/narration\/[^/]+\.mp3$/.test(cue.audioUrl)) {
+        expect(cue.audioUrl).toBe(packagedNarrationUrl(cue.text));
+      }
       const assetPath = resolve(
         process.cwd(),
         "apps/web/public",

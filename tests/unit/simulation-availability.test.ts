@@ -181,6 +181,7 @@ describe('simulation availability routing', () => {
         'c2-english-ch01-prepositions',
         'c8-10-science-solar-system',
         'c8-ch02-a03-fungi-and-its-development',
+        'c8-ch01-a01-ploughing-preparation-of-soil',
       ]),
     );
   });

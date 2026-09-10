@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { questFaceButtonAction } from "../../apps/web/components/simulations/questVrControls";
 
 const controls = readFileSync(
   resolve(
@@ -18,13 +19,13 @@ describe("Shared Quest VR controls", () => {
   });
 
   it("maps A/X to the primary action, B to exit VR, and Y to go back", () => {
-    expect(controls).toContain("const BUTTON_PRIMARY = 4");
-    expect(controls).toContain("const BUTTON_BACK_ALIASES = [5, 6]");
-    expect(controls).toContain("const BUTTON_BACK_FALLBACK = 3");
-    expect(controls).toContain("onPrimary");
-    expect(controls).toContain("onBack");
-    expect(controls).toContain('if (hand === "right") void session.end()');
-    expect(controls).toContain("else onBack()");
+    expect(questFaceButtonAction("right", 4)).toBe("primary");
+    expect(questFaceButtonAction("right", 5)).toBe("exit");
+    expect(questFaceButtonAction("left", 4)).toBe("narrate");
+    expect(questFaceButtonAction("left", 5)).toBe("back");
+    expect(questFaceButtonAction("left", 3)).toBeUndefined();
+    expect(controls).toContain('else if (action === "exit") void session.end()');
+    expect(controls).toContain('else if (action === "narrate") onNarrate()');
     expect(controls).toContain('addEventListener("squeezestart"');
     expect(controls).toContain("renderer.xr.getSession()?.end()");
   });
@@ -37,6 +38,8 @@ describe("Shared Quest VR controls", () => {
     expect(controls).toContain("rig.position.addScaledVector");
     expect(controls).toContain("alternateMagnitude > primaryMagnitude");
     expect(controls).toContain("renderer.xr.getCamera().getWorldDirection");
+    expect(controls).toContain("DEFAULT_MOVEMENT_BOUNDS");
+    expect(controls).toContain("movementBounds.min.x");
   });
 
   it("does not interrupt gesture-unlocked narration when a session starts", () => {

@@ -133,6 +133,12 @@ const AUTHORED_SIMULATION_PRESENTATION_OVERRIDES: Readonly<Record<
     topic: 'Stars and the Solar System',
     archetype: 'immersive VR',
   },
+  'sim-c08-ch01-a01-ploughing-preparation-of-soil': {
+    color: '#b7793f',
+    classLevels: [8],
+    topic: 'Crop Production and Management',
+    archetype: 'immersive VR',
+  },
 };
 
 const DEFAULT_PRESENTATION_BY_FORMAT: Readonly<Record<

@@ -323,7 +323,7 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
     "id": "course:course-cbse-c8-science",
     "kind": "course",
     "title": "CBSE Class 8 Science",
-    "summary": "Middle-school science connecting space, matter, force, living systems, and technology through observable models.",
+    "summary": "Middle-school science connecting crop production, space, living systems, and technology through observable models.",
     "href": "/simulations#course-cbse-c8-science",
     "classLevels": [
       8
@@ -332,6 +332,10 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "science"
     ],
     "conceptIds": [
+      "concept-soil-preparation",
+      "concept-ploughing",
+      "concept-soil-aeration",
+      "concept-field-levelling",
       "concept-fungi",
       "concept-mycelium",
       "concept-decomposition",
@@ -348,9 +352,9 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "middle",
       "school",
       "connecting",
+      "crop",
+      "production",
       "space",
-      "matter",
-      "force",
       "living",
       "systems",
       "and",
@@ -358,6 +362,8 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "through",
       "observable",
       "models",
+      "ploughing",
+      "soil",
       "fungi",
       "mycelium",
       "microorganisms",
@@ -761,6 +767,41 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "chapter",
       "10",
       "topic"
+    ]
+  },
+  {
+    "id": "chapter:chapter-cbse-c8-crop-production",
+    "kind": "chapter",
+    "title": "Crop Production and Management",
+    "summary": "CBSE Class 8 Science · Chapter 1",
+    "href": "/simulations#chapter-cbse-c8-crop-production",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-soil-preparation",
+      "concept-ploughing",
+      "concept-soil-aeration",
+      "concept-field-levelling"
+    ],
+    "tokens": [
+      "crop",
+      "production",
+      "and",
+      "management",
+      "cbse",
+      "class",
+      "8",
+      "science",
+      "chapter",
+      "1",
+      "topic",
+      "ploughing",
+      "soil",
+      "preparation"
     ]
   },
   {
@@ -3191,6 +3232,190 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
     ]
   },
   {
+    "id": "concept:concept-soil-preparation",
+    "kind": "concept",
+    "title": "Soil preparation before sowing",
+    "summary": "The ordered preparation of compact field soil so it becomes loose, even, and suitable for sowing.",
+    "href": "/simulations#concept-soil-preparation",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "environmentalScience"
+    ],
+    "conceptIds": [
+      "concept-soil-preparation"
+    ],
+    "tokens": [
+      "soil",
+      "preparation",
+      "before",
+      "sowing",
+      "the",
+      "ordered",
+      "of",
+      "compact",
+      "field",
+      "so",
+      "it",
+      "becomes",
+      "loose",
+      "even",
+      "and",
+      "suitable",
+      "for",
+      "connects",
+      "crop",
+      "establishment",
+      "to",
+      "condition",
+      "seeds",
+      "are",
+      "sown",
+      "preparing",
+      "seedbed",
+      "production"
+    ]
+  },
+  {
+    "id": "concept:concept-ploughing",
+    "kind": "concept",
+    "title": "Ploughing",
+    "summary": "Loosening and turning the upper soil layer with a traditional plough or a modern cultivator.",
+    "href": "/simulations#concept-ploughing",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "environmentalScience"
+    ],
+    "conceptIds": [
+      "concept-ploughing"
+    ],
+    "tokens": [
+      "ploughing",
+      "loosening",
+      "and",
+      "turning",
+      "the",
+      "upper",
+      "soil",
+      "layer",
+      "with",
+      "a",
+      "traditional",
+      "plough",
+      "or",
+      "modern",
+      "cultivator",
+      "explains",
+      "first",
+      "major",
+      "field",
+      "operation",
+      "farmers",
+      "perform",
+      "before",
+      "sowing",
+      "tilling",
+      "bullocks",
+      "tractor",
+      "furrow"
+    ]
+  },
+  {
+    "id": "concept:concept-soil-aeration",
+    "kind": "concept",
+    "title": "Soil aeration and pore spaces",
+    "summary": "Loose soil contains connected pore spaces that support root penetration, air movement, water entry, and soil organisms.",
+    "href": "/simulations#concept-soil-aeration",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "environmentalScience"
+    ],
+    "conceptIds": [
+      "concept-soil-aeration"
+    ],
+    "tokens": [
+      "soil",
+      "aeration",
+      "and",
+      "pore",
+      "spaces",
+      "loose",
+      "contains",
+      "connected",
+      "that",
+      "support",
+      "root",
+      "penetration",
+      "air",
+      "movement",
+      "water",
+      "entry",
+      "organisms",
+      "links",
+      "field",
+      "preparation",
+      "to",
+      "healthy",
+      "roots",
+      "earthworms",
+      "nutrient",
+      "mixing",
+      "in",
+      "space",
+      "earthworm",
+      "infiltration"
+    ]
+  },
+  {
+    "id": "concept:concept-field-levelling",
+    "kind": "concept",
+    "title": "Breaking clods and levelling a field",
+    "summary": "Breaking remaining soil clods and smoothing the field after ploughing to create an even seedbed.",
+    "href": "/simulations#concept-field-levelling",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "environmentalScience"
+    ],
+    "conceptIds": [
+      "concept-field-levelling"
+    ],
+    "tokens": [
+      "breaking",
+      "clods",
+      "and",
+      "levelling",
+      "a",
+      "field",
+      "remaining",
+      "soil",
+      "smoothing",
+      "the",
+      "after",
+      "ploughing",
+      "to",
+      "create",
+      "an",
+      "even",
+      "seedbed",
+      "supports",
+      "sowing",
+      "more",
+      "uniform",
+      "irrigation",
+      "across",
+      "prepared",
+      "clod",
+      "leveller"
+    ]
+  },
+  {
     "id": "concept:concept-food-spoilage",
     "kind": "concept",
     "title": "Food spoilage and preservation",
@@ -5263,6 +5488,96 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "physics",
       "pull",
       "stretch"
+    ]
+  },
+  {
+    "id": "simulation:c8-ch01-a01-ploughing-preparation-of-soil",
+    "kind": "simulation",
+    "title": "Ploughing: Preparation of Soil",
+    "summary": "Prepare an Indian farm for sowing by inspecting hard soil, guiding a bullock-drawn plough, comparing a tractor cultivator, breaking clods and levelling the field.",
+    "href": "/simulations/c8-ch01-a01-ploughing-preparation-of-soil",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "environmentalScience"
+    ],
+    "conceptIds": [
+      "concept-soil-preparation",
+      "concept-ploughing",
+      "concept-soil-aeration",
+      "concept-field-levelling"
+    ],
+    "releaseMaturity": "internalQA",
+    "moduleId": "sim-c08-ch01-a01-ploughing-preparation-of-soil",
+    "publicationStatus": "released",
+    "evidenceMaturity": "internalQA",
+    "tokens": [
+      "ploughing",
+      "preparation",
+      "of",
+      "soil",
+      "prepare",
+      "an",
+      "indian",
+      "farm",
+      "for",
+      "sowing",
+      "by",
+      "inspecting",
+      "hard",
+      "guiding",
+      "a",
+      "bullock",
+      "drawn",
+      "plough",
+      "comparing",
+      "tractor",
+      "cultivator",
+      "breaking",
+      "clods",
+      "and",
+      "levelling",
+      "the",
+      "field",
+      "students",
+      "will",
+      "explain",
+      "as",
+      "loosening",
+      "turning",
+      "identify",
+      "why",
+      "it",
+      "supports",
+      "crop",
+      "growth",
+      "compare",
+      "traditional",
+      "with",
+      "environmentalscience",
+      "before",
+      "preparing",
+      "seedbed",
+      "production",
+      "tilling",
+      "bullocks",
+      "furrow",
+      "aeration",
+      "pore",
+      "spaces",
+      "air",
+      "in",
+      "loose",
+      "space",
+      "roots",
+      "earthworm",
+      "water",
+      "infiltration",
+      "clod",
+      "leveller",
+      "even",
+      "irrigation"
     ]
   },
   {
@@ -13539,46 +13854,6 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "rather",
       "than",
       "score"
-    ]
-  },
-  {
-    "id": "simulation:c8-ch01-a01-ploughing-preparation-of-soil",
-    "kind": "simulation",
-    "title": "Ploughing : Preparation of Soil",
-    "summary": "Crop Production and Management · Class 8 environmentalScience",
-    "href": "/simulations#c8-ch01-a01-ploughing-preparation-of-soil",
-    "classLevels": [
-      8
-    ],
-    "subjects": [
-      "environmentalScience"
-    ],
-    "conceptIds": [],
-    "releaseMaturity": "catalogued",
-    "tokens": [
-      "ploughing",
-      "preparation",
-      "of",
-      "soil",
-      "crop",
-      "production",
-      "and",
-      "management",
-      "environmentalscience",
-      "processtimeline",
-      "use",
-      "staged",
-      "timeline",
-      "with",
-      "progressive",
-      "reveal",
-      "scrubber",
-      "cue",
-      "card",
-      "checkpoints",
-      "final",
-      "sequence",
-      "recap"
     ]
   },
   {

@@ -84,7 +84,7 @@ describe('screen-safe text layout', () => {
   });
 
   it('keeps every released simulation title, cue, and answer inside the shared HUD regions', () => {
-    expect(IMPLEMENTED_SIMULATIONS).toHaveLength(36);
+    expect(IMPLEMENTED_SIMULATIONS).toHaveLength(37);
     for (const definition of IMPLEMENTED_SIMULATIONS) {
       for (const stage of definition.experience.stages) {
         const title = fitTextLines(stage.title, approximateMeasure, {

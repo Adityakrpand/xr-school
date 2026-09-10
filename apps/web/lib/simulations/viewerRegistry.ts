@@ -149,6 +149,10 @@ const VIEWER_INPUTS = {
     sourcePath: 'apps/web/components/simulations/MoneyTownViewer.tsx',
     load: () => import('../../components/simulations/MoneyTownViewer'),
   },
+  'ploughing-preparation': {
+    sourcePath: 'apps/web/components/simulations/PloughingPreparationViewer.tsx',
+    load: () => import('../../components/simulations/PloughingPreparationViewer'),
+  },
   'preposition-adventure': {
     sourcePath: 'apps/web/components/simulations/PrepositionAdventureViewer.tsx',
     load: () => import('../../components/simulations/PrepositionAdventureViewer'),

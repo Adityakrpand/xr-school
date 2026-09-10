@@ -1,0 +1,52 @@
+{
+  "slug": "c8-ch01-a01-ploughing-preparation-of-soil",
+  "profile": {
+    "previewNumber": 7,
+    "label": "Neerja — Dramatic Narrator",
+    "voice": "en-IN-NeerjaExpressiveNeural",
+    "rate": "-12%",
+    "pitch": "-2Hz"
+  },
+  "cues": [
+    {
+      "id": "farm",
+      "text": "Welcome to the farm. The previous crop has been harvested. Before new seeds are sown, the soil must be prepared. Inspect the soil and meet the farmer.",
+      "audioUrl": "/narration/ploughing-soil-preparation/farm.mp3"
+    },
+    {
+      "id": "hard-soil",
+      "text": "The soil is hard, dry and uneven. Large lumps called clods leave little room for young roots, air or water. Examine a clod before you decide.",
+      "audioUrl": "/narration/ploughing-soil-preparation/hard-soil.mp3"
+    },
+    {
+      "id": "plough",
+      "text": "Ploughing means loosening and turning the soil before sowing. Traditionally, bullocks pull a plough. Its blade cuts the hard upper layer and turns it into smaller pieces.",
+      "audioUrl": "/narration/ploughing-soil-preparation/plough.mp3"
+    },
+    {
+      "id": "traditional",
+      "text": "Guide the bullocks in straight lines. Each pass cuts and turns another strip of earth. The long narrow trench left by the plough is called a furrow.",
+      "audioUrl": "/narration/ploughing-soil-preparation/traditional.mp3"
+    },
+    {
+      "id": "modern",
+      "text": "On a large field, a tractor can pull a cultivator. Its metal tines loosen several rows at once, so the work is completed faster than with a bullock-drawn plough.",
+      "audioUrl": "/narration/ploughing-soil-preparation/modern.mp3"
+    },
+    {
+      "id": "underground",
+      "text": "Loose soil lets roots grow deeper and breathe through air spaces. It helps water enter, mixes manure and nutrients, and supports useful organisms such as earthworms.",
+      "audioUrl": "/narration/ploughing-soil-preparation/underground.mp3"
+    },
+    {
+      "id": "levelling",
+      "text": "After ploughing, remaining clods are broken into smaller pieces. The field is then levelled so seeds can be sown evenly and irrigation water does not collect in one place.",
+      "audioUrl": "/narration/ploughing-soil-preparation/levelling.mp3"
+    },
+    {
+      "id": "ready",
+      "text": "The soil is now soft, loose and level. It contains air spaces and is ready for sowing. Complete the field check to finish your soil preparation mission.",
+      "audioUrl": "/narration/ploughing-soil-preparation/ready.mp3"
+    }
+  ]
+}

@@ -9,14 +9,33 @@ interface QuestVrControlsOptions {
   onBack: () => void;
   onNarrate: () => void;
   startPosition?: THREE.Vector3;
+  movementBounds?: THREE.Box2;
 }
 
-const BUTTON_PRIMARY = 4;
-const BUTTON_BACK_ALIASES = [5, 6];
-const BUTTON_BACK_FALLBACK = 3;
+const BUTTON_A_OR_X = 4;
+const BUTTON_B_OR_Y_ALIASES = [5, 6];
 const MOVE_SPEED_METRES_PER_SECOND = 2.15;
 const MOVE_DEAD_ZONE = 0.08;
 const SNAP_TURN_RADIANS = THREE.MathUtils.degToRad(30);
+const DEFAULT_MOVEMENT_BOUNDS = new THREE.Box2(
+  new THREE.Vector2(-4, -4),
+  new THREE.Vector2(4, 4),
+);
+
+export type QuestFaceButtonAction = "primary" | "exit" | "narrate" | "back";
+
+export function questFaceButtonAction(
+  handedness: XRHandedness,
+  buttonIndex: number,
+): QuestFaceButtonAction | undefined {
+  const isPrimaryFaceButton = buttonIndex === BUTTON_A_OR_X;
+  const isSecondaryFaceButton = BUTTON_B_OR_Y_ALIASES.includes(buttonIndex);
+  if (handedness === "right" && isPrimaryFaceButton) return "primary";
+  if (handedness === "right" && isSecondaryFaceButton) return "exit";
+  if (handedness === "left" && isPrimaryFaceButton) return "narrate";
+  if (handedness === "left" && isSecondaryFaceButton) return "back";
+  return undefined;
+}
 
 function thumbstickAxes(gamepad: Gamepad) {
   const axes = gamepad.axes;
@@ -34,8 +53,9 @@ export function createQuestVrControls({
   controllers,
   onPrimary,
   onBack,
-  onNarrate: _onNarrate,
+  onNarrate,
   startPosition = new THREE.Vector3(0, 0, 2.6),
+  movementBounds = DEFAULT_MOVEMENT_BOUNDS,
 }: QuestVrControlsOptions) {
   const rig = new THREE.Group();
   rig.name = "quest-player-rig";
@@ -135,24 +155,26 @@ export function createQuestVrControls({
         const actuator = gamepad.hapticActuators?.[0];
         actuator?.pulse?.(0.45, 45).catch?.(() => undefined);
       };
-      const primaryPressed = Boolean(gamepad.buttons[BUTTON_PRIMARY]?.pressed || (gamepad.buttons[BUTTON_PRIMARY]?.value ?? 0) > 0.55);
-      const backPressed = BUTTON_BACK_ALIASES.some((index) => Boolean(gamepad.buttons[index]?.pressed || (gamepad.buttons[index]?.value ?? 0) > 0.55));
-      const fallbackPressed = hand === "right" && Boolean(gamepad.buttons[BUTTON_BACK_FALLBACK]?.pressed || (gamepad.buttons[BUTTON_BACK_FALLBACK]?.value ?? 0) > 0.55);
-      const primaryKey = `${hand}-primary`;
-      if (primaryPressed && !buttonState.get(primaryKey)) {
-        onPrimary();
-        pulse();
+      const faceButtonActions: QuestFaceButtonAction[] = hand === "right"
+        ? ["primary", "exit"]
+        : ["narrate", "back"];
+      for (const action of faceButtonActions) {
+        const pressed = [BUTTON_A_OR_X, ...BUTTON_B_OR_Y_ALIASES]
+          .filter((buttonIndex) => questFaceButtonAction(hand, buttonIndex) === action)
+          .some((buttonIndex) => {
+            const button = gamepad.buttons[buttonIndex];
+            return Boolean(button?.pressed || (button?.value ?? 0) > 0.55);
+          });
+        const key = `${hand}-${action}`;
+        if (pressed && !buttonState.get(key)) {
+          if (action === "primary") onPrimary();
+          else if (action === "exit") void session.end();
+          else if (action === "narrate") onNarrate();
+          else onBack();
+          pulse();
+        }
+        buttonState.set(key, pressed);
       }
-      buttonState.set(primaryKey, primaryPressed);
-
-      const backKey = `${hand}-back`;
-      const backOrExitPressed = backPressed || fallbackPressed;
-      if (backOrExitPressed && !buttonState.get(backKey)) {
-        pulse();
-        if (hand === "right") void session.end();
-        else onBack();
-      }
-      buttonState.set(backKey, backOrExitPressed);
     }
 
     if (moveX || moveY) {
@@ -163,6 +185,16 @@ export function createQuestVrControls({
       const right = new THREE.Vector3(-forward.z, 0, forward.x);
       rig.position.addScaledVector(forward, -moveY * MOVE_SPEED_METRES_PER_SECOND * deltaSeconds);
       rig.position.addScaledVector(right, moveX * MOVE_SPEED_METRES_PER_SECOND * deltaSeconds);
+      rig.position.x = THREE.MathUtils.clamp(
+        rig.position.x,
+        movementBounds.min.x,
+        movementBounds.max.x,
+      );
+      rig.position.z = THREE.MathUtils.clamp(
+        rig.position.z,
+        movementBounds.min.y,
+        movementBounds.max.y,
+      );
     }
 
     if (turnX && turnReady) {

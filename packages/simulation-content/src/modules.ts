@@ -96,6 +96,18 @@ Ask students to list the five effects of force they just caused: starting motion
 REVISION TRIGGER
 One week later, show a photo of a stretched rubber band and a dented can and ask students which shape changes are elastic (spring back) and which are not, and to name the effect of force in each case.`;
 
+const ploughingPreparationScript = `SETUP
+Show students a tray of hard, compact soil and ask whether seeds and young roots could grow well in it. Non-headset students predict what a farmer must change before sowing.
+
+DURING HEADSET BATCH
+Guide students through the harvested field, hard-soil inspection, bullock-drawn plough, three-furrow task, tractor and cultivator comparison, underground cutaway, clod breaking, levelling and final field assessment. Pause before each reveal so students predict what will change.
+
+DEBRIEF
+Ask students to explain how loosening soil helps roots, air, water, earthworms and manure. Compare the speed and scale of traditional and modern methods without treating either as universally better.
+
+REVISION TRIGGER
+One week later, show hard, ploughed and levelled soil photographs and ask students to put them in preparation order and justify each transition.`;
+
 const moneyTownScript = `SETUP
 Show Indian coins and notes and ask students to name where they have seen them used. Non-headset students prepare a simple shop table with item prices.
 
@@ -538,6 +550,74 @@ export const FORCE_MOTION_MODULE: SimulationModuleRecord = {
   status: 'released',
 };
 
+export const PLOUGHING_PREPARATION_MODULE: SimulationModuleRecord = {
+  id: 'sim-c08-ch01-a01-ploughing-preparation-of-soil',
+  slug: 'c8-ch01-a01-ploughing-preparation-of-soil',
+  viewerKey: 'ploughing-preparation',
+  legacyAliases: [],
+  title: 'Ploughing: Preparation of Soil',
+  summary: 'Prepare an Indian farm for sowing by inspecting hard soil, guiding a bullock-drawn plough, comparing a tractor cultivator, breaking clods and levelling the field.',
+  gradeBands: ['class6To8'],
+  subjects: ['environmentalScience'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c8-ch01-crop-production-ploughing'],
+  conceptIds: [
+    'concept-soil-preparation',
+    'concept-ploughing',
+    'concept-soil-aeration',
+    'concept-field-levelling',
+  ],
+  simulationFormat: 'immersiveVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  publicationStatus: 'released',
+  evidenceMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'VR lets learners inspect field-scale traditional and modern implements, then move underground to connect ploughing with root growth, aeration, soil organisms and nutrient mixing.',
+  learningObjective: 'Students will explain ploughing as loosening and turning soil, identify why it supports crop growth, and compare traditional ploughing with a tractor-drawn cultivator.',
+  scientificConceptExplanation: 'Ploughing loosens and turns compact topsoil before sowing. The resulting pore spaces improve aeration and water movement, let roots penetrate more easily, help mix manure and nutrients, and support useful soil organisms. Breaking clods and levelling then prepare an even seedbed.',
+  misconceptionsAddressed: [
+    'Seeds grow equally well when placed directly in hard, compact soil.',
+    'Ploughing is only for making straight lines in a field.',
+    'A tractor changes the purpose of ploughing rather than mainly changing its speed and scale.',
+  ],
+  visualizationStrategy: 'Use photorealistic Indian farm panoramas with close interactive models, visible furrow formation and an underground soil cutaway showing roots, pore spaces, earthworms and mixed nutrients.',
+  interactionStrategy: 'Students inspect evidence, make a hard-soil decision, complete three plough passes, compare implements, investigate underground effects, break clods, level the field and finish a four-question assessment.',
+  imaginationHelperStrategy: 'Normally hidden pore spaces, roots, organisms and nutrient mixing are enlarged in a labelled underground cutaway.',
+  practicalUseCase: 'Connects textbook soil preparation to crop establishment, irrigation, manure application and real traditional and mechanised farming practices.',
+  cueCardIds: [
+    'cue-ploughing-field-001',
+    'cue-ploughing-hard-soil-002',
+    'cue-ploughing-tool-003',
+    'cue-ploughing-furrow-004',
+    'cue-ploughing-modern-005',
+    'cue-ploughing-underground-006',
+    'cue-ploughing-levelling-007',
+    'cue-ploughing-ready-008',
+  ],
+  revisionCardIds: ['rev-ploughing-sequence-001'],
+  assessmentHookIds: [
+    'assess-ploughing-observation-001',
+    'assess-ploughing-misconception-001',
+    'assess-ploughing-transfer-001',
+  ],
+  instructorScript: ploughingPreparationScript,
+  batchActivityPrompt: 'Arrange hard soil, ploughed soil and levelled soil in order, then explain how each preparation step helps the next crop.',
+  expectedDurationMinutes: 10,
+  maxSessionDurationMinutes: 12,
+  comfortRiskLevel: 'low',
+  safetyNotes: [
+    'Use seated or stationary play and the bounded virtual movement area.',
+    'The simulation teaches farm processes; students must not approach working animals or machinery without trained adult supervision.',
+  ],
+  offlineContentPackId: 'pack-science-crop-production-class8-v1',
+  estimatedPackageSizeMb: 8,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 8,
+  status: 'released',
+};
+
 const acidBaseScript = `SETUP
 Ask students how they could tell an acid from a base without tasting or touching it. Non-headset students list household acids and bases and predict litmus colours.
 
@@ -824,6 +904,7 @@ export const SIMULATION_MODULES = [
   DIGESTIVE_SYSTEM_MODULE,
   BREATHING_PROCESS_MODULE,
   FORCE_MOTION_MODULE,
+  PLOUGHING_PREPARATION_MODULE,
   ACID_BASE_MODULE,
   COLOUR_ADVENTURE_MODULE,
   MONEY_TOWN_MODULE,
