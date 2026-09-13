@@ -139,6 +139,12 @@ const AUTHORED_SIMULATION_PRESENTATION_OVERRIDES: Readonly<Record<
     topic: 'Crop Production and Management',
     archetype: 'immersive VR',
   },
+  'sim-c08-ch01-a02-sowing-of-seeds': {
+    color: '#6f8f45',
+    classLevels: [8],
+    topic: 'Crop Production and Management',
+    archetype: 'immersive VR',
+  },
 };
 
 const DEFAULT_PRESENTATION_BY_FORMAT: Readonly<Record<

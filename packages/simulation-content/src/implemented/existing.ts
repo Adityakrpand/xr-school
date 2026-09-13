@@ -17,6 +17,7 @@ import {
   PLOUGHING_PREPARATION_MODULE,
   POLLINATION_MODULE,
   PREPOSITION_ADVENTURE_MODULE,
+  SOWING_SEEDS_MODULE,
   SOLAR_SYSTEM_MISSION_MODULE,
   SOURCES_OF_FOOD_MODULE,
   STATES_OF_MATTER_MODULE,
@@ -256,6 +257,12 @@ const ploughingAssets: AssetDefinition[] = [
     byteSize: 717309,
   },
 ];
+
+const sowingAssets: AssetDefinition[] = ploughingAssets.map((asset) => ({
+  ...asset,
+  id: asset.id.replace('ploughing-', 'sowing-shared-'),
+  source: `${asset.source}; reused for the connected Sowing of Seeds farm lesson`,
+}));
 
 function smallestHonestAssessment(
   module: SimulationModuleRecord,
@@ -547,6 +554,17 @@ const ploughingStages = [
   stage('ready', 'Prove the field is ready', 'Inspect the prepared soil and seed bag, then complete the assessment.', ['inspect-ready-soil', 'inspect-seed-bag', 'complete-assessment'], ['field-readiness-explained'], 'The field is now loose, even and ready for sowing. Complete the check to explain what ploughing changes and why those changes matter for a healthy crop.', '/narration/ploughing-soil-preparation/ready.mp3'),
 ];
 
+const sowingStages = [
+  stage('prepared', 'The field is ready', 'Inspect the loose soil, seed bag and farmer before sowing.', ['inspect-ready-seedbed', 'inspect-seed-bag', 'inspect-farmer'], ['prepared-field-inspected'], 'Welcome back to the farm. The soil has been ploughed and levelled, so it is loose, even and ready. Inspect the seedbed, the seed bag and the farmer to begin the next crop-production step.', '/narration/sowing-of-seeds/prepared.mp3'),
+  stage('meaning', 'Place a seed with purpose', 'Inspect a seed and its furrow, then identify what sowing means.', ['inspect-seed', 'inspect-sowing-furrow', 'answer-sowing-meaning'], ['sowing-defined'], 'Sowing is the process of placing seeds in prepared soil so they can germinate and grow into new plants. Examine the seed and the furrow, then choose the correct meaning.', '/narration/sowing-of-seeds/meaning.mp3'),
+  stage('selection', 'Build a healthy seed batch', 'Select five healthy seeds and inspect the broken and damaged examples.', ['select-five-healthy-seeds', 'inspect-broken-seed', 'inspect-damaged-seed'], ['healthy-batch-selected'], 'Before sowing, farmers select healthy, well-developed seeds. Choose five full, undamaged seeds for the good-seed basket, and inspect why broken or damaged seeds are rejected.', '/narration/sowing-of-seeds/selection.mp3'),
+  stage('water-test', 'Which seeds float and sink?', 'Drop the sample into water, then inspect the floating and sunken seeds.', ['test-seed-sample', 'inspect-floating-seeds', 'inspect-sunken-seeds'], ['water-observation-recorded'], 'A simple water activity can reveal differences in a seed sample. Some hollow or damaged seeds may float, while well-filled seeds often sink. This observation supports selection, but it does not replace checking the crop and seed source.', '/narration/sowing-of-seeds/water-test.mp3'),
+  stage('depth', 'Not shallow. Not too deep.', 'Compare all three positions and place the seed at the suitable depth.', ['inspect-shallow-seed', 'inspect-suitable-depth', 'inspect-deep-seed', 'choose-suitable-depth'], ['depth-selected'], 'Seeds must be placed at a suitable depth. A shallow seed can dry out or be eaten by birds. A very deep seed may struggle to reach the surface. Choose the middle position where moisture and emergence are balanced.', '/narration/sowing-of-seeds/depth.mp3'),
+  stage('spacing', 'Turn a crowded row into a crop row', 'Compare both rows, then move three seeds into evenly spaced positions.', ['inspect-crowded-row', 'inspect-spaced-row', 'repair-seed-spacing'], ['spacing-corrected'], 'Seeds also need proper spacing. Crowded plants compete for sunlight, water, nutrients and room for their roots. Compare the crowded and evenly spaced rows, then correct the crowded row.', '/narration/sowing-of-seeds/spacing.mp3'),
+  stage('methods', 'From funnel tool to seed drill', 'Inspect both tools and identify which one places seeds uniformly in rows.', ['inspect-traditional-tool', 'inspect-seed-drill', 'compare-sowing-methods'], ['methods-compared'], 'Traditional sowing can use a funnel-shaped tool behind a plough. A tractor-drawn seed drill places seeds in rows at a more uniform depth and spacing, then covers them with soil. Compare both methods.', '/narration/sowing-of-seeds/methods.mp3'),
+  stage('germination', 'The seed wakes underground', 'Inspect the covered seed, root and shoot, then complete the five-question crop check.', ['inspect-covered-seed', 'inspect-root', 'inspect-shoot', 'complete-crop-check'], ['sowing-sequence-explained'], 'The selected seeds are now covered at the correct depth and spacing. With suitable water, air and temperature, the seed absorbs water, its root grows downward and its shoot reaches upward toward light. Complete the crop check.', '/narration/sowing-of-seeds/germination.mp3'),
+];
+
 const acidBaseStages = [
   stage('stage-test-acid', 'Test the acid with litmus', 'Dip red and blue litmus into the acidic solution and see which paper changes colour.', ['test-acid-litmus'], ['acid-identified']),
   stage('stage-test-base', 'Test the base with litmus', 'Switch to the basic solution and dip the litmus again.', ['test-base-litmus'], ['base-identified']),
@@ -699,6 +717,12 @@ export const EXISTING_IMPLEMENTED_SIMULATIONS: ImplementedSimulationDefinition[]
     gradeTone: 'class6To8',
     stages: ploughingStages,
     assets: ploughingAssets,
+  }),
+  createExistingDefinition(SOWING_SEEDS_MODULE, {
+    experienceId: 'experience-sowing-seeds',
+    gradeTone: 'class6To8',
+    stages: sowingStages,
+    assets: sowingAssets,
   }),
   createExistingDefinition(ACID_BASE_MODULE, {
     experienceId: 'experience-acids-bases',

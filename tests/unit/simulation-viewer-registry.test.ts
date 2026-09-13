@@ -57,6 +57,10 @@ const EXPECTED_VIEWERS = {
     fileName: "PloughingPreparationViewer.tsx",
     load: () => import("../../apps/web/components/simulations/PloughingPreparationViewer"),
   },
+  "sowing-seeds": {
+    fileName: "SowingSeedsViewer.tsx",
+    load: () => import("../../apps/web/components/simulations/SowingSeedsViewer"),
+  },
   pollination: {
     fileName: "PollinationViewer.tsx",
     load: () => import("../../apps/web/components/simulations/PollinationViewer"),

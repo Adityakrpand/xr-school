@@ -108,6 +108,18 @@ Ask students to explain how loosening soil helps roots, air, water, earthworms a
 REVISION TRIGGER
 One week later, show hard, ploughed and levelled soil photographs and ask students to put them in preparation order and justify each transition.`;
 
+const sowingSeedsScript = `SETUP
+Show a mixed sample of healthy, broken and damaged seeds. Ask students which seeds they would sow and what else a farmer must control after selecting them.
+
+DURING HEADSET BATCH
+Guide students through the prepared seedbed, meaning of sowing, healthy-seed selection, float-and-sink observation, depth comparison, spacing repair, traditional funnel tool, modern seed drill and germination cutaway. Require evidence at every scene before moving on.
+
+DEBRIEF
+Ask students to explain why seed quality, suitable depth and even spacing all affect crop establishment. Treat the water activity as one observation rather than a universal guarantee of viability, and compare traditional and modern tools by precision, scale and context.
+
+REVISION TRIGGER
+One week later, give students cards showing seed selection, sowing, covering and germination. Ask them to arrange the sequence and annotate the depth, spacing and germination conditions needed for a healthy row.`;
+
 const moneyTownScript = `SETUP
 Show Indian coins and notes and ask students to name where they have seen them used. Non-headset students prepare a simple shop table with item prices.
 
@@ -618,6 +630,77 @@ export const PLOUGHING_PREPARATION_MODULE: SimulationModuleRecord = {
   status: 'released',
 };
 
+export const SOWING_SEEDS_MODULE: SimulationModuleRecord = {
+  id: 'sim-c08-ch01-a02-sowing-of-seeds',
+  slug: 'c8-ch01-a02-sowing-of-seeds',
+  viewerKey: 'sowing-seeds',
+  legacyAliases: [],
+  title: 'Sowing of Seeds',
+  summary: 'Continue the farm mission by selecting healthy seeds, observing a water test, setting suitable depth and spacing, comparing sowing tools and watching germination begin.',
+  gradeBands: ['class6To8'],
+  subjects: ['environmentalScience'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c8-ch01-crop-production-sowing'],
+  conceptIds: [
+    'concept-sowing',
+    'concept-seed-quality',
+    'concept-sowing-depth',
+    'concept-seed-spacing',
+    'concept-seed-drill',
+    'concept-seed-germination',
+  ],
+  simulationFormat: 'immersiveVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  publicationStatus: 'released',
+  evidenceMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'VR lets learners handle visible seed samples, compare depth and spacing at field scale, inspect sowing implements and enter an underground cutaway where root and shoot growth are normally hidden.',
+  learningObjective: 'Students will define sowing, select healthy seed, explain suitable depth and spacing, compare traditional sowing with a seed drill, and identify the first stages of germination.',
+  scientificConceptExplanation: 'Sowing places selected seeds in prepared soil. Seed quality, suitable depth and even spacing improve the chance that seedlings receive moisture, air, light, nutrients and room to establish. Seed drills can meter and cover seeds uniformly. Germination begins when a viable seed receives suitable water, oxygen and temperature.',
+  misconceptionsAddressed: [
+    'Any seed in a bag is equally suitable for sowing.',
+    'Seeds grow best when left on the surface or buried as deeply as possible.',
+    'Crowding more seeds into one place always produces more crop.',
+    'Every floating seed is dead and every sinking seed is guaranteed to germinate.',
+  ],
+  visualizationStrategy: 'Use a realistic Indian seedbed, tactile seed-sorting table, transparent water cylinder, soil-depth and spacing cutaways, field-scale sowing tools and an enlarged underground germination sequence.',
+  interactionStrategy: 'Students inspect the prepared field, select five healthy seeds, run the float-and-sink observation, choose suitable depth, repair a crowded row, compare implements and pass a five-question crop check.',
+  imaginationHelperStrategy: 'Seed embryos, soil depth, root emergence and shoot growth are enlarged and animated so students can connect a small seed to the developing plant.',
+  practicalUseCase: 'Connects textbook crop-production steps to kitchen gardens, school gardens and real decisions farmers make about seed lots, row placement and sowing equipment.',
+  cueCardIds: [
+    'cue-sowing-prepared-001',
+    'cue-sowing-meaning-002',
+    'cue-sowing-selection-003',
+    'cue-sowing-water-test-004',
+    'cue-sowing-depth-005',
+    'cue-sowing-spacing-006',
+    'cue-sowing-methods-007',
+    'cue-sowing-germination-008',
+  ],
+  revisionCardIds: ['rev-sowing-sequence-001'],
+  assessmentHookIds: [
+    'assess-sowing-observation-001',
+    'assess-sowing-misconception-001',
+    'assess-sowing-transfer-001',
+  ],
+  instructorScript: sowingSeedsScript,
+  batchActivityPrompt: 'Design one healthy crop row: identify the seed you would choose, mark suitable depth and spacing, name the sowing tool and explain what the seed needs to germinate.',
+  expectedDurationMinutes: 10,
+  maxSessionDurationMinutes: 12,
+  comfortRiskLevel: 'low',
+  safetyNotes: [
+    'Use seated or stationary play and the bounded virtual movement area.',
+    'The simulation models seed handling and farm equipment; real seed treatments and moving machinery require trained adult supervision.',
+  ],
+  offlineContentPackId: 'pack-science-crop-production-class8-v1',
+  estimatedPackageSizeMb: 8,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 8,
+  status: 'released',
+};
+
 const acidBaseScript = `SETUP
 Ask students how they could tell an acid from a base without tasting or touching it. Non-headset students list household acids and bases and predict litmus colours.
 
@@ -905,6 +988,7 @@ export const SIMULATION_MODULES = [
   BREATHING_PROCESS_MODULE,
   FORCE_MOTION_MODULE,
   PLOUGHING_PREPARATION_MODULE,
+  SOWING_SEEDS_MODULE,
   ACID_BASE_MODULE,
   COLOUR_ADVENTURE_MODULE,
   MONEY_TOWN_MODULE,

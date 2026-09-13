@@ -10391,6 +10391,15 @@ export const RELEASED_SIMULATION_CATALOG = [
     "evidenceMaturity": "internalQA"
   },
   {
+    "id": "sim-c08-ch01-a02-sowing-of-seeds",
+    "slug": "c8-ch01-a02-sowing-of-seeds",
+    "title": "Sowing of Seeds",
+    "href": "/simulations/c8-ch01-a02-sowing-of-seeds",
+    "releaseMaturity": "internalQA",
+    "publicationStatus": "released",
+    "evidenceMaturity": "internalQA"
+  },
+  {
     "id": "sim-c10-ch02-a01-introduction-to-acids-and-bases-and-litmus-test",
     "slug": "c10-ch02-a01-introduction-to-acids-and-bases-and-litmus-test",
     "title": "Acids, Bases & Neutralisation",

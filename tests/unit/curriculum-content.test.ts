@@ -85,6 +85,7 @@ describe('canonical curriculum content', () => {
       'sim-c8-10-science-solar-system',
       'sim-c08-ch02-a03-fungi-and-its-development',
       'sim-c08-ch01-a01-ploughing-preparation-of-soil',
+      'sim-c08-ch01-a02-sowing-of-seeds',
     ]) {
       expect(linkedSimulationIds.has(simulationId)).toBe(true);
     }
@@ -108,6 +109,12 @@ describe('canonical curriculum content', () => {
       conceptIds: ['concept-fungi', 'concept-mycelium', 'concept-decomposition'],
       simulationIds: ['sim-c08-ch02-a03-fungi-and-its-development'],
     });
+    expect(CURRICULUM_CHAPTERS.find(
+      item => item.id === 'chapter-cbse-c8-crop-production',
+    )?.simulationIds).toEqual([
+      'sim-c08-ch01-a01-ploughing-preparation-of-soil',
+      'sim-c08-ch01-a02-sowing-of-seeds',
+    ]);
   });
 
   it('links Colour Adventure through honest Class 1 Art concepts', () => {

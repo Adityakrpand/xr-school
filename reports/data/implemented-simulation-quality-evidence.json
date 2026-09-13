@@ -1,16 +1,16 @@
 {
   "auditDate": "2026-08-01",
   "portfolio": {
-    "publiclyLaunchableSimulations": 37,
+    "publiclyLaunchableSimulations": 38,
     "evidenceMaturityDistribution": {
-      "internalQA": 37,
+      "internalQA": 38,
       "deviceVerified": 0,
       "classroomVerified": 0
     },
-    "narrationCues": 248,
-    "packagedNarrationClips": 248,
+    "narrationCues": 256,
+    "packagedNarrationClips": 256,
     "missingNarrationFiles": 0,
-    "assets": 106,
+    "assets": 110,
     "signedQuestAcceptanceRuns": 0,
     "classroomStudies": 0
   },
@@ -885,6 +885,116 @@
         },
         {
           "id": "c8-ch01-a01-ploughing-preparation-of-soil:release-build",
+          "kind": "build",
+          "ref": "npm --workspace apps/web run build",
+          "finding": "The route is included in the static production build and canonical registry coverage gate.",
+          "dimensions": [
+            "stability",
+            "deployment"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "c8-ch01-a02-sowing-of-seeds",
+      "title": "Sowing of Seeds",
+      "route": "/simulations/c8-ch01-a02-sowing-of-seeds",
+      "publicationStatus": "released",
+      "evidenceMaturity": "internalQA",
+      "legacyPaths": [],
+      "kind": "interactive",
+      "contribution": "existing",
+      "counts": {
+        "stages": 8,
+        "actions": 26,
+        "evidence": 8,
+        "assessmentPrompts": 2
+      },
+      "narration": {
+        "cues": 8,
+        "captions": 8,
+        "packagedAudio": 8,
+        "missingFiles": 0,
+        "hashValidated": 8,
+        "fallback": "browserTts"
+      },
+      "assets": {
+        "count": 4,
+        "visualSource": "manifest-assets",
+        "provenanceComplete": true,
+        "fallback": "not applicable: visuals are code-native",
+        "pathValidated": true,
+        "hashValidated": true
+      },
+      "tests": [
+        "c8-ch01-a02-sowing-of-seeds:behavior",
+        "implemented-registry:coverage",
+        "viewer-registry:coverage"
+      ],
+      "lastVerifiedCommand": "npm run verify",
+      "browserEvidence": {
+        "status": "build-and-contract-verified",
+        "finding": "Static production route generation and shared-host contract checks pass; final deployed browser acceptance is recorded in production release evidence."
+      },
+      "questDeviceEvidence": "not-run",
+      "classroomEvidence": "not-run",
+      "references": [
+        {
+          "id": "c8-ch01-a02-sowing-of-seeds:definition",
+          "kind": "source",
+          "ref": "packages/simulation-content/src/implemented/existing.ts",
+          "finding": "8 canonical stages, 2 assessment prompts, and release metadata are declared in the shared content contract.",
+          "dimensions": [
+            "education",
+            "integrity"
+          ]
+        },
+        {
+          "id": "c8-ch01-a02-sowing-of-seeds:behavior",
+          "kind": "test",
+          "ref": "tests/unit/implemented-simulation-registry.test.ts",
+          "finding": "Behavior tests execute declared actions, evidence gates, assessment behavior, or canonical registry resolution.",
+          "dimensions": [
+            "education",
+            "integrity",
+            "interactivity",
+            "usability",
+            "stability"
+          ]
+        },
+        {
+          "id": "c8-ch01-a02-sowing-of-seeds:assets",
+          "kind": "asset",
+          "ref": "sowing-seeds-assets",
+          "finding": "4 declared assets; path, digest, and provenance validation passes.",
+          "dimensions": [
+            "visuals",
+            "stability"
+          ]
+        },
+        {
+          "id": "c8-ch01-a02-sowing-of-seeds:narration",
+          "kind": "narration",
+          "ref": "sowing-seeds-narration",
+          "finding": "8 exact captions; 8 packaged clips; fallback browserTts.",
+          "dimensions": [
+            "audio",
+            "usability"
+          ]
+        },
+        {
+          "id": "c8-ch01-a02-sowing-of-seeds:browser-contract",
+          "kind": "browser",
+          "ref": "/simulations/c8-ch01-a02-sowing-of-seeds",
+          "finding": "The canonical route delegates to the shared experience shell and registered viewer; production observation remains separate from this contract evidence.",
+          "dimensions": [
+            "interactivity",
+            "usability",
+            "stability"
+          ]
+        },
+        {
+          "id": "c8-ch01-a02-sowing-of-seeds:release-build",
           "kind": "build",
           "ref": "npm --workspace apps/web run build",
           "finding": "The route is included in the static production build and canonical registry coverage gate.",

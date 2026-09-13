@@ -1,0 +1,52 @@
+{
+  "slug": "c8-ch01-a02-sowing-of-seeds",
+  "profile": {
+    "previewNumber": 7,
+    "label": "Neerja — Dramatic Narrator",
+    "voice": "en-IN-NeerjaExpressiveNeural",
+    "rate": "-12%",
+    "pitch": "-2Hz"
+  },
+  "cues": [
+    {
+      "id": "prepared",
+      "text": "Welcome back to the farm. The soil has been ploughed and levelled, so it is loose, even and ready. Inspect the seedbed, the seed bag and the farmer to begin the next crop-production step.",
+      "audioUrl": "/narration/sowing-of-seeds/prepared.mp3"
+    },
+    {
+      "id": "meaning",
+      "text": "Sowing is the process of placing seeds in prepared soil so they can germinate and grow into new plants. Examine the seed and the furrow, then choose the correct meaning.",
+      "audioUrl": "/narration/sowing-of-seeds/meaning.mp3"
+    },
+    {
+      "id": "selection",
+      "text": "Before sowing, farmers select healthy, well-developed seeds. Choose five full, undamaged seeds for the good-seed basket, and inspect why broken or damaged seeds are rejected.",
+      "audioUrl": "/narration/sowing-of-seeds/selection.mp3"
+    },
+    {
+      "id": "water-test",
+      "text": "A simple water activity can reveal differences in a seed sample. Some hollow or damaged seeds may float, while well-filled seeds often sink. This observation supports selection, but it does not replace checking the crop and seed source.",
+      "audioUrl": "/narration/sowing-of-seeds/water-test.mp3"
+    },
+    {
+      "id": "depth",
+      "text": "Seeds must be placed at a suitable depth. A shallow seed can dry out or be eaten by birds. A very deep seed may struggle to reach the surface. Choose the middle position where moisture and emergence are balanced.",
+      "audioUrl": "/narration/sowing-of-seeds/depth.mp3"
+    },
+    {
+      "id": "spacing",
+      "text": "Seeds also need proper spacing. Crowded plants compete for sunlight, water, nutrients and room for their roots. Compare the crowded and evenly spaced rows, then correct the crowded row.",
+      "audioUrl": "/narration/sowing-of-seeds/spacing.mp3"
+    },
+    {
+      "id": "methods",
+      "text": "Traditional sowing can use a funnel-shaped tool behind a plough. A tractor-drawn seed drill places seeds in rows at a more uniform depth and spacing, then covers them with soil. Compare both methods.",
+      "audioUrl": "/narration/sowing-of-seeds/methods.mp3"
+    },
+    {
+      "id": "germination",
+      "text": "The selected seeds are now covered at the correct depth and spacing. With suitable water, air and temperature, the seed absorbs water, its root grows downward and its shoot reaches upward toward light. Complete the crop check.",
+      "audioUrl": "/narration/sowing-of-seeds/germination.mp3"
+    }
+  ]
+}

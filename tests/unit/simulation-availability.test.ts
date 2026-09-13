@@ -182,6 +182,7 @@ describe('simulation availability routing', () => {
         'c8-10-science-solar-system',
         'c8-ch02-a03-fungi-and-its-development',
         'c8-ch01-a01-ploughing-preparation-of-soil',
+        'c8-ch01-a02-sowing-of-seeds',
       ]),
     );
   });

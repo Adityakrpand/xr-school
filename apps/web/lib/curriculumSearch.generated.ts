@@ -336,6 +336,12 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "concept-ploughing",
       "concept-soil-aeration",
       "concept-field-levelling",
+      "concept-sowing",
+      "concept-seed-quality",
+      "concept-sowing-depth",
+      "concept-seed-spacing",
+      "concept-seed-drill",
+      "concept-seed-germination",
       "concept-fungi",
       "concept-mycelium",
       "concept-decomposition",
@@ -363,6 +369,10 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "observable",
       "models",
       "ploughing",
+      "sowing",
+      "seed",
+      "quality",
+      "drill",
       "soil",
       "fungi",
       "mycelium",
@@ -785,7 +795,13 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "concept-soil-preparation",
       "concept-ploughing",
       "concept-soil-aeration",
-      "concept-field-levelling"
+      "concept-field-levelling",
+      "concept-sowing",
+      "concept-seed-quality",
+      "concept-sowing-depth",
+      "concept-seed-spacing",
+      "concept-seed-drill",
+      "concept-seed-germination"
     ],
     "tokens": [
       "crop",
@@ -801,7 +817,9 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "topic",
       "ploughing",
       "soil",
-      "preparation"
+      "preparation",
+      "sowing",
+      "seeds"
     ]
   },
   {
@@ -1386,7 +1404,8 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
     "summary": "Growth of a seed into a seedling when water, oxygen, and temperature are suitable.",
     "href": "/simulations#concept-seed-germination",
     "classLevels": [
-      7
+      7,
+      8
     ],
     "subjects": [
       "biology"
@@ -3413,6 +3432,248 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "prepared",
       "clod",
       "leveller"
+    ]
+  },
+  {
+    "id": "concept:concept-sowing",
+    "kind": "concept",
+    "title": "Sowing seeds",
+    "summary": "Placing selected seeds in prepared soil so they can germinate and establish a crop.",
+    "href": "/simulations#concept-sowing",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "environmentalScience"
+    ],
+    "conceptIds": [
+      "concept-sowing"
+    ],
+    "tokens": [
+      "sowing",
+      "seeds",
+      "placing",
+      "selected",
+      "in",
+      "prepared",
+      "soil",
+      "so",
+      "they",
+      "can",
+      "germinate",
+      "and",
+      "establish",
+      "a",
+      "crop",
+      "connects",
+      "field",
+      "preparation",
+      "to",
+      "the",
+      "establishment",
+      "of",
+      "healthy",
+      "seed",
+      "seedbed",
+      "production"
+    ]
+  },
+  {
+    "id": "concept:concept-seed-quality",
+    "kind": "concept",
+    "title": "Seed selection and quality",
+    "summary": "Selecting full, healthy and undamaged seeds while treating simple observations such as floating or sinking as supporting evidence rather than proof.",
+    "href": "/simulations#concept-seed-quality",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "environmentalScience"
+    ],
+    "conceptIds": [
+      "concept-seed-quality"
+    ],
+    "tokens": [
+      "seed",
+      "selection",
+      "and",
+      "quality",
+      "selecting",
+      "full",
+      "healthy",
+      "undamaged",
+      "seeds",
+      "while",
+      "treating",
+      "simple",
+      "observations",
+      "such",
+      "as",
+      "floating",
+      "or",
+      "sinking",
+      "supporting",
+      "evidence",
+      "rather",
+      "than",
+      "proof",
+      "good",
+      "improves",
+      "crop",
+      "establishment",
+      "reduces",
+      "wasted",
+      "field",
+      "space",
+      "viable",
+      "damaged",
+      "float",
+      "test",
+      "viability"
+    ]
+  },
+  {
+    "id": "concept:concept-sowing-depth",
+    "kind": "concept",
+    "title": "Suitable sowing depth",
+    "summary": "Placing seeds deep enough to remain covered and moist but close enough to the surface for the shoot to emerge.",
+    "href": "/simulations#concept-sowing-depth",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "environmentalScience"
+    ],
+    "conceptIds": [
+      "concept-sowing-depth"
+    ],
+    "tokens": [
+      "suitable",
+      "sowing",
+      "depth",
+      "placing",
+      "seeds",
+      "deep",
+      "enough",
+      "to",
+      "remain",
+      "covered",
+      "and",
+      "moist",
+      "but",
+      "close",
+      "the",
+      "surface",
+      "for",
+      "shoot",
+      "emerge",
+      "protects",
+      "while",
+      "preserving",
+      "stored",
+      "energy",
+      "emergence",
+      "seed",
+      "planting",
+      "shallow"
+    ]
+  },
+  {
+    "id": "concept:concept-seed-spacing",
+    "kind": "concept",
+    "title": "Seed spacing",
+    "summary": "Distributing seeds so developing plants have appropriate access to light, water, nutrients and root space.",
+    "href": "/simulations#concept-seed-spacing",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "environmentalScience"
+    ],
+    "conceptIds": [
+      "concept-seed-spacing"
+    ],
+    "tokens": [
+      "seed",
+      "spacing",
+      "distributing",
+      "seeds",
+      "so",
+      "developing",
+      "plants",
+      "have",
+      "appropriate",
+      "access",
+      "to",
+      "light",
+      "water",
+      "nutrients",
+      "and",
+      "root",
+      "space",
+      "even",
+      "reduces",
+      "unnecessary",
+      "competition",
+      "supports",
+      "consistent",
+      "crop",
+      "growth",
+      "row",
+      "rows",
+      "crowding",
+      "plant"
+    ]
+  },
+  {
+    "id": "concept:concept-seed-drill",
+    "kind": "concept",
+    "title": "Seed drill",
+    "summary": "Equipment that meters seeds into rows at controlled depth and spacing and then covers them with soil.",
+    "href": "/simulations#concept-seed-drill",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "environmentalScience"
+    ],
+    "conceptIds": [
+      "concept-seed-drill"
+    ],
+    "tokens": [
+      "seed",
+      "drill",
+      "equipment",
+      "that",
+      "meters",
+      "seeds",
+      "into",
+      "rows",
+      "at",
+      "controlled",
+      "depth",
+      "and",
+      "spacing",
+      "then",
+      "covers",
+      "them",
+      "with",
+      "soil",
+      "explains",
+      "how",
+      "modern",
+      "farms",
+      "sow",
+      "larger",
+      "areas",
+      "more",
+      "uniform",
+      "placement",
+      "sowing",
+      "machine",
+      "tractor",
+      "drawn",
+      "tool"
     ]
   },
   {
@@ -5578,6 +5839,99 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "leveller",
       "even",
       "irrigation"
+    ]
+  },
+  {
+    "id": "simulation:c8-ch01-a02-sowing-of-seeds",
+    "kind": "simulation",
+    "title": "Sowing of Seeds",
+    "summary": "Continue the farm mission by selecting healthy seeds, observing a water test, setting suitable depth and spacing, comparing sowing tools and watching germination begin.",
+    "href": "/simulations/c8-ch01-a02-sowing-of-seeds",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "environmentalScience"
+    ],
+    "conceptIds": [
+      "concept-sowing",
+      "concept-seed-quality",
+      "concept-sowing-depth",
+      "concept-seed-spacing",
+      "concept-seed-drill",
+      "concept-seed-germination"
+    ],
+    "releaseMaturity": "internalQA",
+    "moduleId": "sim-c08-ch01-a02-sowing-of-seeds",
+    "publicationStatus": "released",
+    "evidenceMaturity": "internalQA",
+    "tokens": [
+      "sowing",
+      "of",
+      "seeds",
+      "continue",
+      "the",
+      "farm",
+      "mission",
+      "by",
+      "selecting",
+      "healthy",
+      "observing",
+      "a",
+      "water",
+      "test",
+      "setting",
+      "suitable",
+      "depth",
+      "and",
+      "spacing",
+      "comparing",
+      "tools",
+      "watching",
+      "germination",
+      "begin",
+      "students",
+      "will",
+      "define",
+      "select",
+      "seed",
+      "explain",
+      "compare",
+      "traditional",
+      "with",
+      "drill",
+      "identify",
+      "first",
+      "stages",
+      "environmentalscience",
+      "placing",
+      "seedbed",
+      "crop",
+      "production",
+      "selection",
+      "quality",
+      "viable",
+      "damaged",
+      "float",
+      "viability",
+      "planting",
+      "shallow",
+      "deep",
+      "emergence",
+      "row",
+      "rows",
+      "crowding",
+      "plant",
+      "competition",
+      "machine",
+      "tractor",
+      "drawn",
+      "tool",
+      "uniform",
+      "sprouting",
+      "seedling",
+      "sprout",
+      "growth"
     ]
   },
   {
@@ -13854,45 +14208,6 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "rather",
       "than",
       "score"
-    ]
-  },
-  {
-    "id": "simulation:c8-ch01-a02-sowing-of-seeds",
-    "kind": "simulation",
-    "title": "Sowing of seeds",
-    "summary": "Crop Production and Management · Class 8 biology",
-    "href": "/simulations#c8-ch01-a02-sowing-of-seeds",
-    "classLevels": [
-      8
-    ],
-    "subjects": [
-      "biology"
-    ],
-    "conceptIds": [],
-    "releaseMaturity": "catalogued",
-    "tokens": [
-      "sowing",
-      "of",
-      "seeds",
-      "crop",
-      "production",
-      "and",
-      "management",
-      "biology",
-      "processtimeline",
-      "use",
-      "staged",
-      "timeline",
-      "with",
-      "progressive",
-      "reveal",
-      "scrubber",
-      "cue",
-      "card",
-      "checkpoints",
-      "final",
-      "sequence",
-      "recap"
     ]
   },
   {

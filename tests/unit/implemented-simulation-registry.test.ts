@@ -25,9 +25,9 @@ function mutableClone(
 }
 
 describe("implemented simulation registry", () => {
-  it("contains the complete released registry while preserving the 14 bespoke module seeds", () => {
+  it("contains the complete released registry while preserving the 15 bespoke module seeds", () => {
     expect(IMPLEMENTED_SIMULATIONS).toHaveLength(EXPECTED_RELEASED_SIMULATION_COUNT);
-    expect(SIMULATION_MODULES).toHaveLength(14);
+    expect(SIMULATION_MODULES).toHaveLength(15);
     const implementedIds = new Set(
       IMPLEMENTED_SIMULATIONS.map(({ module }) => module.id),
     );

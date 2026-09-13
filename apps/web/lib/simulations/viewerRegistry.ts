@@ -153,6 +153,10 @@ const VIEWER_INPUTS = {
     sourcePath: 'apps/web/components/simulations/PloughingPreparationViewer.tsx',
     load: () => import('../../components/simulations/PloughingPreparationViewer'),
   },
+  'sowing-seeds': {
+    sourcePath: 'apps/web/components/simulations/SowingSeedsViewer.tsx',
+    load: () => import('../../components/simulations/SowingSeedsViewer'),
+  },
   'preposition-adventure': {
     sourcePath: 'apps/web/components/simulations/PrepositionAdventureViewer.tsx',
     load: () => import('../../components/simulations/PrepositionAdventureViewer'),
