@@ -145,6 +145,12 @@ const AUTHORED_SIMULATION_PRESENTATION_OVERRIDES: Readonly<Record<
     topic: 'Crop Production and Management',
     archetype: 'immersive VR',
   },
+  'sim-c07-ch02-a02-nutrition-in-amoeba': {
+    color: '#2aa198',
+    classLevels: [7],
+    topic: 'Nutrition in Animals',
+    archetype: 'immersive VR',
+  },
 };
 
 const DEFAULT_PRESENTATION_BY_FORMAT: Readonly<Record<

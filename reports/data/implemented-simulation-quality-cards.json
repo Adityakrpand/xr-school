@@ -69,6 +69,75 @@
     "action": "Run representative browser and headset acceptance, then conduct a teacher-facilitated pilot before making learning-effect claims."
   },
   {
+    "slug": "c7-ch02-a02-nutrition-in-amoeba",
+    "title": "Nutrition in Amoeba",
+    "route": "/simulations/c7-ch02-a02-nutrition-in-amoeba",
+    "publicationStatus": "released",
+    "evidenceMaturity": "internalQA",
+    "legacyPaths": [],
+    "grade": "Class 7",
+    "subject": "Biology",
+    "evidenceConfidence": "Internal automated evidence; device and classroom evidence not run",
+    "scores": {
+      "education": 18,
+      "integrity": 14,
+      "interactivity": 14,
+      "visuals": 11,
+      "audio": 8,
+      "usability": 8,
+      "stability": 8,
+      "deployment": 3
+    },
+    "band": "Promising internal QA",
+    "dimensionEvidence": {
+      "education": [
+        "c7-ch02-a02-nutrition-in-amoeba:definition",
+        "c7-ch02-a02-nutrition-in-amoeba:behavior"
+      ],
+      "integrity": [
+        "c7-ch02-a02-nutrition-in-amoeba:definition",
+        "c7-ch02-a02-nutrition-in-amoeba:behavior"
+      ],
+      "interactivity": [
+        "c7-ch02-a02-nutrition-in-amoeba:behavior",
+        "c7-ch02-a02-nutrition-in-amoeba:browser-contract"
+      ],
+      "visuals": [
+        "c7-ch02-a02-nutrition-in-amoeba:visual-source",
+        "c7-ch02-a02-nutrition-in-amoeba:visual-behavior"
+      ],
+      "audio": [
+        "c7-ch02-a02-nutrition-in-amoeba:narration"
+      ],
+      "usability": [
+        "c7-ch02-a02-nutrition-in-amoeba:behavior",
+        "c7-ch02-a02-nutrition-in-amoeba:narration",
+        "c7-ch02-a02-nutrition-in-amoeba:browser-contract"
+      ],
+      "stability": [
+        "c7-ch02-a02-nutrition-in-amoeba:behavior",
+        "c7-ch02-a02-nutrition-in-amoeba:visual-source",
+        "c7-ch02-a02-nutrition-in-amoeba:visual-behavior",
+        "c7-ch02-a02-nutrition-in-amoeba:release-build"
+      ],
+      "deployment": [
+        "c7-ch02-a02-nutrition-in-amoeba:release-build"
+      ]
+    },
+    "summary": "Nutrition in Amoeba is now a canonical interactive class with declared stages, evidence gates, assessment, narration, an auditable visual implementation, route ownership, and release metadata.",
+    "strengths": [
+      "10 declared stages connect the curriculum objective to observable learner actions and evidence.",
+      "2 assessment prompts include misconception and transfer checks; completion is kept separate from mastery.",
+      "10 committed narration clips are owned by the manifest with exact captions."
+    ],
+    "risks": [
+      "Evidence maturity remains internal QA: no signed headset acceptance run or classroom outcome study has occurred.",
+      "Code-native visual structure has source and automated evidence; visual clarity and performance still need a representative low-end device review.",
+      "Teacher facilitation, learner-language comprehension, and multi-session reliability still require a controlled school pilot."
+    ],
+    "action": "Run representative browser and headset acceptance, then conduct a teacher-facilitated pilot before making learning-effect claims."
+  },
+  {
     "slug": "c8-ch01-a01-ploughing-preparation-of-soil",
     "title": "Ploughing: Preparation of Soil",
     "route": "/simulations/c8-ch01-a01-ploughing-preparation-of-soil",

@@ -18,7 +18,7 @@ describe("catalog narration assets", () => {
       definition.narration.cues.map((cue) => ({ definition, cue })),
     );
 
-    expect(cues).toHaveLength(256);
+    expect(cues).toHaveLength(266);
     expect(cues.every(({ cue }) => Boolean(cue.audioUrl))).toBe(true);
     expect(
       cues.filter(({ cue }) => /^\/narration\/[^/]+\.mp3$/.test(cue.audioUrl ?? "")),

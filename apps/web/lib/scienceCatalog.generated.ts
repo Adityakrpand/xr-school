@@ -10400,6 +10400,15 @@ export const RELEASED_SIMULATION_CATALOG = [
     "evidenceMaturity": "internalQA"
   },
   {
+    "id": "sim-c07-ch02-a02-nutrition-in-amoeba",
+    "slug": "c7-ch02-a02-nutrition-in-amoeba",
+    "title": "Nutrition in Amoeba",
+    "href": "/simulations/c7-ch02-a02-nutrition-in-amoeba",
+    "releaseMaturity": "internalQA",
+    "publicationStatus": "released",
+    "evidenceMaturity": "internalQA"
+  },
+  {
     "id": "sim-c10-ch02-a01-introduction-to-acids-and-bases-and-litmus-test",
     "slug": "c10-ch02-a01-introduction-to-acids-and-bases-and-litmus-test",
     "title": "Acids, Bases & Neutralisation",

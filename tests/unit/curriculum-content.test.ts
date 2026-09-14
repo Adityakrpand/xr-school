@@ -10,7 +10,7 @@ import { validateCurriculumGraph } from '../../packages/simulation-schema/src/in
 describe('canonical curriculum content', () => {
   it('defines typed courses, chapters, and concepts for every working simulation', () => {
     expect(COURSES).toHaveLength(11);
-    expect(CURRICULUM_CHAPTERS).toHaveLength(24);
+    expect(CURRICULUM_CHAPTERS).toHaveLength(25);
     expect(LEARNING_CONCEPTS.length).toBeGreaterThanOrEqual(74);
 
     const linkedSimulationIds = new Set(COURSES.flatMap(course => course.simulationIds));

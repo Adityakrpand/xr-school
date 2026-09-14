@@ -1,0 +1,62 @@
+{
+  "slug": "c7-ch02-a02-nutrition-in-amoeba",
+  "profile": {
+    "previewNumber": 7,
+    "label": "Neerja — Dramatic Narrator",
+    "voice": "en-IN-NeerjaExpressiveNeural",
+    "rate": "-12%",
+    "pitch": "-2Hz"
+  },
+  "cues": [
+    {
+      "id": "pond",
+      "text": "Welcome, young scientist. This freshwater pond contains an entire world of organisms too small for our eyes to see. Follow Dr Anaya's method: take the dropper, collect one drop of pond water, place it on the glass slide and look through the microscope.",
+      "audioUrl": "/narration/amoeba-nutrition/pond.mp3"
+    },
+    {
+      "id": "find",
+      "text": "You are now inside the water drop. Algae, bacteria and tiny organisms drift around you. Look for the transparent, jelly-like organism that continuously changes its shape. That organism is an amoeba.",
+      "audioUrl": "/narration/amoeba-nutrition/find.mp3"
+    },
+    {
+      "id": "anatomy",
+      "text": "Ami is a unicellular organism, which means its whole body is one cell. Inspect the protective cell membrane, jelly-like cytoplasm, controlling nucleus, temporary food vacuole and finger-like pseudopodia. Pseudopodia means false feet; they help the amoeba move and capture food.",
+      "audioUrl": "/narration/amoeba-nutrition/anatomy.mp3"
+    },
+    {
+      "id": "hungry",
+      "text": "Amoeba has no mouth or teeth. It feeds on tiny organisms, bacteria and small organic particles in water. Choose a suitable food particle and help Ami extend a pseudopodium towards it.",
+      "audioUrl": "/narration/amoeba-nutrition/hungry.mp3"
+    },
+    {
+      "id": "ingestion",
+      "text": "Watch carefully. Two pseudopodia extend around the food and join together, carrying it inside the cell. Taking food into the body is called ingestion. A food vacuole now forms around the captured particle and acts like a temporary stomach.",
+      "audioUrl": "/narration/amoeba-nutrition/ingestion.mp3"
+    },
+    {
+      "id": "digestion",
+      "text": "Digestive juices enter the food vacuole and break complex food into simple, soluble substances. Activate the three enzyme points and watch the food separate into small nutrient particles. This stage is called digestion.",
+      "audioUrl": "/narration/amoeba-nutrition/digestion.mp3"
+    },
+    {
+      "id": "assimilation",
+      "text": "Digested nutrients pass from the food vacuole into the cytoplasm. That is absorption. The cell then uses those nutrients for energy, growth and repair. Using absorbed nutrients is called assimilation. Power all three zones to help Ami become active again.",
+      "audioUrl": "/narration/amoeba-nutrition/assimilation.mp3"
+    },
+    {
+      "id": "egestion",
+      "text": "Not every part of food can be digested. Guide the remaining waste to the cell membrane and release it outside. Removing undigested food is called egestion. An amoeba can release waste through its cell membrane at different points.",
+      "audioUrl": "/narration/amoeba-nutrition/egestion.mp3"
+    },
+    {
+      "id": "sequence",
+      "text": "Now rebuild the complete nutrition cycle. Amoeba follows holozoic nutrition: it ingests solid food, digests it, absorbs the nutrients, assimilates them for life processes and removes undigested waste by egestion.",
+      "audioUrl": "/narration/amoeba-nutrition/sequence.mp3"
+    },
+    {
+      "id": "recap",
+      "text": "You have returned to Dr Anaya's microscope. Prove what you discovered: identify the structure that captures food, the place where digestion occurs and the name of waste removal. Complete all three questions to earn the Amoeba Nutrition Explorer badge.",
+      "audioUrl": "/narration/amoeba-nutrition/recap.mp3"
+    }
+  ]
+}

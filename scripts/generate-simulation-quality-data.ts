@@ -58,6 +58,10 @@ const CODE_NATIVE_VISUAL_EVIDENCE: Readonly<
     sourcePath: 'apps/web/lib/world-builder/fungiWorld.ts',
     behaviorTestPath: 'tests/unit/fungi-world.test.ts',
   },
+  'c7-ch02-a02-nutrition-in-amoeba': {
+    sourcePath: 'apps/web/lib/amoebaNutritionScene.ts',
+    behaviorTestPath: 'tests/unit/amoeba-nutrition-scene.test.ts',
+  },
 });
 
 const BASELINE_TOTALS: Readonly<Record<string, number>> = Object.freeze({

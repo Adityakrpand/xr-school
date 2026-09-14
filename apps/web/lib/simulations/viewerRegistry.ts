@@ -157,6 +157,10 @@ const VIEWER_INPUTS = {
     sourcePath: 'apps/web/components/simulations/SowingSeedsViewer.tsx',
     load: () => import('../../components/simulations/SowingSeedsViewer'),
   },
+  'amoeba-nutrition': {
+    sourcePath: 'apps/web/components/simulations/AmoebaNutritionViewer.tsx',
+    load: () => import('../../components/simulations/AmoebaNutritionViewer'),
+  },
   'preposition-adventure': {
     sourcePath: 'apps/web/components/simulations/PrepositionAdventureViewer.tsx',
     load: () => import('../../components/simulations/PrepositionAdventureViewer'),

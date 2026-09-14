@@ -1,14 +1,14 @@
 {
   "auditDate": "2026-08-01",
   "portfolio": {
-    "publiclyLaunchableSimulations": 38,
+    "publiclyLaunchableSimulations": 39,
     "evidenceMaturityDistribution": {
-      "internalQA": 38,
+      "internalQA": 39,
       "deviceVerified": 0,
       "classroomVerified": 0
     },
-    "narrationCues": 256,
-    "packagedNarrationClips": 256,
+    "narrationCues": 266,
+    "packagedNarrationClips": 266,
     "missingNarrationFiles": 0,
     "assets": 110,
     "signedQuestAcceptanceRuns": 0,
@@ -995,6 +995,126 @@
         },
         {
           "id": "c8-ch01-a02-sowing-of-seeds:release-build",
+          "kind": "build",
+          "ref": "npm --workspace apps/web run build",
+          "finding": "The route is included in the static production build and canonical registry coverage gate.",
+          "dimensions": [
+            "stability",
+            "deployment"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "c7-ch02-a02-nutrition-in-amoeba",
+      "title": "Nutrition in Amoeba",
+      "route": "/simulations/c7-ch02-a02-nutrition-in-amoeba",
+      "publicationStatus": "released",
+      "evidenceMaturity": "internalQA",
+      "legacyPaths": [],
+      "kind": "interactive",
+      "contribution": "existing",
+      "counts": {
+        "stages": 10,
+        "actions": 25,
+        "evidence": 10,
+        "assessmentPrompts": 2
+      },
+      "narration": {
+        "cues": 10,
+        "captions": 10,
+        "packagedAudio": 10,
+        "missingFiles": 0,
+        "hashValidated": 10,
+        "fallback": "browserTts"
+      },
+      "assets": {
+        "count": 0,
+        "visualSource": "code-native",
+        "provenanceComplete": false,
+        "fallback": "not applicable: visuals are code-native",
+        "pathValidated": false,
+        "hashValidated": false
+      },
+      "tests": [
+        "c7-ch02-a02-nutrition-in-amoeba:behavior",
+        "implemented-registry:coverage",
+        "viewer-registry:coverage"
+      ],
+      "lastVerifiedCommand": "npm run verify",
+      "browserEvidence": {
+        "status": "build-and-contract-verified",
+        "finding": "Static production route generation and shared-host contract checks pass; final deployed browser acceptance is recorded in production release evidence."
+      },
+      "questDeviceEvidence": "not-run",
+      "classroomEvidence": "not-run",
+      "references": [
+        {
+          "id": "c7-ch02-a02-nutrition-in-amoeba:definition",
+          "kind": "source",
+          "ref": "packages/simulation-content/src/implemented/existing.ts",
+          "finding": "10 canonical stages, 2 assessment prompts, and release metadata are declared in the shared content contract.",
+          "dimensions": [
+            "education",
+            "integrity"
+          ]
+        },
+        {
+          "id": "c7-ch02-a02-nutrition-in-amoeba:behavior",
+          "kind": "test",
+          "ref": "tests/unit/implemented-simulation-registry.test.ts",
+          "finding": "Behavior tests execute declared actions, evidence gates, assessment behavior, or canonical registry resolution.",
+          "dimensions": [
+            "education",
+            "integrity",
+            "interactivity",
+            "usability",
+            "stability"
+          ]
+        },
+        {
+          "id": "c7-ch02-a02-nutrition-in-amoeba:visual-source",
+          "kind": "code-native-visual",
+          "ref": "apps/web/lib/amoebaNutritionScene.ts",
+          "finding": "The visual world is authored in repository code; no file-asset path, digest, or provenance validation is claimed.",
+          "dimensions": [
+            "visuals",
+            "stability"
+          ]
+        },
+        {
+          "id": "c7-ch02-a02-nutrition-in-amoeba:visual-behavior",
+          "kind": "test",
+          "ref": "tests/unit/amoeba-nutrition-scene.test.ts",
+          "finding": "Executable visual-world tests verify authored targets, state projection, performance budgets, and disposal behavior.",
+          "dimensions": [
+            "visuals",
+            "stability"
+          ]
+        },
+        {
+          "id": "c7-ch02-a02-nutrition-in-amoeba:narration",
+          "kind": "narration",
+          "ref": "amoeba-nutrition-narration",
+          "finding": "10 exact captions; 10 packaged clips; fallback browserTts.",
+          "dimensions": [
+            "audio",
+            "usability"
+          ]
+        },
+        {
+          "id": "c7-ch02-a02-nutrition-in-amoeba:browser-contract",
+          "kind": "browser",
+          "ref": "/simulations/c7-ch02-a02-nutrition-in-amoeba",
+          "finding": "The canonical route delegates to the shared experience shell and registered viewer; production observation remains separate from this contract evidence.",
+          "dimensions": [
+            "interactivity",
+            "usability",
+            "stability"
+          ]
+        },
+        {
+          "id": "c7-ch02-a02-nutrition-in-amoeba:release-build",
           "kind": "build",
           "ref": "npm --workspace apps/web run build",
           "finding": "The route is included in the static production build and canonical registry coverage gate.",

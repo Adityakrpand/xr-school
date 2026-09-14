@@ -21,6 +21,10 @@ import {
 import { EXPECTED_RELEASED_SIMULATION_COUNT } from "../../scripts/lib/simulation-quality-data";
 
 const EXPECTED_VIEWERS = {
+  "amoeba-nutrition": {
+    fileName: "AmoebaNutritionViewer.tsx",
+    load: () => import("../../apps/web/components/simulations/AmoebaNutritionViewer"),
+  },
   "acid-base": {
     fileName: "AcidBaseViewer.tsx",
     load: () => import("../../apps/web/components/simulations/AcidBaseViewer"),

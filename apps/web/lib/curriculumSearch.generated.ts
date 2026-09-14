@@ -244,7 +244,7 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
     "id": "course:course-cbse-c7-biology",
     "kind": "course",
     "title": "CBSE Class 7 Biology",
-    "summary": "Life-science concepts made visible through plant structure, reproduction, and human respiration.",
+    "summary": "Life-science concepts made visible through nutrition, cell structure, plant reproduction, and human respiration.",
     "href": "/simulations#course-cbse-c7-biology",
     "classLevels": [
       7
@@ -253,6 +253,11 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "biology"
     ],
     "conceptIds": [
+      "concept-amoeba-cell",
+      "concept-pseudopodia",
+      "concept-food-vacuole",
+      "concept-holozoic-nutrition",
+      "concept-amoeba-nutrition-cycle",
       "concept-flower-structure",
       "concept-pollination",
       "concept-fertilisation",
@@ -272,12 +277,15 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "made",
       "visible",
       "through",
-      "plant",
+      "nutrition",
+      "cell",
       "structure",
+      "plant",
       "reproduction",
       "and",
       "human",
       "respiration",
+      "amoeba",
       "plants",
       "pollination",
       "breathing",
@@ -684,6 +692,39 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "1",
       "topic",
       "origins"
+    ]
+  },
+  {
+    "id": "chapter:chapter-cbse-c7-nutrition-in-animals",
+    "kind": "chapter",
+    "title": "Nutrition in Animals",
+    "summary": "CBSE Class 7 Biology · Chapter 2",
+    "href": "/simulations#chapter-cbse-c7-nutrition-in-animals",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-amoeba-cell",
+      "concept-pseudopodia",
+      "concept-food-vacuole",
+      "concept-holozoic-nutrition",
+      "concept-amoeba-nutrition-cycle"
+    ],
+    "tokens": [
+      "nutrition",
+      "in",
+      "animals",
+      "cbse",
+      "class",
+      "7",
+      "biology",
+      "chapter",
+      "2",
+      "topic",
+      "amoeba"
     ]
   },
   {
@@ -2339,6 +2380,240 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "eating",
       "fruit",
       "vegetables"
+    ]
+  },
+  {
+    "id": "concept:concept-amoeba-cell",
+    "kind": "concept",
+    "title": "Amoeba as a unicellular organism",
+    "summary": "An amoeba is a microscopic organism whose entire body consists of one shape-changing cell.",
+    "href": "/simulations#concept-amoeba-cell",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-amoeba-cell"
+    ],
+    "tokens": [
+      "amoeba",
+      "as",
+      "a",
+      "unicellular",
+      "organism",
+      "an",
+      "is",
+      "microscopic",
+      "whose",
+      "entire",
+      "body",
+      "consists",
+      "of",
+      "one",
+      "shape",
+      "changing",
+      "cell",
+      "connects",
+      "microscope",
+      "observations",
+      "to",
+      "the",
+      "basic",
+      "unit",
+      "life",
+      "freshwater"
+    ]
+  },
+  {
+    "id": "concept:concept-pseudopodia",
+    "kind": "concept",
+    "title": "Pseudopodia",
+    "summary": "Temporary extensions of an amoeba cell used for movement and for surrounding food.",
+    "href": "/simulations#concept-pseudopodia",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-pseudopodia"
+    ],
+    "tokens": [
+      "pseudopodia",
+      "temporary",
+      "extensions",
+      "of",
+      "an",
+      "amoeba",
+      "cell",
+      "used",
+      "for",
+      "movement",
+      "and",
+      "surrounding",
+      "food",
+      "explains",
+      "how",
+      "one",
+      "can",
+      "move",
+      "feed",
+      "without",
+      "limbs",
+      "or",
+      "a",
+      "mouth",
+      "false",
+      "feet",
+      "projections",
+      "engulf",
+      "ingestion"
+    ]
+  },
+  {
+    "id": "concept:concept-food-vacuole",
+    "kind": "concept",
+    "title": "Food vacuole",
+    "summary": "A temporary membrane-bound space where engulfed food is stored and digested inside an amoeba.",
+    "href": "/simulations#concept-food-vacuole",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-food-vacuole"
+    ],
+    "tokens": [
+      "food",
+      "vacuole",
+      "a",
+      "temporary",
+      "membrane",
+      "bound",
+      "space",
+      "where",
+      "engulfed",
+      "is",
+      "stored",
+      "and",
+      "digested",
+      "inside",
+      "an",
+      "amoeba",
+      "makes",
+      "intracellular",
+      "digestion",
+      "understandable",
+      "as",
+      "process",
+      "occurring",
+      "within",
+      "one",
+      "cell",
+      "digestive",
+      "stomach",
+      "juices"
+    ]
+  },
+  {
+    "id": "concept:concept-holozoic-nutrition",
+    "kind": "concept",
+    "title": "Holozoic nutrition",
+    "summary": "A mode of nutrition in which solid food is taken inside, digested, absorbed, used and followed by removal of undigested material.",
+    "href": "/simulations#concept-holozoic-nutrition",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-holozoic-nutrition"
+    ],
+    "tokens": [
+      "holozoic",
+      "nutrition",
+      "a",
+      "mode",
+      "of",
+      "in",
+      "which",
+      "solid",
+      "food",
+      "is",
+      "taken",
+      "inside",
+      "digested",
+      "absorbed",
+      "used",
+      "and",
+      "followed",
+      "by",
+      "removal",
+      "undigested",
+      "material",
+      "provides",
+      "simple",
+      "cellular",
+      "model",
+      "for",
+      "comparing",
+      "across",
+      "living",
+      "organisms",
+      "amoeba",
+      "feeding",
+      "ingestion",
+      "digestion",
+      "absorption",
+      "assimilation",
+      "egestion"
+    ]
+  },
+  {
+    "id": "concept:concept-amoeba-nutrition-cycle",
+    "kind": "concept",
+    "title": "Amoeba nutrition cycle",
+    "summary": "The ordered stages ingestion, digestion, absorption, assimilation and egestion in an amoeba.",
+    "href": "/simulations#concept-amoeba-nutrition-cycle",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-amoeba-nutrition-cycle"
+    ],
+    "tokens": [
+      "amoeba",
+      "nutrition",
+      "cycle",
+      "the",
+      "ordered",
+      "stages",
+      "ingestion",
+      "digestion",
+      "absorption",
+      "assimilation",
+      "and",
+      "egestion",
+      "in",
+      "an",
+      "supports",
+      "correct",
+      "sequencing",
+      "comparison",
+      "with",
+      "larger",
+      "animals",
+      "of",
+      "sequence"
     ]
   },
   {
@@ -5932,6 +6207,88 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "seedling",
       "sprout",
       "growth"
+    ]
+  },
+  {
+    "id": "simulation:c7-ch02-a02-nutrition-in-amoeba",
+    "kind": "simulation",
+    "title": "Nutrition in Amoeba",
+    "summary": "Collect pond water, enter a microscope world, explore a living amoeba and guide food through ingestion, digestion, absorption, assimilation and egestion.",
+    "href": "/simulations/c7-ch02-a02-nutrition-in-amoeba",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-amoeba-cell",
+      "concept-pseudopodia",
+      "concept-food-vacuole",
+      "concept-holozoic-nutrition",
+      "concept-amoeba-nutrition-cycle"
+    ],
+    "releaseMaturity": "internalQA",
+    "moduleId": "sim-c07-ch02-a02-nutrition-in-amoeba",
+    "publicationStatus": "released",
+    "evidenceMaturity": "internalQA",
+    "tokens": [
+      "nutrition",
+      "in",
+      "amoeba",
+      "collect",
+      "pond",
+      "water",
+      "enter",
+      "a",
+      "microscope",
+      "world",
+      "explore",
+      "living",
+      "and",
+      "guide",
+      "food",
+      "through",
+      "ingestion",
+      "digestion",
+      "absorption",
+      "assimilation",
+      "egestion",
+      "students",
+      "will",
+      "identify",
+      "the",
+      "main",
+      "structures",
+      "of",
+      "an",
+      "explain",
+      "ordered",
+      "stages",
+      "holozoic",
+      "biology",
+      "as",
+      "unicellular",
+      "organism",
+      "cell",
+      "one",
+      "freshwater",
+      "pseudopodia",
+      "false",
+      "feet",
+      "projections",
+      "movement",
+      "engulf",
+      "vacuole",
+      "digestive",
+      "temporary",
+      "stomach",
+      "juices",
+      "intracellular",
+      "feeding",
+      "solid",
+      "cycle",
+      "sequence"
     ]
   },
   {
@@ -11005,41 +11362,6 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "system",
       "nutrition",
       "in",
-      "animals",
-      "biology",
-      "modelinspection",
-      "use",
-      "labeled",
-      "3d",
-      "inspection",
-      "with",
-      "isolate",
-      "zoom",
-      "explode",
-      "compare",
-      "and",
-      "vocabulary",
-      "layer"
-    ]
-  },
-  {
-    "id": "simulation:c7-ch02-a02-nutrition-in-amoeba",
-    "kind": "simulation",
-    "title": "Nutrition in Amoeba",
-    "summary": "Nutrition in Animals · Class 7 biology",
-    "href": "/simulations#c7-ch02-a02-nutrition-in-amoeba",
-    "classLevels": [
-      7
-    ],
-    "subjects": [
-      "biology"
-    ],
-    "conceptIds": [],
-    "releaseMaturity": "catalogued",
-    "tokens": [
-      "nutrition",
-      "in",
-      "amoeba",
       "animals",
       "biology",
       "modelinspection",

@@ -120,6 +120,18 @@ Ask students to explain why seed quality, suitable depth and even spacing all af
 REVISION TRIGGER
 One week later, give students cards showing seed selection, sowing, covering and germination. Ask them to arrange the sequence and annotate the depth, spacing and germination conditions needed for a healthy row.`;
 
+const amoebaNutritionScript = `SETUP
+Show students a drop of pond water and ask whether it might contain living organisms too small to see. Non-headset students sketch what they expect an amoeba to look like and predict how it could eat without a mouth.
+
+DURING HEADSET BATCH
+Guide students through pond-water collection, the microscope transition, finding a shape-changing amoeba, inspecting its cell parts, capturing food with pseudopodia, digestion inside a food vacuole, absorption and assimilation in the cytoplasm, egestion, and the ordered nutrition cycle. Pause before every process name so learners describe the visible event first.
+
+DEBRIEF
+Ask students to distinguish ingestion, digestion, absorption, assimilation and egestion. Review that pseudopodia are temporary extensions, that digestion occurs in a food vacuole, and that the amoeba is one cell rather than a tiny many-celled animal.
+
+REVISION TRIGGER
+One week later, show five shuffled nutrition-stage cards and an unlabelled amoeba diagram. Ask students to order the stages, label pseudopodia and the food vacuole, and explain one piece of visible evidence for each label.`;
+
 const moneyTownScript = `SETUP
 Show Indian coins and notes and ask students to name where they have seen them used. Non-headset students prepare a simple shop table with item prices.
 
@@ -701,6 +713,79 @@ export const SOWING_SEEDS_MODULE: SimulationModuleRecord = {
   status: 'released',
 };
 
+export const AMOEBA_NUTRITION_MODULE: SimulationModuleRecord = {
+  id: 'sim-c07-ch02-a02-nutrition-in-amoeba',
+  slug: 'c7-ch02-a02-nutrition-in-amoeba',
+  viewerKey: 'amoeba-nutrition',
+  legacyAliases: [],
+  title: 'Nutrition in Amoeba',
+  summary: 'Collect pond water, enter a microscope world, explore a living amoeba and guide food through ingestion, digestion, absorption, assimilation and egestion.',
+  gradeBands: ['class6To8'],
+  subjects: ['biology'],
+  applicableBoards: ['cbse', 'icse', 'stateBoard'],
+  curriculumMapIds: ['cm-cbse-c7-ch02-amoeba-nutrition'],
+  conceptIds: [
+    'concept-amoeba-cell',
+    'concept-pseudopodia',
+    'concept-food-vacuole',
+    'concept-holozoic-nutrition',
+    'concept-amoeba-nutrition-cycle',
+  ],
+  simulationFormat: 'immersiveVr',
+  evidenceConfidenceLevel: 'expertDesigned',
+  releaseMaturity: 'internalQA',
+  publicationStatus: 'released',
+  evidenceMaturity: 'internalQA',
+  xrFitType: 'strongVrFit',
+  xrFitJustification: 'VR enlarges a normally invisible one-celled organism and lets learners move around and inside it while each nutrition process unfolds spatially in the correct order.',
+  learningObjective: 'Students will identify the main structures of an amoeba and explain the ordered stages of holozoic nutrition: ingestion, digestion, absorption, assimilation and egestion.',
+  scientificConceptExplanation: 'An amoeba is a unicellular organism with no fixed shape. Temporary projections called pseudopodia help it move and surround food. The enclosed food forms a food vacuole, where digestive juices break it into soluble substances. Nutrients pass into the cytoplasm, are used for energy, growth and repair, and undigested material is released through the cell membrane.',
+  misconceptionsAddressed: [
+    'An amoeba is a tiny many-celled animal with a mouth and stomach.',
+    'Pseudopodia are permanent legs.',
+    'Absorption and assimilation mean the same step.',
+    'Egestion and excretion are identical processes.',
+  ],
+  visualizationStrategy: 'Begin beside a realistic pond and microscope, then transition to a glowing microscopic environment with a translucent, continuously changing amoeba. Make the membrane, cytoplasm, nucleus, food vacuole, pseudopodia, digestive enzymes, nutrients and waste visible at an enlarged scale.',
+  interactionStrategy: 'Students collect and mount a pond sample, locate the shape-changing organism, inspect five cell structures, guide pseudopodia around food, activate digestion, distribute nutrients to three uses, release waste, order the five nutrition stages and complete an evidence-based quiz.',
+  imaginationHelperStrategy: 'The learner shrinks into a water drop, where microscopic cell parts and invisible nutrient movement become room-sized, animated and directly inspectable.',
+  practicalUseCase: 'Connects microscope observations and cell diagrams to the wider idea that even one cell must obtain food, digest it, use nutrients and remove undigested material.',
+  cueCardIds: [
+    'cue-amoeba-pond-001',
+    'cue-amoeba-find-002',
+    'cue-amoeba-anatomy-003',
+    'cue-amoeba-hungry-004',
+    'cue-amoeba-ingestion-005',
+    'cue-amoeba-digestion-006',
+    'cue-amoeba-assimilation-007',
+    'cue-amoeba-egestion-008',
+    'cue-amoeba-sequence-009',
+    'cue-amoeba-recap-010',
+  ],
+  revisionCardIds: ['rev-amoeba-nutrition-cycle-001'],
+  assessmentHookIds: [
+    'assess-amoeba-structure-001',
+    'assess-amoeba-sequence-001',
+    'assess-amoeba-misconception-001',
+  ],
+  instructorScript: amoebaNutritionScript,
+  batchActivityPrompt: 'Draw one amoeba capturing food, label pseudopodia and the food vacuole, then arrange ingestion, digestion, absorption, assimilation and egestion in order.',
+  expectedDurationMinutes: 8,
+  maxSessionDurationMinutes: 10,
+  comfortRiskLevel: 'low',
+  safetyNotes: [
+    'Use seated or stationary play with optional bounded joystick movement.',
+    'The shrinking transition is a gentle visual fade with no forced camera acceleration.',
+    'Real pond water must only be handled under teacher supervision and never tasted or touched to the face.',
+  ],
+  offlineContentPackId: 'pack-biology-amoeba-nutrition-class7-v1',
+  estimatedPackageSizeMb: 9,
+  targetFrameRateFps: 72,
+  minQuestStorageGb: 1,
+  stages: 10,
+  status: 'released',
+};
+
 const acidBaseScript = `SETUP
 Ask students how they could tell an acid from a base without tasting or touching it. Non-headset students list household acids and bases and predict litmus colours.
 
@@ -987,6 +1072,7 @@ export const SIMULATION_MODULES = [
   DIGESTIVE_SYSTEM_MODULE,
   BREATHING_PROCESS_MODULE,
   FORCE_MOTION_MODULE,
+  AMOEBA_NUTRITION_MODULE,
   PLOUGHING_PREPARATION_MODULE,
   SOWING_SEEDS_MODULE,
   ACID_BASE_MODULE,

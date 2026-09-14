@@ -24,7 +24,7 @@ QUALITY_WEIGHTS: dict[str, int] = {
     "stability": 10,
     "deployment": 5,
 }
-EXPECTED_RELEASED_SIMULATION_COUNT = 38
+EXPECTED_RELEASED_SIMULATION_COUNT = 39
 
 QUALITY_LABELS: dict[str, str] = {
     "education": "Educational effectiveness",

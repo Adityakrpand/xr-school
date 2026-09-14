@@ -8,6 +8,7 @@ import type {
 } from '@xr-school/simulation-schema';
 import {
   ACID_BASE_MODULE,
+  AMOEBA_NUTRITION_MODULE,
   BREATHING_PROCESS_MODULE,
   CIRCUIT_MODULE,
   COLOUR_ADVENTURE_MODULE,
@@ -565,6 +566,19 @@ const sowingStages = [
   stage('germination', 'The seed wakes underground', 'Inspect the covered seed, root and shoot, then complete the five-question crop check.', ['inspect-covered-seed', 'inspect-root', 'inspect-shoot', 'complete-crop-check'], ['sowing-sequence-explained'], 'The selected seeds are now covered at the correct depth and spacing. With suitable water, air and temperature, the seed absorbs water, its root grows downward and its shoot reaches upward toward light. Complete the crop check.', '/narration/sowing-of-seeds/germination.mp3'),
 ];
 
+const amoebaNutritionStages = [
+  stage('pond', 'The hidden world in a pond', 'Use the dropper, collect pond water, place it on the slide and inspect it through the microscope.', ['use-dropper', 'collect-pond-water', 'place-glass-slide', 'inspect-microscope'], ['pond-sample-prepared'], "Welcome, young scientist. This freshwater pond contains an entire world of organisms too small for our eyes to see. Follow Dr Anaya's method: take the dropper, collect one drop of pond water, place it on the glass slide and look through the microscope.", '/narration/amoeba-nutrition/pond.mp3'),
+  stage('find', 'Look for a changing shape', 'Search the microscopic water and select the organism that has no fixed shape.', ['find-amoeba'], ['amoeba-identified'], 'You are now inside the water drop. Algae, bacteria and tiny organisms drift around you. Look for the transparent, jelly-like organism that continuously changes its shape. That organism is an amoeba.', '/narration/amoeba-nutrition/find.mp3'),
+  stage('anatomy', 'One cell with many working parts', 'Inspect the membrane, cytoplasm, nucleus, pseudopodia and food vacuole. Find the part that captures food.', ['inspect-cell-membrane', 'inspect-cytoplasm', 'inspect-nucleus', 'inspect-pseudopodia', 'inspect-food-vacuole'], ['amoeba-structures-identified'], 'Ami is a unicellular organism, which means its whole body is one cell. Inspect the protective cell membrane, jelly-like cytoplasm, controlling nucleus, temporary food vacuole and finger-like pseudopodia. Pseudopodia means false feet; they help the amoeba move and capture food.', '/narration/amoeba-nutrition/anatomy.mp3'),
+  stage('hungry', 'Ami becomes hungry', "Choose a suitable bacterium, then guide Ami's pseudopodium towards it.", ['choose-food-particle', 'extend-feeding-pseudopodium'], ['food-located'], 'Amoeba has no mouth or teeth. It feeds on tiny organisms, bacteria and small organic particles in water. Choose a suitable food particle and help Ami extend a pseudopodium towards it.', '/narration/amoeba-nutrition/hungry.mp3'),
+  stage('ingestion', 'Capture the food — ingestion', 'Activate both pseudopodia around the food, then inspect the new food vacuole.', ['activate-left-pseudopodium', 'activate-right-pseudopodium', 'inspect-ingestion-vacuole'], ['ingestion-observed'], 'Watch carefully. Two pseudopodia extend around the food and join together, carrying it inside the cell. Taking food into the body is called ingestion. A food vacuole now forms around the captured particle and acts like a temporary stomach.', '/narration/amoeba-nutrition/ingestion.mp3'),
+  stage('digestion', 'Break food into simple substances', 'Activate all three digestive-enzyme points inside the food vacuole.', ['activate-enzyme-one', 'activate-enzyme-two', 'activate-enzyme-three'], ['digestion-observed'], 'Digestive juices enter the food vacuole and break complex food into simple, soluble substances. Activate the three enzyme points and watch the food separate into small nutrient particles. This stage is called digestion.', '/narration/amoeba-nutrition/digestion.mp3'),
+  stage('assimilation', 'Absorption and assimilation', 'Guide nutrients from the vacuole to energy, growth and body-repair zones.', ['power-energy-zone', 'power-growth-zone', 'power-repair-zone'], ['absorption-assimilation-observed'], 'Digested nutrients pass from the food vacuole into the cytoplasm. That is absorption. The cell then uses those nutrients for energy, growth and repair. Using absorbed nutrients is called assimilation. Power all three zones to help Ami become active again.', '/narration/amoeba-nutrition/assimilation.mp3'),
+  stage('egestion', 'Undigested food leaves the cell', 'Guide the waste vacuole to the membrane, then release the waste outside.', ['guide-waste-vacuole', 'release-undigested-food'], ['egestion-observed'], 'Not every part of food can be digested. Guide the remaining waste to the cell membrane and release it outside. Removing undigested food is called egestion. An amoeba can release waste through its cell membrane at different points.', '/narration/amoeba-nutrition/egestion.mp3'),
+  stage('sequence', 'Put holozoic nutrition in order', 'Select the five stages in order: ingestion, digestion, absorption, assimilation and egestion.', ['complete-nutrition-sequence'], ['holozoic-cycle-ordered'], 'Now rebuild the complete nutrition cycle. Amoeba follows holozoic nutrition: it ingests solid food, digests it, absorbs the nutrients, assimilates them for life processes and removes undigested waste by egestion.', '/narration/amoeba-nutrition/sequence.mp3'),
+  stage('recap', 'Return from the microscopic world', 'Use the enlarged amoeba to answer three evidence questions and unlock the explorer badge.', ['complete-amoeba-evidence-check'], ['amoeba-nutrition-explained'], "You have returned to Dr Anaya's microscope. Prove what you discovered: identify the structure that captures food, the place where digestion occurs and the name of waste removal. Complete all three questions to earn the Amoeba Nutrition Explorer badge.", '/narration/amoeba-nutrition/recap.mp3'),
+];
+
 const acidBaseStages = [
   stage('stage-test-acid', 'Test the acid with litmus', 'Dip red and blue litmus into the acidic solution and see which paper changes colour.', ['test-acid-litmus'], ['acid-identified']),
   stage('stage-test-base', 'Test the base with litmus', 'Switch to the basic solution and dip the litmus again.', ['test-base-litmus'], ['base-identified']),
@@ -723,6 +737,11 @@ export const EXISTING_IMPLEMENTED_SIMULATIONS: ImplementedSimulationDefinition[]
     gradeTone: 'class6To8',
     stages: sowingStages,
     assets: sowingAssets,
+  }),
+  createExistingDefinition(AMOEBA_NUTRITION_MODULE, {
+    experienceId: 'experience-amoeba-nutrition',
+    gradeTone: 'class6To8',
+    stages: amoebaNutritionStages,
   }),
   createExistingDefinition(ACID_BASE_MODULE, {
     experienceId: 'experience-acids-bases',
