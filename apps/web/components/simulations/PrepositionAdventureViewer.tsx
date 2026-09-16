@@ -27,6 +27,7 @@ import {
   playSimulationNarration,
   stopSimulationNarration,
 } from '@/lib/simulationAudio';
+import { createQuestVrControls } from './questVrControls';
 
 const STAGE_FRAMES: Record<PrepositionStageId, {
   position: [number, number, number];
@@ -534,6 +535,19 @@ export default function PrepositionAdventureViewer() {
     controller0.add(makeRay());
     controller1.add(makeRay());
     scene.add(controller0, controller1);
+    const questVr = createQuestVrControls({
+      renderer,
+      scene,
+      camera,
+      controllers: [controller0, controller1],
+      onPrimary: () => goToStageRef.current(stageIndexRef.current + 1),
+      onBack: () => goToStageRef.current(stageIndexRef.current - 1),
+      onNarrate: () => {
+        const index = stageIndexRef.current;
+        void playSimulationNarration(PREPOSITION_STAGES[index].teacherNarration, index);
+      },
+      startPosition: new THREE.Vector3(0, 0, 2.5),
+    });
 
     const interactionSystem = createInteractionSystem({
       camera,
@@ -561,6 +575,7 @@ export default function PrepositionAdventureViewer() {
       elapsed += delta;
       const intensity = comfortModeRef.current ? 0.42 : 1;
       if (!renderer.xr.isPresenting) guidedCamera.update(delta);
+      else questVr.update();
       sparkleLight.intensity = 1.85 + Math.sin(elapsed * 1.3) * 0.28 * intensity;
       const { teacher } = animatedRefs.current;
       if (teacher) {
@@ -597,6 +612,7 @@ export default function PrepositionAdventureViewer() {
       renderer.setAnimationLoop(null);
       window.removeEventListener('resize', onResize);
       interactionSystem.dispose();
+      questVr.dispose();
       guidedCamera.dispose();
       scene.traverse(object => {
         const mesh = object as THREE.Mesh;

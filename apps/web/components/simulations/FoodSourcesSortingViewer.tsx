@@ -7,6 +7,12 @@ import { ClassroomSync } from '@/components/robotree/ClassroomSync';
 import SimulationCanvasHost from '@/components/simulation-experience/SimulationCanvasHost';
 import { computeFocusFrame, createGuidedCamera } from '@/lib/world-builder/guidedCamera';
 import { createInteractionSystem } from '@/lib/world-builder/interactionSystem';
+import {
+  createFoodSourcesEnvironment,
+  createFoodTokenVisual,
+  type FoodTokenVisual,
+} from '@/lib/foodSourcesVisuals';
+import { createQuestVrControls } from './questVrControls';
 
 const CATEGORIES = [
   { id: 'plant', label: 'Plant source', color: '#4ade80', threeColor: 0x4ade80, cue: 'Fields, trees, grains, pulses, fruits, vegetables, oils, and spices.' },
@@ -141,12 +147,14 @@ function assignmentAudioUrl(itemId: ItemId, categoryId: CategoryId) {
 export default function FoodSourcesSortingViewer() {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const tokenRefs = useRef<THREE.Mesh[]>([]);
+  const tokenRefs = useRef<FoodTokenVisual[]>([]);
   const platformRefs = useRef<THREE.Mesh[]>([]);
   const assignmentRef = useRef<Assignments>({});
   const selectedItemRef = useRef<ItemId>('rice');
+  const stageIndexRef = useRef(0);
   const [started, setStarted] = useState(false);
   const [vrSupported, setVrSupported] = useState(false);
+  const [runtimeError, setRuntimeError] = useState<string>();
   const [stageIndex, setStageIndex] = useState(0);
   const [selectedItemId, setSelectedItemId] = useState<ItemId>('rice');
   const [assignments, setAssignments] = useState<Assignments>({});
@@ -163,6 +171,10 @@ export default function FoodSourcesSortingViewer() {
   }, [selectedItemId]);
 
   useEffect(() => {
+    stageIndexRef.current = stageIndex;
+  }, [stageIndex]);
+
+  useEffect(() => {
     if (typeof navigator !== 'undefined' && 'xr' in navigator) setVrSupported(true);
   }, []);
 
@@ -176,12 +188,16 @@ export default function FoodSourcesSortingViewer() {
     renderer.xr.enabled = true;
     renderer.xr.setReferenceSpaceType('local-floor');
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x10140f);
-    scene.fog = new THREE.Fog(0x10140f, 8, 18);
+    scene.background = new THREE.Color(0xaed8e6);
+    scene.fog = new THREE.Fog(0xaed8e6, 10, 24);
 
     const camera = new THREE.PerspectiveCamera(64, mount.clientWidth / mount.clientHeight, 0.05, 50);
     const guidedCamera = createGuidedCamera(camera, renderer.domElement);
@@ -190,21 +206,33 @@ export default function FoodSourcesSortingViewer() {
       { animate: false },
     );
 
-    scene.add(new THREE.HemisphereLight(0xf8fafc, 0x172013, 1.5));
+    scene.add(new THREE.HemisphereLight(0xfff6de, 0x4f6b38, 2.1));
     const key = new THREE.DirectionalLight(0xffffff, 1.8);
     key.position.set(3, 6, 4);
     key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.camera.left = -7;
+    key.shadow.camera.right = 7;
+    key.shadow.camera.top = 7;
+    key.shadow.camera.bottom = -7;
     scene.add(key);
 
-    const floor = new THREE.Mesh(new THREE.CircleGeometry(7, 64), new THREE.MeshStandardMaterial({ color: 0x172013, roughness: 0.9 }));
-    floor.rotation.x = -Math.PI / 2;
-    floor.receiveShadow = true;
-    scene.add(floor);
+    scene.add(createFoodSourcesEnvironment());
 
-    const table = new THREE.Mesh(new THREE.BoxGeometry(5.7, 0.25, 3.9), new THREE.MeshStandardMaterial({ color: 0x4b3b2a, roughness: 0.65 }));
+    const tableMaterial = new THREE.MeshStandardMaterial({ color: 0x6f442d, roughness: 0.68 });
+    const table = new THREE.Mesh(new THREE.BoxGeometry(5.7, 0.25, 3.9), tableMaterial);
     table.position.y = 0.32;
     table.receiveShadow = true;
+    table.castShadow = true;
     scene.add(table);
+    for (const x of [-2.45, 2.45]) {
+      for (const z of [-1.55, 1.55]) {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.7, 0.22), tableMaterial);
+        leg.position.set(x, -0.05, z);
+        leg.castShadow = true;
+        scene.add(leg);
+      }
+    }
 
     platformRefs.current = CATEGORIES.map((category, index) => {
       const platform = new THREE.Mesh(
@@ -225,21 +253,21 @@ export default function FoodSourcesSortingViewer() {
       return platform;
     });
 
-    const tokenGeometry = new THREE.CylinderGeometry(0.28, 0.28, 0.16, 32);
     tokenRefs.current = ITEMS.map((item, index) => {
-      const token = new THREE.Mesh(tokenGeometry, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35 }));
-      token.name = `food-token-${item.id}`;
-      token.castShadow = true;
-      token.position.copy(tokenPosition(index, assignmentRef.current));
-      scene.add(token);
+      const token = createFoodTokenVisual(item.id);
+      token.root.position.copy(tokenPosition(index, assignmentRef.current));
+      scene.add(token.root);
 
       const label = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.72, 0.32),
-        new THREE.MeshBasicMaterial({ map: makeLabelTexture(item.label, '#facc15') })
+        new THREE.PlaneGeometry(0.7, 0.3),
+        new THREE.MeshBasicMaterial({
+          map: makeLabelTexture(item.label, '#facc15'),
+          transparent: true,
+        })
       );
-      label.position.set(0, 0.19, 0);
-      label.rotation.x = -Math.PI / 2;
-      token.add(label);
+      label.position.set(0, 0.68, 0);
+      label.name = `${item.id}-label`;
+      token.root.add(label);
       return token;
     });
 
@@ -247,7 +275,30 @@ export default function FoodSourcesSortingViewer() {
     const controller1 = renderer.xr.getController(1);
     controller0.add(makeControllerRay());
     controller1.add(makeControllerRay());
-    scene.add(controller0, controller1);
+    const narrateCurrentStage = () => {
+      const currentStage = stageIndexRef.current;
+      void playSimulationNarration(NARRATIONS[currentStage], currentStage, NARRATION_AUDIO_URLS[currentStage]);
+    };
+    const quest = createQuestVrControls({
+      renderer,
+      scene,
+      camera,
+      controllers: [controller0, controller1],
+      onPrimary: () => {
+        const itemId = selectedItemRef.current;
+        const item = itemById[itemId];
+        void playSimulationNarration(`${item.label}. ${item.clue}`, ITEMS.findIndex(option => option.id === itemId), ITEM_AUDIO_URLS[itemId]);
+      },
+      onBack: () => {
+        const nextStage = Math.max(0, stageIndexRef.current - 1);
+        stageIndexRef.current = nextStage;
+        setStageIndex(nextStage);
+        void playSimulationNarration(NARRATIONS[nextStage], nextStage, NARRATION_AUDIO_URLS[nextStage]);
+      },
+      onNarrate: narrateCurrentStage,
+      startPosition: new THREE.Vector3(0, 0, 2.7),
+      movementBounds: new THREE.Box2(new THREE.Vector2(-4.8, -2.2), new THREE.Vector2(4.8, 5.2)),
+    });
 
     // ── Selection: one shared raycasting/highlight system for mouse + XR.
     // Lets desktop learners click tokens and platforms directly ──────────
@@ -282,7 +333,7 @@ export default function FoodSourcesSortingViewer() {
       },
     });
     for (const token of tokenRefs.current) {
-      interactionSystem.register(token.name, token, { highlightColor: '#facc15' });
+      interactionSystem.register(token.root.name, token.root, { highlightColor: '#facc15' });
     }
     for (const platform of platformRefs.current) {
       const categoryId = platform.name.replace('food-platform-', '') as CategoryId;
@@ -295,17 +346,19 @@ export default function FoodSourcesSortingViewer() {
       const delta = clock.getDelta();
       elapsedTotal += delta;
       const elapsed = elapsedTotal;
-      if (!renderer.xr.isPresenting) guidedCamera.update(delta);
+      if (renderer.xr.isPresenting) quest.update();
+      else guidedCamera.update(delta);
       tokenRefs.current.forEach((token, index) => {
         const target = tokenPosition(index, assignmentRef.current);
-        token.position.lerp(target, 0.08);
-        token.rotation.y = Math.sin(elapsed * 1.4 + index) * 0.08;
+        token.root.position.lerp(target, 0.08);
+        token.root.rotation.y = Math.sin(elapsed * 1.4 + index) * 0.08;
         const item = ITEMS[index];
         const category = assignmentRef.current[item.id];
-        const material = token.material as THREE.MeshStandardMaterial;
+        const material = token.feedbackMaterial;
         if (!category) {
-          material.color.setHex(0xf8fafc);
+          material.color.setHex(0xe9c46a);
           material.emissive.setHex(0x000000);
+          material.emissiveIntensity = 0;
         } else if (category === item.source) {
           material.color.setHex(categoryById[category].threeColor);
           material.emissive.setHex(categoryById[category].threeColor);
@@ -333,6 +386,23 @@ export default function FoodSourcesSortingViewer() {
       renderer.setAnimationLoop(null);
       interactionSystem.dispose();
       guidedCamera.dispose();
+      quest.dispose();
+      const geometries = new Set<THREE.BufferGeometry>();
+      const materials = new Set<THREE.Material>();
+      const textures = new Set<THREE.Texture>();
+      scene.traverse(object => {
+        if (!(object instanceof THREE.Mesh || object instanceof THREE.Line)) return;
+        geometries.add(object.geometry);
+        const objectMaterials = Array.isArray(object.material) ? object.material : [object.material];
+        objectMaterials.forEach(material => {
+          materials.add(material);
+          const map = (material as THREE.MeshBasicMaterial).map;
+          if (map) textures.add(map);
+        });
+      });
+      textures.forEach(texture => texture.dispose());
+      materials.forEach(material => material.dispose());
+      geometries.forEach(geometry => geometry.dispose());
       renderer.dispose();
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
       tokenRefs.current = [];
@@ -389,8 +459,18 @@ export default function FoodSourcesSortingViewer() {
     void playSimulationNarration(NARRATIONS[stageIndex], stageIndex, NARRATION_AUDIO_URLS[stageIndex]);
     const renderer = rendererRef.current;
     if (!renderer || !navigator.xr) return;
-    const session = await navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor', 'bounded-floor'] });
-    await renderer.xr.setSession(session);
+    let session: XRSession | undefined;
+    try {
+      session = await navigator.xr.requestSession('immersive-vr', {
+        requiredFeatures: ['local-floor'],
+        optionalFeatures: ['bounded-floor'],
+      });
+      await renderer.xr.setSession(session);
+      setRuntimeError(undefined);
+    } catch {
+      void session?.end().catch(() => undefined);
+      setRuntimeError('VR could not start. You can still complete the full sorting activity in the browser.');
+    }
   }
 
   return (
@@ -421,6 +501,7 @@ export default function FoodSourcesSortingViewer() {
       )}
       {started && (
       <section style={panelStyle}>
+        {runtimeError && <p role="alert" style={{ margin: '0 0 10px', color: '#fed7aa', fontSize: 13 }}>{runtimeError}</p>}
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center' }}>
           <div>
             <div style={{ color: '#86efac', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1 }}>Sources of Food</div>

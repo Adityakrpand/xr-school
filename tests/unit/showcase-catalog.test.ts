@@ -16,11 +16,17 @@ describe('showcase catalog', () => {
     expect(source).toContain("'use client'");
     expect(source).toContain('Search courses, chapters, concepts, and simulations');
     expect(source).toContain('Class level');
+    expect(source).toContain('CBSE Classes 1–10');
+    expect(source).toContain("{ value: 'mathematics', label: 'Mathematics' }");
+    expect(source).toContain('[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]');
     expect(source).toContain('Subject');
     expect(source).toContain('Release maturity');
     expect(source).toContain('searchCurriculum');
     expect(source).toContain('{launchableCards.length} Internal QA builds');
     expect(source).toContain('canonicalConceptCount');
+    expect(source).toContain('Latest improvement batch');
+    expect(source).toContain('data-recently-updated="true"');
+    expect(source).toContain('Quest check required');
   });
 
   it('filters the featured and roadmap simulation cards in place instead of hiding them behind text search', () => {
@@ -51,6 +57,8 @@ describe('showcase catalog', () => {
     expect(homeStyles).toContain('@media (max-width: 640px)');
     expect(styles).toContain('.showcase-shell');
     expect(styles).toContain('.catalog-grid');
+    expect(styles).toContain('.catalog-update-banner');
+    expect(styles).toContain('.simulation-card-update');
     expect(styles).toContain('@media (max-width: 720px)');
   });
 

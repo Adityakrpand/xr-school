@@ -45,7 +45,86 @@ export function createBreathingScene(config: BreathingSceneConfig) {
   comparisonBoard.position.set(0.78, 0.85, -0.08);
   comparisonBoard.rotation.y = -0.4;
 
+  const torso = new THREE.Mesh(
+    new THREE.SphereGeometry(0.58, 40, 28),
+    config.materials.body,
+  );
+  torso.name = 'transparent-torso-context';
+  torso.position.set(0, 0.55, -0.04);
+  torso.scale.set(1, 1.28, 0.62);
+  torso.castShadow = true;
+
+  const neck = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.12, 0.17, 0.34, 24),
+    config.materials.body,
+  );
+  neck.position.set(0, 1.32, -0.02);
+
+  const shoulderBar = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.12, 1.02, 8, 20),
+    config.materials.body,
+  );
+  shoulderBar.position.set(0, 1.17, -0.02);
+  shoulderBar.rotation.z = Math.PI / 2;
+
+  const airflow = new THREE.Group();
+  airflow.name = 'animated-airflow';
+  const airParticles: THREE.Mesh[] = [];
+  for (let index = 0; index < 18; index += 1) {
+    const particle = new THREE.Mesh(
+      new THREE.SphereGeometry(index % 3 === 0 ? 0.016 : 0.011, 10, 8),
+      config.materials.airflow,
+    );
+    particle.userData.offset = index / 18;
+    particle.userData.side = index % 2 === 0 ? -1 : 1;
+    airParticles.push(particle);
+    airflow.add(particle);
+  }
+
+  const lab = new THREE.Group();
+  lab.name = 'respiratory-learning-lab';
+  const platform = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.32, 1.46, 0.12, 64),
+    config.materials.board,
+  );
+  platform.position.y = -0.5;
+  platform.receiveShadow = true;
+  lab.add(platform);
+  const backPanel = new THREE.Mesh(
+    new THREE.BoxGeometry(4.6, 2.8, 0.08),
+    config.materials.body,
+  );
+  backPanel.position.set(0, 0.5, -2.35);
+  lab.add(backPanel);
+  for (const x of [-1.72, -0.86, 0, 0.86, 1.72]) {
+    const lightStrip = new THREE.Mesh(
+      new THREE.BoxGeometry(0.035, 2.25, 0.025),
+      config.materials.airflow,
+    );
+    lightStrip.position.set(x, 0.5, -2.29);
+    lab.add(lightStrip);
+  }
+  for (const x of [-1.72, 1.72]) {
+    const console = new THREE.Mesh(
+      new THREE.BoxGeometry(0.72, 0.62, 0.48),
+      config.materials.board,
+    );
+    console.position.set(x, -0.18, -1.65);
+    console.castShadow = true;
+    lab.add(console);
+    const screen = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.5, 0.3),
+      x < 0 ? config.materials.control : config.materials.controlAccent,
+    );
+    screen.position.set(x, 0.02, -1.4);
+    lab.add(screen);
+  }
+
   root.add(
+    lab,
+    torso,
+    neck,
+    shoulderBar,
     ribCage.root,
     lungs.root,
     diaphragm,
@@ -54,6 +133,7 @@ export function createBreathingScene(config: BreathingSceneConfig) {
     inhaleControl,
     exhaleControl,
     comparisonBoard,
+    airflow,
   );
 
   const diaphragmBaseY = diaphragm.position.y;
@@ -83,6 +163,26 @@ export function createBreathingScene(config: BreathingSceneConfig) {
     const t = Math.min(1, deltaSeconds * EASE_RATE);
     phase += (targetPhase - phase) * t;
     applyPhase();
+
+    const inhaleDirection = targetPhase >= 0.5 || autoCycle;
+    for (const particle of airParticles) {
+      let progress = (elapsedSeconds * 0.32 + particle.userData.offset) % 1;
+      if (!inhaleDirection) progress = 1 - progress;
+      if (progress < 0.62) {
+        const airwayProgress = progress / 0.62;
+        particle.position.set(0, 1.42 - airwayProgress * 0.76, 0.035);
+      } else {
+        const lungProgress = (progress - 0.62) / 0.38;
+        const side = particle.userData.side as number;
+        particle.position.set(
+          side * (0.08 + lungProgress * 0.18),
+          0.66 - lungProgress * 0.25,
+          0.035 - lungProgress * 0.045,
+        );
+      }
+      const pulse = 0.8 + Math.sin(elapsedSeconds * 5 + particle.userData.offset * 12) * 0.2;
+      particle.scale.setScalar(pulse);
+    }
   }
 
   let stage = 0;

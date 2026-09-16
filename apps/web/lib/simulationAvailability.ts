@@ -34,7 +34,13 @@ export type CatalogCard = {
   color: string;
   releaseMaturity: 'catalogued' | 'inDevelopment' | 'internalQA' | 'pilotReady' | 'schoolValidated';
   href?: string;
+  latestUpdate?: CatalogUpdate;
 };
+
+export interface CatalogUpdate {
+  readonly summary: string;
+  readonly highlights: readonly string[];
+}
 
 export interface SimulationPresentationOverlay {
   readonly color: string;
@@ -50,6 +56,66 @@ function deepFreeze<T>(value: T): T {
   }
   return value;
 }
+
+/**
+ * Human-readable release notes for the current student-readiness batch.
+ * These notes describe shipped implementation work only; they deliberately
+ * do not promote a build beyond its evidence-backed release maturity.
+ */
+export const LATEST_SIMULATION_UPDATES: Readonly<Record<string, CatalogUpdate>> = deepFreeze({
+  'c1-math-ch01-introduction-to-money': {
+    summary: 'Recognisable Indian currency, a clearer Money Town layout, and more reliable Quest interaction.',
+    highlights: ['RBI-reference visuals', 'Quest controls', 'Narration replay'],
+  },
+  'c6-ch01-a01-sources-of-food': {
+    summary: 'Distinct food models now sit inside a populated farm-market environment with clearer sorting feedback.',
+    highlights: ['Realistic food models', 'Farm market', 'Quest controls'],
+  },
+  'c7-ch10-a02-the-breathing-process-in-human': {
+    summary: 'Expanded lungs, ribs, bronchioles, and animated airflow make the breathing mechanism easier to follow.',
+    highlights: ['Improved anatomy', 'Animated airflow', 'Respiratory lab'],
+  },
+  'c8-ch10-a02-the-effects-of-force-on-object-s-motion-and-shape': {
+    summary: 'A brighter measurement lab now shows force vectors and a visible motion-history trail.',
+    highlights: ['Motion trail', 'Force vectors', 'Lab environment'],
+  },
+  'c10-ch02-a01-introduction-to-acids-and-bases-and-litmus-test': {
+    summary: 'The investigation now takes place in a recognisable chemistry lab with visible neutralisation effects.',
+    highlights: ['Chemistry lab', 'Reaction bubbles', 'Quest controls'],
+  },
+  'c5-ch03-a02-introduction-of-digestive-system': {
+    summary: 'Recognisable digestive anatomy and a calmer, screen-aware lesson panel replace the cluttered opening view.',
+    highlights: ['Organ preview', 'Cleaner lesson UI', 'Quest controls'],
+  },
+  'c1-art-a01-learning-of-colours': {
+    summary: 'The existing colour adventure keeps its visual design while gaining the standard Quest movement and exit controls.',
+    highlights: ['Joystick movement', 'Snap turn', 'B to exit VR'],
+  },
+  'c2-english-ch01-prepositions': {
+    summary: 'The storybook lesson now uses the same dependable movement, turning, exit, and narration controls as the wider catalog.',
+    highlights: ['Joystick movement', 'B to exit VR', 'Narration replay'],
+  },
+});
+
+export function assertCatalogUpdateIntegrity(
+  updates: Readonly<Record<string, CatalogUpdate>>,
+  definitions: readonly ImplementedSimulationDefinition[] = RELEASED_SIMULATIONS,
+): void {
+  const releasedSlugs = new Set(definitions.map(({ module }) => module.slug));
+  for (const [slug, update] of Object.entries(updates)) {
+    if (!releasedSlugs.has(slug)) {
+      throw new Error(`Catalog update references unreleased simulation "${slug}"`);
+    }
+    if (!update.summary.trim() || update.highlights.length === 0) {
+      throw new Error(`Catalog update "${slug}" requires a summary and highlights`);
+    }
+    if (update.highlights.some(highlight => !highlight.trim())) {
+      throw new Error(`Catalog update "${slug}" contains an empty highlight`);
+    }
+  }
+}
+
+assertCatalogUpdateIntegrity(LATEST_SIMULATION_UPDATES);
 
 const AUTHORED_SIMULATION_PRESENTATION_OVERRIDES: Readonly<Record<
   string,
@@ -283,6 +349,7 @@ function toImplementedCard(
     color: overlay.color,
     releaseMaturity: module.releaseMaturity,
     href: routeForSimulation(definition),
+    latestUpdate: LATEST_SIMULATION_UPDATES[module.slug],
   };
 }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { questFaceButtonAction } from "../../apps/web/components/simulations/questVrControls";
 
@@ -57,5 +57,28 @@ describe("Shared Quest VR controls", () => {
     expect(source).toContain("host.enterVr()");
     expect(source).toContain("host.dispatch");
     expect(source).toContain("void controller.dispose()");
+  });
+
+  it("keeps every custom immersive viewer on a shared VR control path", () => {
+    const viewerDirectory = resolve(
+      process.cwd(),
+      "apps/web/components/simulations",
+    );
+    const immersiveViewers = readdirSync(viewerDirectory)
+      .filter((name) => name.endsWith("Viewer.tsx"))
+      .map((name) => ({
+        name,
+        source: readFileSync(resolve(viewerDirectory, name), "utf8"),
+      }))
+      .filter(({ source }) => source.includes("requestSession('immersive-vr'"));
+
+    expect(immersiveViewers.length).toBeGreaterThan(0);
+    for (const { name, source } of immersiveViewers) {
+      expect(
+        source.includes("createQuestVrControls")
+          || source.includes("createVrLocomotion"),
+        `${name} bypasses the shared VR controls`,
+      ).toBe(true);
+    }
   });
 });

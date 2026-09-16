@@ -9,6 +9,8 @@ export interface BreathingAnatomyMaterials {
   control: THREE.Material;
   controlAccent: THREE.Material;
   board: THREE.Material;
+  body: THREE.Material;
+  airflow: THREE.Material;
 }
 
 export interface RibCage {
@@ -37,11 +39,11 @@ export function createRibCage(material: THREE.Material): RibCage {
   const root = new THREE.Group();
   root.name = 'rib-cage';
   const ribs: THREE.Mesh[] = [];
-  const ribCount = 6;
+  const ribCount = 10;
   for (let index = 0; index < ribCount; index += 1) {
     const t = index / (ribCount - 1);
-    const y = 0.92 - t * 0.82;
-    const radius = 0.24 + Math.sin(t * Math.PI) * 0.1;
+    const y = 0.98 - t * 0.92;
+    const radius = 0.22 + Math.sin(t * Math.PI) * 0.13;
     const pair = createRibPair(radius, material);
     pair.position.y = y;
     root.add(pair);
@@ -93,6 +95,17 @@ export function createLungs(material: THREE.Material): Lungs {
   left.name = 'left-lung';
   const right = lobe(1);
   right.name = 'right-lung';
+
+  // Secondary lobes soften the old balloon-like silhouette and show the
+  // asymmetry/lobulation learners see in real respiratory diagrams.
+  for (const [side, parent] of [[-1, left], [1, right]] as const) {
+    const lowerLobe = new THREE.Mesh(new THREE.SphereGeometry(0.2, 22, 18), material);
+    lowerLobe.name = side === -1 ? 'left-lower-lobe' : 'right-lower-lobe';
+    lowerLobe.position.set(side * 0.03, -0.16, 0.015);
+    lowerLobe.scale.set(0.92, 0.72, 0.94);
+    lowerLobe.castShadow = true;
+    parent.add(lowerLobe);
+  }
   root.add(left, right);
   return { root, left, right };
 }
@@ -149,6 +162,18 @@ export function createAirway(material: THREE.Material): Airway {
     bronchus.rotation.z = side * 0.55;
     bronchus.castShadow = true;
     root.add(bronchus);
+
+    for (const branch of [-1, 1] as const) {
+      const bronchiole = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.013, 0.022, 0.23, 10),
+        material,
+      );
+      bronchiole.name = 'bronchiole';
+      bronchiole.position.set(side * 0.22, 0.53 + branch * 0.055, -0.02);
+      bronchiole.rotation.z = side * (0.78 + branch * 0.18);
+      bronchiole.castShadow = true;
+      root.add(bronchiole);
+    }
   }
 
   const noseCap = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), material);

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -20,6 +20,8 @@ describe('Class 1 Money Town viewer', () => {
       "renderer.xr.setReferenceSpaceType('local-floor')",
       'renderer.xr.getController(0)',
       'renderer.xr.getController(1)',
+      'createQuestVrControls',
+      'quest.update()',
       'optionalFeatures',
       'hand-tracking',
       'playSimulationNarration',
@@ -35,6 +37,33 @@ describe('Class 1 Money Town viewer', () => {
     }
     expect(source).not.toContain('student-desk');
     expect(source).not.toContain('animated-student');
+  });
+
+  it('uses readable RBI reference faces instead of generic currency discs', () => {
+    const source = readFileSync(viewerPath, 'utf8');
+    expect(source).toContain('RBI_CURRENCY_ASSETS');
+    expect(source).toContain('rbi-reference-face');
+    expect(source).toContain('EDUCATIONAL SPECIMEN');
+
+    for (const asset of [
+      'coin-1-obverse.png',
+      'coin-1-reverse.png',
+      'coin-2-obverse.png',
+      'coin-2-reverse.png',
+      'coin-5-obverse.png',
+      'coin-5-reverse.png',
+      'coin-10-obverse.png',
+      'coin-10-reverse.png',
+      'note-10-front.png',
+      'note-20-front.png',
+      'note-50-front.png',
+      'note-100-front.png',
+      'note-200-front.png',
+    ]) {
+      const path = resolve(process.cwd(), 'apps/web/public/assets/money/rbi', asset);
+      expect(existsSync(path), asset).toBe(true);
+      expect(statSync(path).size, asset).toBeGreaterThan(8_000);
+    }
   });
 
   it('builds the requested Money Town scenes and interactions', () => {

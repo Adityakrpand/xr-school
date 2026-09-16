@@ -186,7 +186,14 @@ function hasAuditableVisualEvidence(
 
 function postScores(definition: ImplementedSimulationDefinition): QualityScores {
   const existing = EXISTING_SCORES[definition.module.slug];
-  if (existing) return existing;
+  if (existing) {
+    return {
+      ...existing,
+      // Narration readiness is derived from the canonical manifest instead of
+      // preserving a stale hand-authored value after recordings are added.
+      audio: packagedAudio(definition) > 0 ? Math.max(existing.audio, 8) : existing.audio,
+    };
+  }
   const prContribution = PR8_CONTRIBUTIONS.find(
     contribution => contribution.canonicalSlug === definition.module.slug,
   );

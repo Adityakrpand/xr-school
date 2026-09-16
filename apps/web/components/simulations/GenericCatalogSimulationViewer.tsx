@@ -7,6 +7,7 @@ import type { ScienceSimulationCatalogItem } from '@/lib/scienceCatalog.generate
 import { playSimulationNarration, stopSimulationNarration } from '@/lib/simulationAudio';
 import { computeFocusFrame, createGuidedCamera } from '@/lib/world-builder/guidedCamera';
 import { createInteractionSystem } from '@/lib/world-builder/interactionSystem';
+import { createQuestVrControls } from './questVrControls';
 
 type Stage = {
   title: string;
@@ -269,6 +270,26 @@ export default function GenericCatalogSimulationViewer({ simulation }: { simulat
     ctrl0.add(makeControllerRay());
     ctrl1.add(makeControllerRay());
     scene.add(ctrl0, ctrl1);
+    const questVr = createQuestVrControls({
+      renderer,
+      scene,
+      camera,
+      controllers: [ctrl0, ctrl1],
+      onPrimary: () => {
+        const index = Math.min(stageRef.current + 1, stages.length - 1);
+        stageRef.current = index;
+        setStageIndex(index);
+        narrateStage(index);
+      },
+      onBack: () => {
+        const index = Math.max(stageRef.current - 1, 0);
+        stageRef.current = index;
+        setStageIndex(index);
+        narrateStage(index);
+      },
+      onNarrate: () => narrateStage(stageRef.current),
+      startPosition: new THREE.Vector3(0, 0, 2.55),
+    });
 
     // ── Selection: one shared raycasting/highlight system for mouse + XR ─
     const interactionSystem = createInteractionSystem({
@@ -295,6 +316,7 @@ export default function GenericCatalogSimulationViewer({ simulation }: { simulat
       const dt = Math.min(clock.getDelta(), 0.033);
       const elapsed = clock.elapsedTime;
       if (!renderer.xr.isPresenting) guidedCamera.update(dt);
+      else questVr.update();
       physicsWorld.bodies().forEach(body => {
         physicsWorld.applyForce(body.id, {
           x: Math.sin(elapsed * 1.2 + body.position.y * 7) * 0.8,
@@ -328,6 +350,7 @@ export default function GenericCatalogSimulationViewer({ simulation }: { simulat
       renderer.setAnimationLoop(null);
       window.removeEventListener('resize', onResize);
       interactionSystem.dispose();
+      questVr.dispose();
       guidedCamera.dispose();
       renderer.dispose();
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);

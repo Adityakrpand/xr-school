@@ -24,6 +24,7 @@ import {
   playSimulationNarration,
   stopSimulationNarration,
 } from '@/lib/simulationAudio';
+import { createQuestVrControls } from './questVrControls';
 
 const colourHexById = new Map(COLOUR_ADVENTURE_COLOURS.map(colour => [colour.id, colour.hex]));
 const colourNameById = new Map(COLOUR_ADVENTURE_COLOURS.map(colour => [colour.id, colour.name]));
@@ -543,6 +544,19 @@ export default function ColourAdventureViewer() {
     controller0.add(makeRay());
     controller1.add(makeRay());
     scene.add(controller0, controller1);
+    const questVr = createQuestVrControls({
+      renderer,
+      scene,
+      camera,
+      controllers: [controller0, controller1],
+      onPrimary: () => goToStageRef.current(stageIndexRef.current + 1),
+      onBack: () => goToStageRef.current(stageIndexRef.current - 1),
+      onNarrate: () => {
+        const index = stageIndexRef.current;
+        void playSimulationNarration(COLOUR_ADVENTURE_STAGES[index].teacherNarration, index);
+      },
+      startPosition: new THREE.Vector3(0, 0, 2.5),
+    });
 
     const interactionSystem = createInteractionSystem({
       camera,
@@ -570,6 +584,7 @@ export default function ColourAdventureViewer() {
       elapsed += delta;
       const time = elapsed;
       if (!renderer.xr.isPresenting) guidedCamera.update(delta);
+      else questVr.update();
       const intensity = comfortModeRef.current ? 0.4 : 1;
       rainbowLight.intensity = 1.8 + Math.sin(time * 1.4) * 0.3 * intensity;
       const { teacher } = animatedRefs.current;
@@ -609,6 +624,7 @@ export default function ColourAdventureViewer() {
       renderer.setAnimationLoop(null);
       window.removeEventListener('resize', onResize);
       interactionSystem.dispose();
+      questVr.dispose();
       guidedCamera.dispose();
       scene.traverse(object => {
         const mesh = object as THREE.Mesh;

@@ -4,6 +4,8 @@ import { IMPLEMENTED_SIMULATIONS } from '../../packages/simulation-content/src/i
 import {
   IMPLEMENTED_SIMULATION_SLUGS,
   SIMULATION_PRESENTATION_OVERLAYS,
+  LATEST_SIMULATION_UPDATES,
+  assertCatalogUpdateIntegrity,
   assertSimulationPresentationOverlayIntegrity,
   deriveSimulationPresentationOverlay,
   isImplementedSimulationSlug,
@@ -185,5 +187,28 @@ describe('simulation availability routing', () => {
         'c8-ch01-a02-sowing-of-seeds',
       ]),
     );
+  });
+
+  it('attaches the latest verified improvement notes without changing release maturity', () => {
+    const sections = getSimulationCatalogSections(SCIENCE_SIMULATION_CATALOG);
+    const updatedCards = sections.launchable.filter(card => card.latestUpdate);
+
+    expect(updatedCards).toHaveLength(8);
+    expect(updatedCards.map(card => card.slug)).toEqual(
+      expect.arrayContaining(Object.keys(LATEST_SIMULATION_UPDATES)),
+    );
+    expect(updatedCards.every(card => card.releaseMaturity === 'internalQA')).toBe(true);
+    expect(Object.isFrozen(LATEST_SIMULATION_UPDATES)).toBe(true);
+    expect(
+      Object.values(LATEST_SIMULATION_UPDATES).every(
+        update => Object.isFrozen(update) && Object.isFrozen(update.highlights),
+      ),
+    ).toBe(true);
+    expect(() => assertCatalogUpdateIntegrity({
+      'not-a-released-simulation': {
+        summary: 'Invalid update',
+        highlights: ['Unknown build'],
+      },
+    })).toThrow(/unreleased simulation/i);
   });
 });

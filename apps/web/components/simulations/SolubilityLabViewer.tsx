@@ -23,6 +23,7 @@ import {
   type WebSimulationRuntime,
   type WebSimulationUpdates,
 } from '@/lib/world-builder/webSimulationRuntime';
+import { createQuestVrControls } from './questVrControls';
 
 type OutcomeId = 'dissolves' | 'settles' | 'clouds' | 'separates';
 
@@ -294,6 +295,20 @@ export default function SolubilityLabViewer() {
         controller.add(ray);
         scene.add(controller);
       }
+      const questVr = createQuestVrControls({
+        renderer: host.renderer,
+        scene,
+        camera,
+        controllers,
+        onPrimary: () => addScoop(),
+        onBack: () => resetMixture(),
+        onNarrate: () => {
+          const index = lessonRef.current.stageIndex;
+          void playSimulationNarration(NARRATIONS[index], index, NARRATION_AUDIO_URLS[index]);
+        },
+        startPosition: new THREE.Vector3(0, 0, 2.5),
+      });
+      host.resources.register('solubility-quest-controls', () => questVr.dispose());
       host.resources.register('solubility-controller-rays', () => {
         for (const controller of controllers) {
           controller.traverse(object => { if (object.userData.dispose) object.userData.dispose(); });
@@ -335,6 +350,7 @@ export default function SolubilityLabViewer() {
       };
       renderUpdate = context => {
         if (!host!.renderer.xr.isPresenting) guidedCamera.update(context.frameDeltaSeconds);
+        else questVr.update();
         world.update(mixtureRef.current, context.elapsedSeconds, molecularRef.current);
       };
       world.update(mixtureRef.current, 0, false);

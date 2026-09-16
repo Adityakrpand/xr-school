@@ -24,6 +24,13 @@ const SUBJECT_OPTIONS: { value: Subject; label: string }[] = [
   { value: 'biology', label: 'Biology' },
   { value: 'chemistry', label: 'Chemistry' },
   { value: 'physics', label: 'Physics' },
+  { value: 'mathematics', label: 'Mathematics' },
+  { value: 'english', label: 'English' },
+  { value: 'art', label: 'Art' },
+  { value: 'geography', label: 'Geography' },
+  { value: 'history', label: 'History' },
+  { value: 'computerScience', label: 'Computer Science' },
+  { value: 'vocationalSkills', label: 'Vocational Skills' },
 ];
 
 const MATURITY_LABELS: Record<ReleaseMaturity, string> = {
@@ -93,6 +100,16 @@ export default function SimulationCatalog({
     () => cataloguedCards.filter(card => matchesCatalogFilters(card, cardFilters)),
     [cataloguedCards, classLevel, subject, releaseMaturity],
   );
+  const recentlyUpdatedCards = useMemo(
+    () => launchableCards.filter(card => card.latestUpdate),
+    [launchableCards],
+  );
+  const orderedLaunchableCards = useMemo(
+    () => [...filteredLaunchableCards].sort(
+      (left, right) => Number(Boolean(right.latestUpdate)) - Number(Boolean(left.latestUpdate)),
+    ),
+    [filteredLaunchableCards],
+  );
 
   const courseDocuments = documents.filter(document => document.kind === 'course'
     && (!classLevel || document.classLevels.includes(Number(classLevel)))
@@ -141,7 +158,7 @@ export default function SimulationCatalog({
 
       <section className="catalog-hero">
         <div>
-          <span className="eyebrow">Curriculum library · CBSE Classes 5–10</span>
+          <span className="eyebrow">Curriculum library · CBSE Classes 1–10</span>
           <h1>Find the concept. See its course context. Launch only what is ready.</h1>
           <p>
             Search a structured science curriculum spanning courses, chapters, concepts, and XR simulations.
@@ -154,6 +171,20 @@ export default function SimulationCatalog({
           <Metric value={String(launchableCards.length)} label="headset-testable builds" />
         </div>
       </section>
+
+      {recentlyUpdatedCards.length > 0 && (
+        <section className="catalog-update-banner" aria-label="Latest catalog improvements">
+          <div>
+            <span className="eyebrow">Latest improvement batch</span>
+            <strong>{recentlyUpdatedCards.length} simulations updated for student testing</strong>
+            <p>
+              Clearer environments, recognisable learning objects, screen-aware lesson panels,
+              and consistent Quest movement, turning, narration replay, and B-to-exit controls.
+            </p>
+          </div>
+          <span className="catalog-update-status">Internal QA · Quest check required</span>
+        </section>
+      )}
 
       <section className="search-workbench" aria-label="Curriculum search controls">
         <label className="search-field">
@@ -171,7 +202,7 @@ export default function SimulationCatalog({
             <span>Class level</span>
             <select value={classLevel} onChange={event => setClassLevel(event.target.value)}>
               <option value="">All classes</option>
-              {[5, 6, 7, 8, 9, 10].map(value => <option key={value} value={value}>Class {value}</option>)}
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(value => <option key={value} value={value}>Class {value}</option>)}
             </select>
           </label>
           <label>
@@ -220,7 +251,7 @@ export default function SimulationCatalog({
             />
             {filteredLaunchableCards.length > 0 ? (
               <div className="catalog-grid featured-grid">
-                {filteredLaunchableCards.map(card => <SimulationCard key={card.slug} card={card} />)}
+                {orderedLaunchableCards.map(card => <SimulationCard key={card.slug} card={card} />)}
               </div>
             ) : (
               <div className="empty-state">
@@ -359,6 +390,15 @@ function SimulationCard({ card }: { card: CatalogCard }) {
       <div>
         <p className="card-kicker">{card.grade} · {card.topic}</p>
         <h3>{card.title}</h3>
+        {card.latestUpdate && (
+          <div className="simulation-card-update" data-recently-updated="true">
+            <span>Recently improved</span>
+            <p>{card.latestUpdate.summary}</p>
+            <ul aria-label="Latest improvements">
+              {card.latestUpdate.highlights.map(highlight => <li key={highlight}>{highlight}</li>)}
+            </ul>
+          </div>
+        )}
       </div>
       <div className="simulation-card-footer">
         <span>{formatArchetype(card.archetype)} · {card.minutes} min</span>

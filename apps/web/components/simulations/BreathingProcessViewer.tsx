@@ -186,6 +186,8 @@ function createAnatomyMaterials(): { materials: BreathingAnatomyMaterials; dispo
     control: material({ color: '#38bdf8', roughness: 0.35, metalness: 0.1, emissive: '#0c4a6e', emissiveIntensity: 0.4 }),
     controlAccent: material({ color: '#fb923c', roughness: 0.35, metalness: 0.1, emissive: '#7c2d12', emissiveIntensity: 0.4 }),
     board: material({ color: '#334155', roughness: 0.7, metalness: 0.05 }),
+    body: material({ color: '#b9dce5', roughness: 0.28, metalness: 0.02, transparent: true, opacity: 0.13, side: THREE.DoubleSide, depthWrite: false }),
+    airflow: material({ color: '#67e8f9', roughness: 0.24, metalness: 0.08, emissive: '#0891b2', emissiveIntensity: 1.15 }),
   };
 
   return { materials, dispose: () => { for (const item of owned) item.dispose(); } };
@@ -379,7 +381,8 @@ export default function BreathingProcessViewer() {
 
     async function initialize() {
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color('#0a1220');
+      scene.background = new THREE.Color('#b8d9e2');
+      scene.fog = new THREE.Fog('#b8d9e2', 6, 15);
       const camera = new THREE.PerspectiveCamera(52, 1, 0.04, 40);
       camera.position.copy(DEFAULT_BREATHING_FRAME.position);
       camera.lookAt(DEFAULT_BREATHING_FRAME.target);
@@ -405,7 +408,7 @@ export default function BreathingProcessViewer() {
       playerRigRef.current = vrRig.rig;
       host.resources.register('breathing-player-rig', () => vrRig.dispose());
 
-      const hemisphere = new THREE.HemisphereLight('#cfe8ff', '#101826', 1.6);
+      const hemisphere = new THREE.HemisphereLight('#fff8e7', '#54737d', 2.1);
       scene.add(hemisphere);
       const key = new THREE.DirectionalLight('#fff4e0', 2.2);
       key.position.set(2.2, 3, 2.5);
@@ -415,14 +418,20 @@ export default function BreathingProcessViewer() {
       rim.position.set(-1.6, 1.4, -1.2);
       scene.add(rim);
 
+      const floorMaterial = new THREE.MeshStandardMaterial({ color: '#dce9e7', roughness: 0.9 });
       const floor = new THREE.Mesh(
-        new THREE.CircleGeometry(2.4, 48),
-        new THREE.MeshStandardMaterial({ color: '#0f1b2d', roughness: 0.95 }),
+        new THREE.CircleGeometry(5.4, 64),
+        floorMaterial,
       );
       floor.rotation.x = -Math.PI / 2;
       floor.position.y = -0.9;
       floor.receiveShadow = true;
       scene.add(floor);
+      host.resources.register('breathing-floor', () => {
+        scene.remove(floor);
+        floor.geometry.dispose();
+        floorMaterial.dispose();
+      });
 
       const { materials, dispose: disposeMaterials } = createAnatomyMaterials();
       host.resources.register('breathing-materials', disposeMaterials);

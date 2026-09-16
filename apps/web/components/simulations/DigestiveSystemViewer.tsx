@@ -34,6 +34,7 @@ import {
   stopSimulationNarration,
 } from '@/lib/simulationAudio';
 import { ClassroomSync } from '@/components/robotree/ClassroomSync';
+import { createQuestVrControls } from './questVrControls';
 
 const COLORS = {
   cyan: 0x38bdf8,
@@ -813,20 +814,35 @@ function buildDigestiveStageGroups(
   }
 
   const welcome = groups.get('welcome')!;
+  const torsoMaterial = new THREE.MeshPhysicalMaterial({
+    color: 0x8bd5ff,
+    transparent: true,
+    opacity: 0.09,
+    roughness: 0.22,
+    transmission: 0.28,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+  });
   const torso = new THREE.Mesh(
     new THREE.CapsuleGeometry(0.86, 1.5, 12, 28),
-    new THREE.MeshPhysicalMaterial({
-      color: 0x8bd5ff,
-      transparent: true,
-      opacity: 0.16,
-      roughness: 0.25,
-      transmission: 0.2,
-      side: THREE.DoubleSide,
-    }),
+    torsoMaterial,
   );
+  torso.name = 'transparent-human-torso-context';
   torso.position.set(0, 1.42, 0);
   torso.scale.set(1, 1.12, 0.55);
   welcome.add(torso);
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 28, 22), torsoMaterial);
+  head.name = 'transparent-human-head-context';
+  head.position.set(0, 2.66, 0);
+  head.scale.z = 0.72;
+  welcome.add(head);
+  const shoulders = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 1.5, 8, 20), torsoMaterial);
+  shoulders.name = 'transparent-human-shoulders-context';
+  shoulders.position.set(0, 2.12, 0);
+  shoulders.rotation.z = Math.PI / 2;
+  shoulders.scale.z = 0.62;
+  welcome.add(shoulders);
   const pathway = addTube(welcome, [
     new THREE.Vector3(0, 2.25, 0),
     new THREE.Vector3(0, 1.65, 0),
@@ -835,6 +851,36 @@ function buildDigestiveStageGroups(
     new THREE.Vector3(0, 0.38, 0),
   ], 0.07, COLORS.coral, 'complete-digestive-pathway');
   (pathway.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.65;
+  pathway.renderOrder = 3;
+
+  const organPreview = new THREE.Group();
+  organPreview.name = 'recognisable-digestive-organ-preview';
+  const mouthPreview = new THREE.Mesh(new THREE.SphereGeometry(0.09, 20, 14), organMaterial(0xfb7185, 0.95));
+  mouthPreview.position.set(0, 2.28, 0.04);
+  organPreview.add(mouthPreview);
+  const stomachPreview = new THREE.Mesh(new THREE.SphereGeometry(0.23, 26, 20), organMaterial(0xe85d75, 0.94));
+  stomachPreview.name = 'welcome-stomach-preview';
+  stomachPreview.position.set(0.2, 1.25, 0.035);
+  stomachPreview.scale.set(0.78, 1.18, 0.58);
+  stomachPreview.rotation.z = -0.32;
+  organPreview.add(stomachPreview);
+  const liverPreview = new THREE.Mesh(new THREE.SphereGeometry(0.25, 24, 18), organMaterial(0x8f3d32, 0.94));
+  liverPreview.name = 'welcome-liver-preview';
+  liverPreview.position.set(-0.28, 1.38, 0.02);
+  liverPreview.scale.set(1.25, 0.6, 0.55);
+  organPreview.add(liverPreview);
+  const smallPreview = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.04, 12, 42), organMaterial(COLORS.intestine, 0.96));
+  smallPreview.name = 'welcome-small-intestine-preview';
+  smallPreview.position.set(0, 0.82, 0.04);
+  smallPreview.scale.y = 0.7;
+  organPreview.add(smallPreview);
+  const largePreview = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.055, 12, 48), organMaterial(0xd97786, 0.96));
+  largePreview.name = 'welcome-large-intestine-preview';
+  largePreview.position.set(0, 0.8, 0.02);
+  largePreview.scale.y = 1.15;
+  organPreview.add(largePreview);
+  organPreview.traverse(object => { object.renderOrder = 4; });
+  welcome.add(organPreview);
   const guideOrb = new THREE.Mesh(
     new THREE.SphereGeometry(0.18, 28, 20),
     new THREE.MeshStandardMaterial({
@@ -1456,6 +1502,23 @@ export default function DigestiveSystemViewer() {
     controller0.add(makeControllerRay());
     controller1.add(makeControllerRay());
     scene.add(controller0, controller1);
+    const questVr = createQuestVrControls({
+      renderer,
+      scene,
+      camera,
+      controllers: [controller0, controller1],
+      onPrimary: () => goToStageRef.current(stageIndexRef.current + 1),
+      onBack: () => goToStageRef.current(stageIndexRef.current - 1),
+      onNarrate: () => {
+        const index = stageIndexRef.current;
+        void playSimulationNarration(DIGESTIVE_STAGES[index].teacherNarration, index);
+      },
+      startPosition: new THREE.Vector3(0, 0, 2.4),
+      movementBounds: new THREE.Box2(
+        new THREE.Vector2(-4.5, -4.5),
+        new THREE.Vector2(4.5, 4.5),
+      ),
+    });
 
     // ── Selection: one shared raycasting/highlight system for mouse + XR.
     // Lets desktop learners click organs directly, not just the HTML
@@ -1492,6 +1555,7 @@ export default function DigestiveSystemViewer() {
       elapsed += delta;
       const time = elapsed;
       if (!renderer.xr.isPresenting) guidedCamera.update(delta);
+      else questVr.update();
       const intensity = comfortModeRef.current ? 0.35 : 1;
       for (const mixer of productionMixersRef.current) mixer.update(delta * intensity);
       const {
@@ -1606,6 +1670,7 @@ export default function DigestiveSystemViewer() {
       focusStageRef.current = () => undefined;
       productionMixersRef.current = [];
       interactionSystem.dispose();
+      questVr.dispose();
       guidedCamera.dispose();
       presentationPipeline.dispose();
       scene.traverse(object => {
@@ -1694,8 +1759,8 @@ export default function DigestiveSystemViewer() {
           }}
         >
           <div style={{
-            maxWidth: 620,
-            padding: '18px 22px',
+            width: 'min(500px, calc(100vw - 40px))',
+            padding: '15px 18px',
             borderRadius: 18,
             border: '1px solid rgba(103,232,249,.28)',
             background: 'rgba(3,13,27,.66)',
@@ -1884,7 +1949,7 @@ export default function DigestiveSystemViewer() {
             }}>
               {stage.instruction}
             </p>
-            <div style={{
+            <details style={{
               display: 'grid',
               gap: 8,
               margin: '0 0 16px',
@@ -1896,16 +1961,18 @@ export default function DigestiveSystemViewer() {
               fontSize: 13,
               lineHeight: 1.45,
             }}>
-              <div><strong style={{ color: '#67e8f9' }}>Teacher AI:</strong> {stage.teacherNarration}</div>
-              <div><strong style={{ color: '#67e8f9' }}>Interaction:</strong> {stage.interactionPrompt}</div>
-              <div><strong style={{ color: '#67e8f9' }}>Cinematic:</strong> {stage.cinematicTransition}</div>
-              <div><strong style={{ color: '#67e8f9' }}>Scene:</strong> {stage.visualTreatment}</div>
-              <div><strong style={{ color: '#67e8f9' }}>Spatial audio:</strong> {stage.spatialAudioProfile}</div>
-              <div><strong style={{ color: '#67e8f9' }}>Cues:</strong> {stage.soundCues.join(', ')}</div>
-              {stage.id === 'healthy-habits' && (
-                <div><strong style={{ color: '#67e8f9' }}>Sorting:</strong> {sortingActionCount} food cards</div>
-              )}
-            </div>
+              <summary style={{ cursor: 'pointer', color: '#a5f3fc', fontWeight: 800 }}>Teacher details</summary>
+              <div style={{ display: 'grid', gap: 8, marginTop: 10 }}>
+                <div><strong style={{ color: '#67e8f9' }}>Narration:</strong> {stage.teacherNarration}</div>
+                <div><strong style={{ color: '#67e8f9' }}>Transition:</strong> {stage.cinematicTransition}</div>
+                <div><strong style={{ color: '#67e8f9' }}>Scene:</strong> {stage.visualTreatment}</div>
+                <div><strong style={{ color: '#67e8f9' }}>Spatial audio:</strong> {stage.spatialAudioProfile}</div>
+                <div><strong style={{ color: '#67e8f9' }}>Cues:</strong> {stage.soundCues.join(', ')}</div>
+                {stage.id === 'healthy-habits' && (
+                  <div><strong style={{ color: '#67e8f9' }}>Sorting:</strong> {sortingActionCount} food cards</div>
+                )}
+              </div>
+            </details>
 
             {stage.id !== 'recap' ? (
               <ActionButtons

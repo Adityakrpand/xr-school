@@ -176,6 +176,8 @@ function createForceMotionMaterials(): { materials: ForceMotionMaterials; dispos
     shapeControl: material({ color: '#22d3ee', roughness: 0.35, metalness: 0.1, emissive: '#164e63', emissiveIntensity: 0.4 }),
     velocity: material({ color: '#fde047', roughness: 0.3, metalness: 0.1, emissive: '#a16207', emissiveIntensity: 0.55 }),
     board: material({ color: '#1e293b', roughness: 0.7, metalness: 0.05 }),
+    environment: material({ color: '#d7e8eb', roughness: 0.78, metalness: 0.03 }),
+    trail: material({ color: '#38bdf8', roughness: 0.2, metalness: 0.08, emissive: '#0369a1', emissiveIntensity: 0.55, transparent: true, opacity: 0.42, depthWrite: false }),
   };
 
   return { materials, dispose: () => { for (const item of owned) item.dispose(); } };
@@ -362,7 +364,8 @@ export default function ForceMotionViewer() {
 
     async function initialize() {
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color('#0a1220');
+      scene.background = new THREE.Color('#b9d8e1');
+      scene.fog = new THREE.Fog('#b9d8e1', 6, 16);
       const camera = new THREE.PerspectiveCamera(52, 1, 0.04, 40);
       camera.position.copy(DEFAULT_FORCE_MOTION_FRAME.position);
       camera.lookAt(DEFAULT_FORCE_MOTION_FRAME.target);
@@ -388,7 +391,7 @@ export default function ForceMotionViewer() {
       playerRigRef.current = vrRig.rig;
       host.resources.register('force-motion-player-rig', () => vrRig.dispose());
 
-      const hemisphere = new THREE.HemisphereLight('#cfe8ff', '#101826', 1.6);
+      const hemisphere = new THREE.HemisphereLight('#fff8e7', '#526d76', 2.1);
       scene.add(hemisphere);
       const key = new THREE.DirectionalLight('#fff4e0', 2.2);
       key.position.set(2.2, 3, -1);
@@ -399,8 +402,8 @@ export default function ForceMotionViewer() {
       scene.add(rim);
 
       const floor = new THREE.Mesh(
-        new THREE.CircleGeometry(3.2, 48),
-        new THREE.MeshStandardMaterial({ color: '#0f1b2d', roughness: 0.95 }),
+        new THREE.CircleGeometry(5.5, 64),
+        new THREE.MeshStandardMaterial({ color: '#d8e7e5', roughness: 0.92 }),
       );
       floor.rotation.x = -Math.PI / 2;
       floor.position.set(0.3, -0.05, 0.6);

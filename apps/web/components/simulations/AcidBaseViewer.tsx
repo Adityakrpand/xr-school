@@ -13,11 +13,7 @@ import SimulationExperienceShell, {
 } from '@/components/simulation-experience/SimulationExperienceShell';
 import SimulationCanvasHost from '@/components/simulation-experience/SimulationCanvasHost';
 import { playSimulationNarration, stopSimulationNarration } from '@/lib/simulationAudio';
-import {
-  isQuestBackPressed,
-  updateButtonLatch,
-  updateSnapTurn,
-} from '@/lib/xrNavigation';
+import { createQuestVrControls } from './questVrControls';
 import {
   ACID_BASE_EXPERIENCE_DEFINITION,
   createAcidBaseExperience,
@@ -270,7 +266,8 @@ export default function AcidBaseViewer() {
 
     async function initialize() {
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color('#0b1622');
+      scene.background = new THREE.Color('#b7d7df');
+      scene.fog = new THREE.Fog('#b7d7df', 6, 15);
       const camera = new THREE.PerspectiveCamera(52, 1, 0.04, 40);
       camera.position.copy(DEFAULT_FRAME.position);
       camera.lookAt(DEFAULT_FRAME.target);
@@ -289,7 +286,7 @@ export default function AcidBaseViewer() {
       rendererRef.current = host.renderer;
       cameraRef.current = camera;
 
-      scene.add(new THREE.HemisphereLight('#dbeafe', '#0b1420', 1.6));
+      scene.add(new THREE.HemisphereLight('#fff9e8', '#536d75', 2));
       const key = new THREE.DirectionalLight('#fff6e6', 2.1);
       key.position.set(2, 3.2, 2.4);
       key.castShadow = true;
@@ -297,8 +294,8 @@ export default function AcidBaseViewer() {
       scene.add(new THREE.PointLight('#7dd3fc', 1.1, 8).translateX(-1.4));
 
       const floor = new THREE.Mesh(
-        new THREE.CircleGeometry(3, 48),
-        new THREE.MeshStandardMaterial({ color: '#0f1d2c', roughness: 0.95 }),
+        new THREE.CircleGeometry(5.2, 64),
+        new THREE.MeshStandardMaterial({ color: '#dbe8e5', roughness: 0.92 }),
       );
       floor.rotation.x = -Math.PI / 2;
       floor.position.y = -0.02;
@@ -333,6 +330,24 @@ export default function AcidBaseViewer() {
         playerRig.add(controller);
         return controller;
       });
+      const questVr = createQuestVrControls({
+        renderer: host.renderer,
+        scene,
+        camera,
+        controllers,
+        onPrimary: () => {
+          const actionId = focusActionRef.current;
+          if (actionId) performAction(actionId, 'xr-controller');
+        },
+        onBack: () => previousRef.current(),
+        onNarrate: () => playNarration(snapshotRef.current.stageIndex, true),
+        startPosition: new THREE.Vector3(0, 0, 2.35),
+        movementBounds: new THREE.Box2(
+          new THREE.Vector2(-3.8, -3.2),
+          new THREE.Vector2(3.8, 3.2),
+        ),
+      });
+      host.resources.register('acid-base-quest-controls', () => questVr.dispose());
       host.resources.register('acid-base-controller-rays', () => {
         controllerRayGeometry.dispose();
         controllerRayMaterial.dispose();
@@ -358,8 +373,6 @@ export default function AcidBaseViewer() {
       interactionSystem.register('compare-solutions', world.comparisonBoard, { highlightColor: '#a78bfa' });
       host.resources.register('acid-base-interaction', () => interactionSystem.dispose());
 
-      const snapTurnLatches = [false, false];
-      const backButtonLatches = [false, false];
       const projectedFocus = new THREE.Vector3();
       renderUpdate = context => {
         world.update(context.frameDeltaSeconds);
@@ -368,23 +381,7 @@ export default function AcidBaseViewer() {
         interactionSystem.update(context.elapsedSeconds);
 
         if (host!.renderer.xr.isPresenting) {
-          const session = host!.renderer.xr.getSession();
-          session?.inputSources.forEach((inputSource, index) => {
-            const gamepad = inputSource.gamepad;
-            if (!gamepad) return;
-            const snap = updateSnapTurn(gamepad.axes[2] ?? gamepad.axes[0] ?? 0, snapTurnLatches[index]);
-            snapTurnLatches[index] = snap.latched;
-            playerRig.rotation.y += snap.radians;
-            const back = updateButtonLatch(
-              isQuestBackPressed(gamepad.buttons, inputSource.handedness),
-              backButtonLatches[index],
-            );
-            backButtonLatches[index] = back.latched;
-            if (back.pressed) {
-              if (snapshotRef.current.stageIndex > 0) previousRef.current();
-              else void session.end();
-            }
-          });
+          questVr.update();
         } else {
           guidedCamera.update(context.frameDeltaSeconds);
           const focusTarget = suggestedTargetId ? world[OBJECT_KEY_BY_ACTION[suggestedTargetId]] : undefined;

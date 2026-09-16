@@ -12,6 +12,8 @@ export interface ForceMotionMaterials {
   shapeControl: THREE.Material;
   velocity: THREE.Material;
   board: THREE.Material;
+  environment: THREE.Material;
+  trail: THREE.Material;
 }
 
 /** Play area the motion ball rolls inside. The ball keeps its velocity

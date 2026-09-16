@@ -39,6 +39,71 @@ export function createAcidBaseScene(config: AcidBaseSceneConfig) {
   const metalMat = std({ color: '#94a3b8', roughness: 0.4, metalness: 0.6 });
   const boardMat = std({ color: '#1e293b', roughness: 0.7 });
   const markerMat = std({ color: '#f8fafc', emissive: '#64748b', emissiveIntensity: 0.4, roughness: 0.5 });
+  const benchMat = std({ color: '#d6e1df', roughness: 0.72, metalness: 0.04 });
+  const cabinetMat = std({ color: '#58717a', roughness: 0.68, metalness: 0.08 });
+  const tileMat = std({ color: '#d9edf0', roughness: 0.82 });
+  const bubbleMat = std({ color: '#e0f7ff', transparent: true, opacity: 0.72, emissive: '#38bdf8', emissiveIntensity: 0.45, roughness: 0.16 });
+
+  // ── School chemistry laboratory context ─────────────────────────────
+  const lab = new THREE.Group();
+  lab.name = 'school-chemistry-laboratory';
+  const workbench = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.18, 2.8), benchMat);
+  workbench.position.set(0, -0.12, 0.05);
+  workbench.receiveShadow = true;
+  workbench.castShadow = true;
+  lab.add(workbench);
+
+  const backWall = new THREE.Mesh(new THREE.BoxGeometry(5.4, 3.1, 0.1), tileMat);
+  backWall.position.set(0, 1.35, -2.45);
+  backWall.receiveShadow = true;
+  lab.add(backWall);
+  for (const x of [-2.08, -1.04, 0, 1.04, 2.08]) {
+    const grout = new THREE.Mesh(new THREE.BoxGeometry(0.018, 3, 0.015), cabinetMat);
+    grout.position.set(x, 1.35, -2.38);
+    lab.add(grout);
+  }
+  for (const y of [0.35, 1.35, 2.35]) {
+    const grout = new THREE.Mesh(new THREE.BoxGeometry(5.25, 0.018, 0.015), cabinetMat);
+    grout.position.set(0, y, -2.38);
+    lab.add(grout);
+  }
+
+  for (const x of [-1.85, 1.85]) {
+    const cabinet = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.05, 0.45), cabinetMat);
+    cabinet.position.set(x, 0.48, -1.98);
+    cabinet.castShadow = true;
+    lab.add(cabinet);
+    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.035, 0.04), metalMat);
+    handle.position.set(x, 0.55, -1.73);
+    lab.add(handle);
+  }
+
+  const bottleColors = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b'];
+  bottleColors.forEach((color, index) => {
+    const bottle = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.09, 0.11, 0.42, 20),
+      std({ color, transparent: true, opacity: 0.74, roughness: 0.28 }),
+    );
+    bottle.position.set(-0.52 + index * 0.35, 0.25, -1.72);
+    bottle.castShadow = true;
+    lab.add(bottle);
+    const stopper = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.08, 14), metalMat);
+    stopper.position.set(bottle.position.x, 0.5, bottle.position.z);
+    lab.add(stopper);
+  });
+
+  const goggles = new THREE.Group();
+  goggles.name = 'lab-safety-goggles';
+  for (const x of [-0.15, 0.15]) {
+    const lens = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.018, 8, 24), metalMat);
+    lens.position.x = x;
+    goggles.add(lens);
+  }
+  const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.025, 0.025), metalMat);
+  goggles.add(bridge);
+  goggles.position.set(-1.55, 0.16, 0.9);
+  goggles.rotation.x = -Math.PI / 2;
+  lab.add(goggles);
 
   // ── Beaker + solution ────────────────────────────────────────────────
   const beaker = new THREE.Group();
@@ -107,11 +172,23 @@ export function createAcidBaseScene(config: AcidBaseSceneConfig) {
   }
   comparisonBoard.position.set(1.45, 0.7, -0.2);
 
-  root.add(beaker, redLitmus, blueLitmus, dropper, burette, phScale, comparisonBoard);
+  const bubbles = new THREE.Group();
+  bubbles.name = 'neutralisation-bubbles';
+  for (let index = 0; index < 14; index += 1) {
+    const bubble = new THREE.Mesh(new THREE.SphereGeometry(0.018 + (index % 3) * 0.006, 10, 8), bubbleMat);
+    const angle = index * 2.17;
+    const radius = 0.08 + (index % 5) * 0.06;
+    bubble.position.set(Math.cos(angle) * radius, 0.68 + (index % 4) * 0.055, Math.sin(angle) * radius);
+    bubble.userData.baseY = bubble.position.y;
+    bubbles.add(bubble);
+  }
+
+  root.add(lab, beaker, redLitmus, blueLitmus, dropper, burette, phScale, comparisonBoard, bubbles);
 
   // ── State ────────────────────────────────────────────────────────────
   let ph = ACID_PH;
   let targetPh = ACID_PH;
+  let elapsed = 0;
   let indicatorAdded = false;
   let litmusDipped = false;
   const litmusRestY = 0.85;
@@ -154,9 +231,17 @@ export function createAcidBaseScene(config: AcidBaseSceneConfig) {
   function compareSolutions() { indicatorAdded = true; }
 
   function update(deltaSeconds: number) {
+    elapsed += deltaSeconds;
     const t = Math.min(1, deltaSeconds * 1.6);
     ph += (targetPh - ph) * t;
     refresh();
+    bubbles.visible = stage === 3;
+    bubbles.children.forEach((bubble, index) => {
+      const baseY = bubble.userData.baseY as number;
+      bubble.position.y = baseY + ((elapsed * 0.18 + index * 0.07) % 0.32);
+      const fade = 1 - ((elapsed * 0.18 + index * 0.07) % 0.32) / 0.32;
+      bubble.scale.setScalar(0.55 + fade * 0.7);
+    });
   }
 
   let stage = 0;
@@ -167,6 +252,7 @@ export function createAcidBaseScene(config: AcidBaseSceneConfig) {
     else if (stage === 2) { ph = ACID_PH; targetPh = ACID_PH; indicatorAdded = true; dipLitmus(false); }
     else if (stage === 3) { ph = ACID_PH; targetPh = ACID_PH; indicatorAdded = true; dipLitmus(false); }
     else { ph = NEUTRAL_PH; targetPh = NEUTRAL_PH; indicatorAdded = true; dipLitmus(false); }
+    bubbles.visible = stage === 3;
     refresh();
   }
   setStage(0);

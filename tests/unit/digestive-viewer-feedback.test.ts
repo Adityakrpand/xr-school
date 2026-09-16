@@ -10,7 +10,7 @@ const stylesPath = resolve(process.cwd(), 'apps/web/app/globals.css');
 const assetReadmePath = resolve(process.cwd(), 'apps/web/public/assets/digestive/README.md');
 
 describe('Digestive System viewer experience contract', () => {
-  it('provides Quest WebXR controller selection in a stationary local-floor world', () => {
+  it('provides Quest WebXR controller selection and shared navigation in a local-floor world', () => {
     expect(existsSync(viewerPath)).toBe(true);
     const source = readFileSync(viewerPath, 'utf8');
 
@@ -84,8 +84,9 @@ describe('Digestive System viewer experience contract', () => {
       'floating-ui-panel-digestive-journey',
       'science-lab-equipment-holographic-table',
       'spatial-science-room-ambience-no-student-npcs',
-      'Teacher AI:',
-      'Cinematic:',
+      'Teacher details',
+      'Narration:',
+      'Transition:',
       'Spatial audio:',
       'DIGESTIVE_VR_FEATURES',
       'DIGESTIVE_IMMERSION_REQUIREMENTS',

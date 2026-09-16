@@ -68,6 +68,10 @@ const MOCK_LAUNCHABLE: CatalogCard[] = [
     color: '#fb7185',
     releaseMaturity: 'internalQA',
     href: '#mock-digestive-system',
+    latestUpdate: {
+      summary: 'Anatomy, lesson layout, and shared Quest controls were improved for the current testing batch.',
+      highlights: ['Organ preview', 'Cleaner lesson UI', 'Quest controls'],
+    },
   },
 ];
 

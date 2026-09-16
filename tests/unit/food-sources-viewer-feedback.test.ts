@@ -23,10 +23,13 @@ describe('Food Sources viewer headset regressions', () => {
   it('lets VR controllers select food tokens and category platforms', () => {
     // Raycasting/selection now lives in the shared interaction system used
     // by every migrated viewer, rather than a bespoke per-viewer raycaster.
-    expect(source).toContain("token.name = `food-token-${item.id}`");
+    expect(source).toContain('createFoodTokenVisual(item.id)');
+    expect(source).toContain('interactionSystem.register(token.root.name, token.root');
     expect(source).toContain("platform.name = `food-platform-${category.id}`");
     expect(source).toContain('renderer.xr.getController(0)');
     expect(source).toContain('createInteractionSystem');
+    expect(source).toContain('createQuestVrControls');
+    expect(source).toContain('quest.update()');
     expect(source).toContain("id.startsWith('food-token-')");
     expect(source).toContain("id.startsWith('food-platform-')");
   });

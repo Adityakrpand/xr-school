@@ -11,6 +11,17 @@ const released = IMPLEMENTED_SIMULATIONS.filter(
   definition => definition.module.publicationStatus === 'released',
 );
 
+const firstReadinessBatch = new Set([
+  'c2-english-ch01-prepositions',
+  'c6-ch01-a01-sources-of-food',
+  'c1-math-ch01-introduction-to-money',
+  'c10-ch02-a01-introduction-to-acids-and-bases-and-litmus-test',
+  'c5-ch03-a02-introduction-of-digestive-system',
+  'c8-ch10-a02-the-effects-of-force-on-object-s-motion-and-shape',
+  'c1-art-a01-learning-of-colours',
+  'c7-ch10-a02-the-breathing-process-in-human',
+]);
+
 async function launchBrowserExperience(page: Page): Promise<void> {
   const standardLaunch = page.getByTestId('simulation-launch');
   if (await standardLaunch.count()) {
@@ -107,6 +118,61 @@ test.describe('released simulation portfolio', () => {
       expect(routeFailures).toEqual([]);
       expect(pageErrors).toEqual([]);
       expect(consoleErrors).toEqual([]);
+    }
+  });
+
+  test('launches every first-batch student-readiness class without browser errors', async ({ page }) => {
+    test.setTimeout(process.env.CI ? 300_000 : 180_000);
+    const batch = released.filter(definition => firstReadinessBatch.has(definition.module.slug));
+    expect(batch).toHaveLength(firstReadinessBatch.size);
+
+    for (const definition of batch) {
+      const pageErrors: string[] = [];
+      const consoleErrors: string[] = [];
+      const failedResponses: string[] = [];
+      const onPageError = (error: Error) => pageErrors.push(error.message);
+      const onConsole = (message: { type(): string; text(): string }) => {
+        if (message.type() === 'error') consoleErrors.push(message.text());
+      };
+      const onResponse = (response: { status(): number; url(): string }) => {
+        if (response.status() >= 400) {
+          failedResponses.push(`${response.status()} ${response.url()}`);
+        }
+      };
+      page.on('pageerror', onPageError);
+      page.on('console', onConsole);
+      page.on('response', onResponse);
+
+      const response = await page.goto(routeForSimulation(definition), {
+        waitUntil: 'domcontentloaded',
+      });
+      expect(response?.status(), definition.module.slug).toBe(200);
+      await launchBrowserExperience(page);
+      const canvas = page.getByTestId('simulation-canvas').first();
+      await expect(canvas, definition.module.slug).toBeVisible();
+      const bounds = await canvas.boundingBox();
+      expect(bounds?.width, definition.module.slug).toBeGreaterThan(300);
+      expect(bounds?.height, definition.module.slug).toBeGreaterThan(240);
+      await page.waitForTimeout(250);
+
+      expect(pageErrors, definition.module.slug).toEqual([]);
+      expect(consoleErrors, definition.module.slug).toEqual([]);
+      expect(failedResponses, definition.module.slug).toEqual([]);
+      page.off('pageerror', onPageError);
+      page.off('console', onConsole);
+      page.off('response', onResponse);
+    }
+  });
+
+  test('serves every committed narration clip used by released classes', async ({ request }) => {
+    test.setTimeout(120_000);
+    for (const definition of released) {
+      for (const cue of definition.narration.cues) {
+        expect(cue.audioUrl, `${definition.module.slug}:${cue.id}`).toBeTruthy();
+        const response = await request.get(cue.audioUrl!);
+        expect(response.status(), `${definition.module.slug}:${cue.id}`).toBe(200);
+        expect(Number(response.headers()['content-length'] ?? 0)).toBeGreaterThan(1_024);
+      }
     }
   });
 

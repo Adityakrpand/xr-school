@@ -74,9 +74,73 @@ export function createForceMotionScene(config: ForceMotionSceneConfig) {
   ]);
   comparisonBoard.position.set(0, 0.7, -1.75);
 
+  const lab = new THREE.Group();
+  lab.name = 'force-measurement-laboratory';
+  const backWall = new THREE.Mesh(new THREE.BoxGeometry(5.8, 3.1, 0.08), config.materials.environment);
+  backWall.position.set(0.35, 1.38, -3.15);
+  backWall.receiveShadow = true;
+  lab.add(backWall);
+  for (const x of [-2.25, -1.35, -0.45, 0.45, 1.35, 2.25]) {
+    const gridLine = new THREE.Mesh(new THREE.BoxGeometry(0.018, 2.6, 0.018), config.materials.velocity);
+    gridLine.position.set(x + 0.35, 1.38, -3.08);
+    lab.add(gridLine);
+  }
+  for (const y of [0.25, 0.85, 1.45, 2.05, 2.65]) {
+    const gridLine = new THREE.Mesh(new THREE.BoxGeometry(5.35, 0.018, 0.018), config.materials.velocity);
+    gridLine.position.set(0.35, y, -3.08);
+    lab.add(gridLine);
+  }
+
+  const scoreboard = new THREE.Group();
+  scoreboard.name = 'force-vector-scoreboard';
+  const boardPanel = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.58, 0.06), config.materials.board);
+  scoreboard.add(boardPanel);
+  [config.materials.pushControl, config.materials.brakeControl, config.materials.accelerateControl, config.materials.deflectControl].forEach((material, index) => {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(0.22 + index * 0.08, 0.07, 0.04), material);
+    bar.position.set(-0.45 + index * 0.3, 0.02, 0.05);
+    scoreboard.add(bar);
+  });
+  scoreboard.position.set(0.35, 2.05, -2.98);
+  lab.add(scoreboard);
+
+  for (const x of [-2.15, 2.85]) {
+    const bench = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.14, 2.2), config.materials.board);
+    bench.position.set(x, 0.22, -0.2);
+    bench.castShadow = true;
+    bench.receiveShadow = true;
+    lab.add(bench);
+    for (const z of [-0.9, 0.5]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.48, 0.12), config.materials.board);
+      leg.position.set(x, 0, z);
+      lab.add(leg);
+    }
+  }
+
+  const cones = new THREE.Group();
+  cones.name = 'measurement-cones';
+  for (const [x, z] of [[-1.45, -1.4], [1.45, -1.4], [-1.45, 1.4], [1.45, 1.4]] as const) {
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.28, 16), config.materials.accelerateControl);
+    cone.position.set(x, 0.14, z);
+    cone.castShadow = true;
+    cones.add(cone);
+  }
+  lab.add(cones);
+
+  const trail = new THREE.Group();
+  trail.name = 'motion-history-trail';
+  const trailPoints: THREE.Mesh[] = [];
+  for (let index = 0; index < 10; index += 1) {
+    const point = new THREE.Mesh(new THREE.SphereGeometry(0.045 - index * 0.0025, 12, 8), config.materials.trail);
+    point.position.set(0, BALL_RADIUS, START_Z);
+    trailPoints.push(point);
+    trail.add(point);
+  }
+
   root.add(
+    lab,
     arena,
     ball,
+    trail,
     velocityArrow,
     pushControl,
     brakeControl,
@@ -97,6 +161,8 @@ export function createForceMotionScene(config: ForceMotionSceneConfig) {
   let braking = false;
   let squeezePhase = 0;
   let squeezeTarget = 0;
+  let trailAccumulator = 0;
+  const trailHistory = Array.from({ length: trailPoints.length }, () => position.clone());
 
   function applyBallTransform() {
     ball.position.set(position.x, BALL_RADIUS, position.y);
@@ -158,6 +224,7 @@ export function createForceMotionScene(config: ForceMotionSceneConfig) {
   function update(deltaSeconds: number) {
     const dt = Math.min(deltaSeconds, 0.05); // guard against long frame steps
     const previous = position.clone();
+    trailAccumulator += dt;
 
     if (braking) {
       const speed = velocity.length();
@@ -183,6 +250,18 @@ export function createForceMotionScene(config: ForceMotionSceneConfig) {
     ball.rotation.z += dx / BALL_RADIUS;
     applyBallTransform();
     updateVelocityArrow();
+
+    if (trailAccumulator >= 0.065) {
+      trailAccumulator = 0;
+      trailHistory.pop();
+      trailHistory.unshift(position.clone());
+    }
+    trail.visible = velocity.length() > 0.05;
+    trailPoints.forEach((point, index) => {
+      const history = trailHistory[index];
+      point.position.set(history.x, BALL_RADIUS * 0.72, history.y);
+      point.scale.setScalar(1 - index / (trailPoints.length * 1.18));
+    });
 
     const shapeT = Math.min(1, dt * 3.5);
     squeezePhase += (squeezeTarget - squeezePhase) * shapeT;
@@ -210,6 +289,8 @@ export function createForceMotionScene(config: ForceMotionSceneConfig) {
     }
     squeezeTarget = 0;
     squeezePhase = 0;
+    trailAccumulator = 0;
+    trailHistory.forEach(history => history.copy(position));
     applyBallTransform();
     updateVelocityArrow();
     applyShapeTransform();

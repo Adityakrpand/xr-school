@@ -6,6 +6,7 @@ import { ClassroomSync } from '@/components/robotree/ClassroomSync';
 import SimulationCanvasHost from '@/components/simulation-experience/SimulationCanvasHost';
 import { createGuidedCamera } from '@/lib/world-builder/guidedCamera';
 import { createInteractionSystem } from '@/lib/world-builder/interactionSystem';
+import { createQuestVrControls } from './questVrControls';
 import {
   MONEY_IDENTIFICATION_ROUNDS,
   MONEY_MEMORY_QUESTIONS,
@@ -35,8 +36,8 @@ const STAGE_FRAMES: Record<MoneyTownStageId, {
   target: [number, number, number];
 }> = {
   intro: { position: [0, 1.45, 5.3], target: [0, 1.25, 0] },
-  'learn-coins': { position: [0, 1.35, 4.2], target: [0, 1.15, -0.25] },
-  'learn-notes': { position: [0, 1.4, 4.55], target: [0, 1.35, -0.6] },
+  'learn-coins': { position: [-0.48, 1.35, 3.15], target: [-0.48, 1.18, -0.25] },
+  'learn-notes': { position: [-0.48, 1.4, 3.55], target: [-0.48, 1.35, -0.55] },
   'coins-vs-notes': { position: [0, 1.4, 4.8], target: [0, 1.3, -0.4] },
   'identify-money': { position: [0, 1.35, 4.4], target: [0, 1.2, -0.15] },
   'shopping-challenge': { position: [0, 1.45, 5.4], target: [0, 1.1, -0.6] },
@@ -48,6 +49,79 @@ const moneyColorByKind: Record<MoneyKind, number> = {
   coin: 0xfbbf24,
   note: 0x86efac,
 };
+
+const RBI_CURRENCY_ASSETS: Partial<Record<MoneyId, { front: string; back?: string }>> = {
+  'coin-rs-1': { front: '/assets/money/rbi/coin-1-obverse.png', back: '/assets/money/rbi/coin-1-reverse.png' },
+  'coin-rs-2': { front: '/assets/money/rbi/coin-2-obverse.png', back: '/assets/money/rbi/coin-2-reverse.png' },
+  'coin-rs-5': { front: '/assets/money/rbi/coin-5-obverse.png', back: '/assets/money/rbi/coin-5-reverse.png' },
+  'coin-rs-10': { front: '/assets/money/rbi/coin-10-obverse.png', back: '/assets/money/rbi/coin-10-reverse.png' },
+  'note-rs-10': { front: '/assets/money/rbi/note-10-front.png' },
+  'note-rs-20': { front: '/assets/money/rbi/note-20-front.png' },
+  'note-rs-50': { front: '/assets/money/rbi/note-50-front.png' },
+  'note-rs-100': { front: '/assets/money/rbi/note-100-front.png' },
+  'note-rs-200': { front: '/assets/money/rbi/note-200-front.png' },
+};
+
+function loadCurrencyTexture(url: string) {
+  const texture = new THREE.TextureLoader().load(url);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+function makeSpecimenBanknoteTexture(label: string) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 900;
+  canvas.height = 400;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return new THREE.CanvasTexture(canvas);
+  ctx.fillStyle = '#9ca3a0';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = '#3f4b48';
+  ctx.lineWidth = 20;
+  ctx.strokeRect(18, 18, canvas.width - 36, canvas.height - 36);
+  ctx.fillStyle = '#eef1e9';
+  ctx.fillRect(82, 65, 180, 270);
+  ctx.fillStyle = '#59645f';
+  ctx.beginPath();
+  ctx.arc(172, 175, 70, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#26332f';
+  ctx.font = '700 36px sans-serif';
+  ctx.fillText('RESERVE BANK OF INDIA', 300, 76);
+  ctx.font = '900 122px sans-serif';
+  ctx.fillText(label.replace(' Note', ''), 310, 235);
+  ctx.font = '700 42px sans-serif';
+  ctx.fillText('भारत  •  RBI  •  EDUCATIONAL SPECIMEN', 300, 320);
+  ctx.fillStyle = '#d8ddd5';
+  ctx.fillRect(720, 38, 20, 324);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function addCurrencyFace(
+  parent: THREE.Object3D,
+  url: string | undefined,
+  label: string,
+  kind: MoneyKind,
+  reverse = false,
+) {
+  const geometry = kind === 'coin'
+    ? new THREE.CircleGeometry(0.282, 48)
+    : new THREE.PlaneGeometry(0.86, 0.39);
+  const map = url ? loadCurrencyTexture(url) : makeSpecimenBanknoteTexture(label);
+  const face = new THREE.Mesh(
+    geometry,
+    new THREE.MeshBasicMaterial({ map, transparent: true, side: THREE.FrontSide }),
+  );
+  face.name = `${label}-${reverse ? 'reverse' : 'front'}-rbi-reference-face`;
+  face.position.z = reverse ? -0.031 : 0.031;
+  if (reverse) face.rotation.y = Math.PI;
+  face.userData.educationalReference = true;
+  parent.add(face);
+  return face;
+}
 
 function makeTextTexture(
   title: string,
@@ -153,28 +227,24 @@ function addMoneyModel(
 ) {
   const definition = getMoneyDefinition(moneyId);
   const color = moneyColorByKind[definition.kind];
+  const reference = RBI_CURRENCY_ASSETS[moneyId];
   const money = new THREE.Group();
   money.name = `large-3d-indian-${definition.id}`;
   money.position.set(...position);
 
   const visual = definition.kind === 'coin'
     ? new THREE.Mesh(new THREE.CylinderGeometry(0.31, 0.31, 0.055, 48), material(color))
-    : new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.4, 0.035), material(color));
+    : new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.42, 0.035), material(color));
   visual.name = `${definition.label}-${definition.shape}-${definition.material}`;
   visual.rotation.x = definition.kind === 'coin' ? Math.PI / 2 : 0;
   money.add(visual);
 
-  const value = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.62, 0.26),
-    new THREE.MeshBasicMaterial({
-      map: makeTextTexture(definition.label, definition.material, definition.kind === 'coin' ? '#fef3c7' : '#bbf7d0', 420, 160),
-      transparent: true,
-      depthTest: false,
-    }),
-  );
-  value.position.set(0, 0.04, 0.05);
-  value.scale.setScalar(definition.kind === 'coin' ? 0.72 : 0.9);
-  money.add(value);
+  addCurrencyFace(money, reference?.front, definition.label, definition.kind);
+  if (definition.kind === 'coin') {
+    addCurrencyFace(money, reference?.back, definition.label, definition.kind, true);
+  }
+
+  money.userData.currencyReference = reference ? 'Reserve Bank of India' : 'RBI-specification educational specimen';
 
   const target = addActionTarget(
     money,
@@ -183,7 +253,7 @@ function addMoneyModel(
     definition.label,
     color,
     [0, -0.55, 0.04],
-    definition.kind === 'coin' ? 'sphere' : 'box',
+    'box',
   );
   target.scale.setScalar(0.85);
   group.add(money);
@@ -327,13 +397,17 @@ function buildMoneyTownStages(scene: THREE.Scene, targets: THREE.Object3D[]) {
 
   const coinStage = groups.get('learn-coins')!;
   MONEY_TOWN_MONEY.filter(money => money.kind === 'coin').forEach((money, index) => {
-    addMoneyModel(coinStage, targets, money.id, `grab-${money.id}`, [-1.35 + index * 0.9, 1.24, -0.45]);
+    addMoneyModel(coinStage, targets, money.id, `grab-${money.id}`, [-1.65 + index * 0.8, 1.24, -0.45]);
   });
   addParticleRing(coinStage, 'coin-sparkle-glow-outline-star-reward', 0xfbbf24, 150);
 
   const noteStage = groups.get('learn-notes')!;
   MONEY_TOWN_MONEY.filter(money => money.kind === 'note').forEach((money, index) => {
-    addMoneyModel(noteStage, targets, money.id, `touch-${money.id}`, [-1.85 + index * 0.74, 1.38 + (index % 2) * 0.22, -0.5]);
+    addMoneyModel(noteStage, targets, money.id, `touch-${money.id}`, [
+      -1.68 + (index % 4) * 0.78,
+      1.08 + Math.floor(index / 4) * 0.78,
+      -0.5,
+    ]);
   });
   addParticleRing(noteStage, 'paper-note-flutter-rainbow-card-trail', 0x86efac, 150);
 
@@ -628,7 +702,17 @@ export default function MoneyTownViewer() {
     );
     controller0.add(makeRay());
     controller1.add(makeRay());
-    scene.add(controller0, controller1);
+    const quest = createQuestVrControls({
+      renderer,
+      scene,
+      camera,
+      controllers: [controller0, controller1],
+      onPrimary: () => speak(MONEY_TOWN_STAGES[stageIndexRef.current].interactionPrompt, stageIndexRef.current),
+      onBack: () => goToStageRef.current(stageIndexRef.current - 1),
+      onNarrate: () => speak(MONEY_TOWN_STAGES[stageIndexRef.current].teacherNarration, stageIndexRef.current),
+      startPosition: new THREE.Vector3(0, 0, 2.7),
+      movementBounds: new THREE.Box2(new THREE.Vector2(-3.8, -2.6), new THREE.Vector2(3.8, 4.6)),
+    });
 
     const interactionSystem = createInteractionSystem({
       camera,
@@ -655,7 +739,8 @@ export default function MoneyTownViewer() {
       const delta = clock.getDelta();
       elapsed += delta;
       const intensity = comfortModeRef.current ? 0.42 : 1;
-      if (!renderer.xr.isPresenting) guidedCamera.update(delta);
+      if (renderer.xr.isPresenting) quest.update();
+      else guidedCamera.update(delta);
       sparkleLight.intensity = 1.85 + Math.sin(elapsed * 1.3) * 0.28 * intensity;
       const { teacher, piggy } = animatedRefs.current;
       if (teacher) {
@@ -696,6 +781,7 @@ export default function MoneyTownViewer() {
       window.removeEventListener('resize', onResize);
       interactionSystem.dispose();
       guidedCamera.dispose();
+      quest.dispose();
       scene.traverse(object => {
         const mesh = object as THREE.Mesh;
         mesh.geometry?.dispose();
