@@ -402,9 +402,15 @@ export default function StatesOfMatterViewer() {
     const locomotion = createVrLocomotion({
       renderer,
       rig: vrRig.rig,
+      locomotion: 'boundedTeleport',
+      movementBounds: new THREE.Box3(new THREE.Vector3(-4, -1, -4), new THREE.Vector3(4, 3, 4)),
+      onPrimary: () => applyStage(clamp(stageRef.current + 1, 0, STAGES.length - 1)),
+      onNarrate: () => {
+        const index = stageRef.current;
+        void playSimulationNarration(NARRATIONS[index], index, NARRATION_AUDIO_URLS[index]);
+      },
       onBack: () => {
-        if (stageRef.current > 0) applyStage(stageRef.current - 1);
-        else void renderer.xr.getSession()?.end();
+        applyStage(clamp(stageRef.current - 1, 0, STAGES.length - 1));
       },
     });
 

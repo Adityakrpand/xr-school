@@ -16,6 +16,13 @@ import SimulationExperienceShell, {
 } from '@/components/simulation-experience/SimulationExperienceShell';
 import SimulationCanvasHost from '@/components/simulation-experience/SimulationCanvasHost';
 import { playSimulationNarration, stopSimulationNarration } from '@/lib/simulationAudio';
+import { createInteractionSystem } from '@/lib/world-builder/interactionSystem';
+import { createQuestVrControls } from './questVrControls';
+import {
+  createVrHudPanel,
+  type VrHudButtonId,
+  type VrHudPanel,
+} from '@/lib/vr/vrHudPanel';
 import {
   createWebSimulationRuntime,
   type WebSimulationRuntime,
@@ -148,6 +155,10 @@ export default function FungiDevelopmentViewer() {
   const drawerRef = useRef<HTMLDivElement | null>(null);
   const runtimeRef = useRef<WebSimulationRuntime | null>(null);
   const controllerRef = useRef<FungiViewerController | null>(null);
+  const vrHudRef = useRef<VrHudPanel | null>(null);
+  const vrHudActionsRef = useRef<Partial<Record<VrHudButtonId, () => void>>>({});
+  const replayNarrationRef = useRef<() => void>(() => undefined);
+  const pendingVrSessionRef = useRef<XRSession | null>(null);
   const lessonRef = useRef(createLessonSession(EXPERIENCE));
   const assessmentRef = useRef(createAssessmentSession(ASSESSMENT));
   const recordedMissionsRef = useRef(new Set<FungiMissionId>());
@@ -263,30 +274,6 @@ export default function FungiDevelopmentViewer() {
     [publish],
   );
 
-  /**
-   * A click on the apparatus is the interaction. The learner points at the
-   * mushroom, the thread, the jar — no translating an intention into a slider.
-   */
-  const handleCanvasClick = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      const controller = controllerRef.current;
-      const mount = mountRef.current;
-      if (!controller || !mount) return;
-      const bounds = mount.getBoundingClientRect();
-      if (bounds.width <= 0 || bounds.height <= 0) return;
-      try {
-        const pickId = controller.pickAt(
-          (event.clientX - bounds.left) / bounds.width,
-          (event.clientY - bounds.top) / bounds.height,
-        );
-        if (pickId) publish(controller.interactWith(pickId, BROWSER_SOURCE));
-      } catch (error) {
-        setRuntimeError(error instanceof Error ? error.message : String(error));
-      }
-    },
-    [publish],
-  );
-
   /** Records the authored assessment answer alongside the scientific action. */
   const answerPrompt = useCallback(
     (promptId: string, optionId: string) => {
@@ -322,6 +309,11 @@ export default function FungiDevelopmentViewer() {
     let controller: FungiViewerController | undefined;
     let runtime: WebSimulationRuntime | undefined;
     let observer: ResizeObserver | undefined;
+    let questVr: ReturnType<typeof createQuestVrControls> | undefined;
+    let interactionSystem: ReturnType<typeof createInteractionSystem> | undefined;
+    let hud: VrHudPanel | undefined;
+    let onSessionStart: () => void = () => {};
+    let onSessionEnd: () => void = () => {};
 
     try {
       controller = createFungiViewerController({
@@ -337,13 +329,73 @@ export default function FungiDevelopmentViewer() {
         scene,
         camera,
         updates: {
-          renderUpdate({ frameDeltaSeconds, elapsedSeconds }) {
+          renderUpdate({ frameDeltaSeconds, elapsedSeconds, renderer: frameRenderer, camera: frameCamera }) {
             controller?.update(frameDeltaSeconds, elapsedSeconds);
+            questVr?.update();
+            interactionSystem?.update(elapsedSeconds);
+            if (frameRenderer.xr.isPresenting) {
+              interactionSystem?.updateXrHover();
+              hud?.update(frameRenderer.xr.getCamera(), frameDeltaSeconds);
+            } else {
+              hud?.update(frameCamera, frameDeltaSeconds);
+            }
           },
         },
       });
       runtimeRef.current = runtime;
-      void runtime.initialize();
+      const renderer = runtime.renderer;
+      const controllers = [renderer.xr.getController(0), renderer.xr.getController(1)];
+      controllers.forEach(controllerSpace => scene.add(controllerSpace));
+      hud = createVrHudPanel({ scene });
+      vrHudRef.current = hud;
+      interactionSystem = createInteractionSystem({
+        camera,
+        domElement: renderer.domElement,
+        xrControllers: controllers,
+        onSelect(id, _object, source) {
+          const buttonId = hud?.buttonIdFor(id);
+          if (buttonId) {
+            vrHudActionsRef.current[buttonId]?.();
+            return;
+          }
+          if (!id.startsWith('pick-')) return;
+          try {
+            publish(controller!.interactWith(id.slice(5), source));
+          } catch (error) {
+            setRuntimeError(error instanceof Error ? error.message : String(error));
+          }
+        },
+      });
+      controller.root.traverse(object => {
+        if (object.name.startsWith('pick-')) interactionSystem?.register(object.name, object);
+      });
+      for (const button of Object.values(hud.buttons)) {
+        interactionSystem.register(button.name, button, { highlightColor: '#7dd3fc' });
+      }
+      questVr = createQuestVrControls({
+        renderer,
+        scene,
+        camera,
+        controllers,
+        onPrimary: () => controllerRef.current?.focusSpecimen(),
+        onBack: () => {
+          const next = controllerRef.current?.resetCamera();
+          if (next) setView(next);
+        },
+        onNarrate: () => replayNarrationRef.current(),
+      });
+      onSessionStart = () => hud?.setVisible(true);
+      onSessionEnd = () => hud?.setVisible(false);
+      renderer.xr.addEventListener('sessionstart', onSessionStart);
+      renderer.xr.addEventListener('sessionend', onSessionEnd);
+      void runtime.initialize().then(async () => {
+        const pendingSession = pendingVrSessionRef.current;
+        if (!pendingSession) return;
+        pendingVrSessionRef.current = null;
+        await renderer.xr.setSession(pendingSession);
+      }).catch(error => {
+        setRuntimeError(error instanceof Error ? error.message : String(error));
+      });
 
       syncViewport();
       observer = new ResizeObserver(() => syncViewport());
@@ -357,12 +409,20 @@ export default function FungiDevelopmentViewer() {
     return () => {
       observer?.disconnect();
       stopSimulationNarration();
+      if (runtime) {
+        runtime.renderer.xr.removeEventListener('sessionstart', onSessionStart);
+        runtime.renderer.xr.removeEventListener('sessionend', onSessionEnd);
+      }
+      interactionSystem?.dispose();
+      questVr?.dispose();
+      hud?.dispose();
+      vrHudRef.current = null;
       controller?.dispose();
       controllerRef.current = null;
       void runtime?.dispose();
       runtimeRef.current = null;
     };
-  }, [started, preferences.reducedMotion, syncViewport]);
+  }, [started, preferences.reducedMotion, publish, syncViewport]);
 
   useEffect(() => {
     controllerRef.current?.setReducedMotion(preferences.reducedMotion);
@@ -378,8 +438,26 @@ export default function FungiDevelopmentViewer() {
     stopSimulationNarration();
     if (!preferences.audio) return;
     const cue = FUNGI_DEVELOPMENT_NARRATION.cues[missionIndex];
-    if (cue) void playSimulationNarration(cue.text, missionIndex);
+    if (cue) void playSimulationNarration(cue.text, missionIndex, cue.audioUrl);
   }, [missionIndex, preferences.audio]);
+  replayNarrationRef.current = replayNarration;
+
+  const enterVr = useCallback(async () => {
+    setStarted(true);
+    replayNarration();
+    try {
+      if (!navigator.xr) throw new Error('WebXR is unavailable in this browser');
+      const session = await navigator.xr.requestSession('immersive-vr', {
+        requiredFeatures: ['local-floor'],
+        optionalFeatures: ['bounded-floor', 'hand-tracking'],
+      });
+      const renderer = runtimeRef.current?.renderer;
+      if (renderer) await renderer.xr.setSession(session);
+      else pendingVrSessionRef.current = session;
+    } catch (error) {
+      setRuntimeError(error instanceof Error ? error.message : String(error));
+    }
+  }, [replayNarration]);
 
   const restart = useCallback(() => {
     const controller = controllerRef.current;
@@ -400,6 +478,29 @@ export default function FungiDevelopmentViewer() {
     () => ASSESSMENT.prompts.find((entry) => entry.id === promptId),
     [promptId],
   );
+
+  useEffect(() => {
+    const hud = vrHudRef.current;
+    if (!hud || !view) return;
+    const options = prompt?.options ?? [];
+    hud.setContent({
+      eyebrow: `Mission ${missionIndex + 1} of ${FUNGI_MISSIONS.length}`,
+      title: MISSION_TITLE[view.director.missionId],
+      body: prompt?.question ?? view.mission.objective,
+      hint: view.director.currentHint ?? nextStep,
+      choices: options.slice(0, 3).map(option => ({ label: option.label })),
+      buttons: ['help', 'replay', 'restart', 'exit'],
+    });
+    vrHudActionsRef.current = {
+      help: () => act('director.request-hint'),
+      replay: replayNarration,
+      restart,
+      exit: () => { void runtimeRef.current?.renderer.xr.getSession()?.end(); },
+      'choice-a': () => options[0] && prompt && answerPrompt(prompt.id, options[0].id),
+      'choice-b': () => options[1] && prompt && answerPrompt(prompt.id, options[1].id),
+      'choice-c': () => options[2] && prompt && answerPrompt(prompt.id, options[2].id),
+    };
+  }, [act, answerPrompt, missionIndex, nextStep, prompt, replayNarration, restart, view]);
 
   const tools = view?.tools;
   const savedTrials = view?.director.experiment.savedTrials ?? [];
@@ -825,6 +926,7 @@ export default function FungiDevelopmentViewer() {
       preferences={preferences}
       onPreferencesChange={setPreferences}
       onStartBrowser={() => setStarted(true)}
+      onEnterVr={() => { void enterVr(); }}
       onPrevious={() => undefined}
       onNext={() => undefined}
       evidence={evidence}
@@ -848,7 +950,7 @@ export default function FungiDevelopmentViewer() {
           : undefined
       }
     >
-      <div className="fungi-lab" onClick={handleCanvasClick}>
+      <div className="fungi-lab">
         <SimulationCanvasHost
           ariaLabel="Forest nursery outbreak investigation"
           className="fungi-lab__canvas"

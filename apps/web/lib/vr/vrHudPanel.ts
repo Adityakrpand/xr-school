@@ -50,7 +50,7 @@ const BUTTON_STYLE: Record<VrHudButtonId, { label: string; color: string }> = {
   help: { label: '? Help', color: '#c084fc' },
   replay: { label: '⟲ Replay Narration', color: '#4ade80' },
   restart: { label: '↻ Restart', color: '#fb923c' },
-  exit: { label: '✕ Exit Simulation', color: '#f87171' },
+  exit: { label: '✕ Exit VR', color: '#f87171' },
 };
 
 const PANEL_WIDTH = 1.3;
@@ -59,7 +59,7 @@ const BUTTON_WIDTH = 0.42;
 const BUTTON_HEIGHT = 0.115;
 const BUTTON_GAP = 0.03;
 const FOLLOW_DISTANCE = 1.7;
-const CONTROLS_FOOTER = 'Trigger: select · Right stick: turn · Left stick: move · B: back';
+const CONTROLS_FOOTER = 'Trigger: select · Right stick: turn · Left stick: move · B: exit VR';
 
 function makeButtonTexture(id: VrHudButtonId) {
   const canvas = document.createElement('canvas');

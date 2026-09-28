@@ -135,7 +135,7 @@ export function createWebInputRouter(config: WebInputRouterConfig): WebInputRout
       stageId,
       timestampMs,
     };
-    config.dispatch(action);
+    if (target.emitAction !== false) config.dispatch(action);
     target.onCommit?.(action);
   }
 

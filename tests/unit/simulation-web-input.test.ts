@@ -98,6 +98,7 @@ function registerTarget(
     actionId?: string;
     accessibilityLabel?: string;
     inputSources?: NormalizedInputSource[];
+    emitAction?: boolean;
     onCommit?: (action: NormalizedAction) => void;
   } = {},
 ) {
@@ -107,6 +108,7 @@ function registerTarget(
     actionId: options.actionId ?? 'toggle-switch',
     accessibilityLabel: options.accessibilityLabel ?? 'Toggle the switch',
     inputSources: options.inputSources,
+    emitAction: options.emitAction,
     onCommit: options.onCommit,
   });
 }
@@ -132,6 +134,18 @@ describe('createWebInputRouter', () => {
       timestampMs: 321,
     }]);
     expect(order).toEqual(['dispatch', 'commit']);
+    harness.router.dispose();
+  });
+
+  it('supports host controls that commit without mutating lesson state', () => {
+    const onCommit = vi.fn();
+    const harness = createHarness();
+    registerTarget(harness, createMesh(), { emitAction: false, onCommit });
+
+    harness.router.interactions.activate('target-switch', 'keyboard');
+
+    expect(harness.actions).toEqual([]);
+    expect(onCommit).toHaveBeenCalledOnce();
     harness.router.dispose();
   });
 
