@@ -8,7 +8,6 @@ packages/*/dist/
 tests/
 reports/
 output/
-docs/
 tmp/
 .github/
 .husky/

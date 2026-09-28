@@ -967,6 +967,36 @@ export default function WoolProcessingViewer() {
                 </div>
               </div>
 
+              {stage.requiredTargets.length > 0 && (
+                <fieldset
+                  className={styles.choice}
+                  data-testid="scene-evidence-controls"
+                >
+                  <legend>
+                    Explore the highlighted evidence
+                    {stage.requiredTargets.length > 1
+                      ? ` (${state.inspected.length} of ${stage.requiredTargets.length})`
+                      : ""}
+                  </legend>
+                  <div>
+                    {stage.requiredTargets.map((target) => {
+                      const inspected = state.inspected.includes(target);
+                      return (
+                        <button
+                          key={target}
+                          type="button"
+                          data-done={inspected}
+                          onClick={() => activateTarget(target)}
+                        >
+                          {inspected ? "✓ " : "Inspect: "}
+                          {TARGET_LABELS[target]}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </fieldset>
+              )}
+
               {stage.id === "season" && (
                 <fieldset className={styles.choice}>
                   <legend>Choose a season for Woolly</legend>
@@ -1060,6 +1090,19 @@ export default function WoolProcessingViewer() {
                     >
                       Fast speed
                     </button>
+                  </div>
+                  <div>
+                    {SHEARING_PATH.map((target, index) => (
+                      <button
+                        key={target}
+                        type="button"
+                        data-done={index < state.shearingIndex}
+                        onClick={() => activateTarget(target)}
+                      >
+                        {index < state.shearingIndex ? "✓ " : "Shear: "}
+                        {TARGET_LABELS[target]}
+                      </button>
+                    ))}
                   </div>
                 </fieldset>
               )}

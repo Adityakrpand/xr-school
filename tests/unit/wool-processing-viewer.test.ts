@@ -135,6 +135,15 @@ describe("wool processing viewer integration", () => {
     expect(activateTargetSource).toContain('type: "inspect"');
   });
 
+  it("keeps browser learners from getting trapped on scene-only evidence stages", () => {
+    expect(viewerSource).toContain('data-testid="scene-evidence-controls"');
+    expect(viewerSource).toContain(
+      "stage.requiredTargets.map((target) => {",
+    );
+    expect(viewerSource).toContain("onClick={() => activateTarget(target)}");
+    expect(viewerSource).toContain("SHEARING_PATH.map((target, index) => (");
+  });
+
   it("does not rebuild the renderer when the learner changes shearing controls", () => {
     // The renderer-owning effect must remain stable while angle/speed changes;
     // otherwise React cleanup ends an active session and disposes narration.
