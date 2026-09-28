@@ -10409,6 +10409,15 @@ export const RELEASED_SIMULATION_CATALOG = [
     "evidenceMaturity": "internalQA"
   },
   {
+    "id": "sim-c07-ch03-a01-shearing-and-scouring-of-wool",
+    "slug": "c7-ch03-a01-shearing-and-scouring-of-wool",
+    "title": "Shearing and Scouring of Wool",
+    "href": "/simulations/c7-ch03-a01-shearing-and-scouring-of-wool",
+    "releaseMaturity": "internalQA",
+    "publicationStatus": "released",
+    "evidenceMaturity": "internalQA"
+  },
+  {
     "id": "sim-c10-ch02-a01-introduction-to-acids-and-bases-and-litmus-test",
     "slug": "c10-ch02-a01-introduction-to-acids-and-bases-and-litmus-test",
     "title": "Acids, Bases & Neutralisation",

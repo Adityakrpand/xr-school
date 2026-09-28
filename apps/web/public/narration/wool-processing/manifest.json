@@ -1,0 +1,62 @@
+{
+  "slug": "c7-ch03-a01-shearing-and-scouring-of-wool",
+  "profile": {
+    "previewNumber": 7,
+    "label": "Neerja — Dramatic Narrator",
+    "voice": "en-IN-NeerjaExpressiveNeural",
+    "rate": "-12%",
+    "pitch": "-2Hz"
+  },
+  "cues": [
+    {
+      "id": "arrival",
+      "text": "Welcome to Flock Valley, Young Wool Scientist. This is Woolly. His thick winter coat is called a fleece, and it now feels very warm. Explore the living sheep gently before beginning the mission.",
+      "audioUrl": "/narration/wool-processing/arrival.mp3"
+    },
+    {
+      "id": "season",
+      "text": "Before removing Woolly's fleece, choose the suitable season. The sheep must stay warm in winter, and wet fleece is difficult to shear safely.",
+      "audioUrl": "/narration/wool-processing/season.mp3"
+    },
+    {
+      "id": "prepare",
+      "text": "A trained shearer prepares carefully. Check that the fleece is dry, use a clean non-slip platform, choose clean electric shears, inspect them, oil the blades and calm Woolly.",
+      "audioUrl": "/narration/wool-processing/prepare.mp3"
+    },
+    {
+      "id": "shearing",
+      "text": "Shearing is the careful removal of a sheep's fleece. Keep the shears almost parallel to the skin, move at a controlled speed and follow each glowing path in order.",
+      "audioUrl": "/narration/wool-processing/shearing.mp3"
+    },
+    {
+      "id": "detective",
+      "text": "The fleece is off the sheep, but it is yellowish, heavy and sticky. Use the magnifier to find dust and soil, sweat, plant material and the natural grease called lanolin.",
+      "audioUrl": "/narration/wool-processing/detective.mp3"
+    },
+    {
+      "id": "experiment",
+      "text": "Scouring means thoroughly washing sheared wool to remove dirt, dust, sweat and grease. Compare cold water, very hot rough washing and controlled warm water with a suitable cleaning solution.",
+      "audioUrl": "/narration/wool-processing/experiment.mp3"
+    },
+    {
+      "id": "station",
+      "text": "Use controlled warm water and the correct cleaning-solution dose. Move the fleece gently, rinse until the water stays clear, remove extra water with rollers and spread the wool to dry.",
+      "audioUrl": "/narration/wool-processing/station.mp3"
+    },
+    {
+      "id": "compare",
+      "text": "Compare the two samples. Raw fleece is greasy, dirty, yellowish and heavy. Scoured wool is clean, soft, lighter and ready for the next processing stage.",
+      "audioUrl": "/narration/wool-processing/compare.mp3"
+    },
+    {
+      "id": "journey",
+      "text": "Rebuild Woolly's journey. Begin with the sheep's fleece, remove it by shearing, collect the raw fleece, scour it, rinse it and finally dry it.",
+      "audioUrl": "/narration/wool-processing/journey.mp3"
+    },
+    {
+      "id": "quiz",
+      "text": "Prove that you can distinguish shearing from scouring, explain safe seasonal care and identify lanolin. Four correct answers will complete the mission.",
+      "audioUrl": "/narration/wool-processing/quiz.mp3"
+    }
+  ]
+}

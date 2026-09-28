@@ -193,7 +193,7 @@ describe('simulation availability routing', () => {
     const sections = getSimulationCatalogSections(SCIENCE_SIMULATION_CATALOG);
     const updatedCards = sections.launchable.filter(card => card.latestUpdate);
 
-    expect(updatedCards).toHaveLength(8);
+    expect(updatedCards).toHaveLength(9);
     expect(updatedCards.map(card => card.slug)).toEqual(
       expect.arrayContaining(Object.keys(LATEST_SIMULATION_UPDATES)),
     );

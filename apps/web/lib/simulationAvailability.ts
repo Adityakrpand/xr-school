@@ -2,15 +2,15 @@ import {
   classLevelsForSimulation,
   IMPLEMENTED_SIMULATIONS,
   routeForSimulation,
-} from '@xr-school/simulation-content';
+} from "@xr-school/simulation-content";
 import type {
   ImplementedSimulationDefinition,
   SimulationFormat,
-} from '@xr-school/simulation-schema';
-import type { ScienceSimulationCatalogItem } from './scienceCatalog.generated';
+} from "@xr-school/simulation-schema";
+import type { ScienceSimulationCatalogItem } from "./scienceCatalog.generated";
 
 const RELEASED_SIMULATIONS = IMPLEMENTED_SIMULATIONS.filter(
-  definition => definition.module.publicationStatus === 'released',
+  (definition) => definition.module.publicationStatus === "released",
 );
 
 export const IMPLEMENTED_SIMULATION_SLUGS = Object.freeze(
@@ -32,7 +32,12 @@ export type CatalogCard = {
   archetype: string;
   minutes: number;
   color: string;
-  releaseMaturity: 'catalogued' | 'inDevelopment' | 'internalQA' | 'pilotReady' | 'schoolValidated';
+  releaseMaturity:
+    | "catalogued"
+    | "inDevelopment"
+    | "internalQA"
+    | "pilotReady"
+    | "schoolValidated";
   href?: string;
   latestUpdate?: CatalogUpdate;
 };
@@ -50,7 +55,7 @@ export interface SimulationPresentationOverlay {
 }
 
 function deepFreeze<T>(value: T): T {
-  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
+  if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
     for (const child of Object.values(value)) deepFreeze(child);
     Object.freeze(value);
   }
@@ -62,38 +67,57 @@ function deepFreeze<T>(value: T): T {
  * These notes describe shipped implementation work only; they deliberately
  * do not promote a build beyond its evidence-backed release maturity.
  */
-export const LATEST_SIMULATION_UPDATES: Readonly<Record<string, CatalogUpdate>> = deepFreeze({
-  'c1-math-ch01-introduction-to-money': {
-    summary: 'Recognisable Indian currency, a clearer Money Town layout, and more reliable Quest interaction.',
-    highlights: ['RBI-reference visuals', 'Quest controls', 'Narration replay'],
+export const LATEST_SIMULATION_UPDATES: Readonly<
+  Record<string, CatalogUpdate>
+> = deepFreeze({
+  "c1-math-ch01-introduction-to-money": {
+    summary:
+      "Recognisable Indian currency, a clearer Money Town layout, and more reliable Quest interaction.",
+    highlights: ["RBI-reference visuals", "Quest controls", "Narration replay"],
   },
-  'c6-ch01-a01-sources-of-food': {
-    summary: 'Distinct food models now sit inside a populated farm-market environment with clearer sorting feedback.',
-    highlights: ['Realistic food models', 'Farm market', 'Quest controls'],
+  "c6-ch01-a01-sources-of-food": {
+    summary:
+      "Distinct food models now sit inside a populated farm-market environment with clearer sorting feedback.",
+    highlights: ["Realistic food models", "Farm market", "Quest controls"],
   },
-  'c7-ch10-a02-the-breathing-process-in-human': {
-    summary: 'Expanded lungs, ribs, bronchioles, and animated airflow make the breathing mechanism easier to follow.',
-    highlights: ['Improved anatomy', 'Animated airflow', 'Respiratory lab'],
+  "c7-ch10-a02-the-breathing-process-in-human": {
+    summary:
+      "Expanded lungs, ribs, bronchioles, and animated airflow make the breathing mechanism easier to follow.",
+    highlights: ["Improved anatomy", "Animated airflow", "Respiratory lab"],
   },
-  'c8-ch10-a02-the-effects-of-force-on-object-s-motion-and-shape': {
-    summary: 'A brighter measurement lab now shows force vectors and a visible motion-history trail.',
-    highlights: ['Motion trail', 'Force vectors', 'Lab environment'],
+  "c8-ch10-a02-the-effects-of-force-on-object-s-motion-and-shape": {
+    summary:
+      "A brighter measurement lab now shows force vectors and a visible motion-history trail.",
+    highlights: ["Motion trail", "Force vectors", "Lab environment"],
   },
-  'c10-ch02-a01-introduction-to-acids-and-bases-and-litmus-test': {
-    summary: 'The investigation now takes place in a recognisable chemistry lab with visible neutralisation effects.',
-    highlights: ['Chemistry lab', 'Reaction bubbles', 'Quest controls'],
+  "c10-ch02-a01-introduction-to-acids-and-bases-and-litmus-test": {
+    summary:
+      "The investigation now takes place in a recognisable chemistry lab with visible neutralisation effects.",
+    highlights: ["Chemistry lab", "Reaction bubbles", "Quest controls"],
   },
-  'c5-ch03-a02-introduction-of-digestive-system': {
-    summary: 'Recognisable digestive anatomy and a calmer, screen-aware lesson panel replace the cluttered opening view.',
-    highlights: ['Organ preview', 'Cleaner lesson UI', 'Quest controls'],
+  "c5-ch03-a02-introduction-of-digestive-system": {
+    summary:
+      "Recognisable digestive anatomy and a calmer, screen-aware lesson panel replace the cluttered opening view.",
+    highlights: ["Organ preview", "Cleaner lesson UI", "Quest controls"],
   },
-  'c1-art-a01-learning-of-colours': {
-    summary: 'The existing colour adventure keeps its visual design while gaining the standard Quest movement and exit controls.',
-    highlights: ['Joystick movement', 'Snap turn', 'B to exit VR'],
+  "c1-art-a01-learning-of-colours": {
+    summary:
+      "The existing colour adventure keeps its visual design while gaining the standard Quest movement and exit controls.",
+    highlights: ["Joystick movement", "Snap turn", "B to exit VR"],
   },
-  'c2-english-ch01-prepositions': {
-    summary: 'The storybook lesson now uses the same dependable movement, turning, exit, and narration controls as the wider catalog.',
-    highlights: ['Joystick movement', 'B to exit VR', 'Narration replay'],
+  "c2-english-ch01-prepositions": {
+    summary:
+      "The storybook lesson now uses the same dependable movement, turning, exit, and narration controls as the wider catalog.",
+    highlights: ["Joystick movement", "B to exit VR", "Narration replay"],
+  },
+  "c7-ch03-a01-shearing-and-scouring-of-wool": {
+    summary:
+      "Mission Wool is now a complete Flock Valley investigation from humane shearing decisions to clean, dry fleece.",
+    highlights: [
+      "Life-sized Woolly",
+      "Interactive scouring line",
+      "Indian teacher narration",
+    ],
   },
 });
 
@@ -104,12 +128,16 @@ export function assertCatalogUpdateIntegrity(
   const releasedSlugs = new Set(definitions.map(({ module }) => module.slug));
   for (const [slug, update] of Object.entries(updates)) {
     if (!releasedSlugs.has(slug)) {
-      throw new Error(`Catalog update references unreleased simulation "${slug}"`);
+      throw new Error(
+        `Catalog update references unreleased simulation "${slug}"`,
+      );
     }
     if (!update.summary.trim() || update.highlights.length === 0) {
-      throw new Error(`Catalog update "${slug}" requires a summary and highlights`);
+      throw new Error(
+        `Catalog update "${slug}" requires a summary and highlights`,
+      );
     }
-    if (update.highlights.some(highlight => !highlight.trim())) {
+    if (update.highlights.some((highlight) => !highlight.trim())) {
       throw new Error(`Catalog update "${slug}" contains an empty highlight`);
     }
   }
@@ -117,119 +145,129 @@ export function assertCatalogUpdateIntegrity(
 
 assertCatalogUpdateIntegrity(LATEST_SIMULATION_UPDATES);
 
-const AUTHORED_SIMULATION_PRESENTATION_OVERRIDES: Readonly<Record<
-  string,
-  Readonly<SimulationPresentationOverlay>
->> = {
-  'sim-pollination-001': {
-    color: '#34d399',
+const AUTHORED_SIMULATION_PRESENTATION_OVERRIDES: Readonly<
+  Record<string, Readonly<SimulationPresentationOverlay>>
+> = {
+  "sim-pollination-001": {
+    color: "#34d399",
     classLevels: [6, 7, 8, 9, 10],
-    topic: 'Plant reproduction',
-    archetype: 'immersive VR',
+    topic: "Plant reproduction",
+    archetype: "immersive VR",
   },
-  'sim-circuit-001': {
-    color: '#fbbf24',
+  "sim-circuit-001": {
+    color: "#fbbf24",
     classLevels: [6, 7, 8, 9, 10],
-    topic: 'Electricity',
-    archetype: 'interactive 3D',
+    topic: "Electricity",
+    archetype: "interactive 3D",
   },
-  'sim-c09-ch01-a02-states-of-matter': {
-    color: '#38bdf8',
+  "sim-c09-ch01-a02-states-of-matter": {
+    color: "#38bdf8",
     classLevels: [9],
-    topic: 'Matter in Our Surroundings',
-    archetype: 'interactive3d',
+    topic: "Matter in Our Surroundings",
+    archetype: "interactive3d",
   },
-  'sim-c06-ch01-a01-sources-of-food': {
-    color: '#4ade80',
+  "sim-c06-ch01-a01-sources-of-food": {
+    color: "#4ade80",
     classLevels: [6],
-    topic: 'Food: Where does It come from?',
-    archetype: 'sortingBoard',
+    topic: "Food: Where does It come from?",
+    archetype: "sortingBoard",
   },
-  'sim-c05-ch07-a03-soluble-and-insoluble-substances': {
-    color: '#67e8f9',
+  "sim-c05-ch07-a03-soluble-and-insoluble-substances": {
+    color: "#67e8f9",
     classLevels: [5],
-    topic: 'Experiments with Water',
-    archetype: 'experimentBench',
+    topic: "Experiments with Water",
+    archetype: "experimentBench",
   },
-  'sim-c05-ch03-a02-introduction-of-digestive-system': {
-    color: '#fb7185',
+  "sim-c05-ch03-a02-introduction-of-digestive-system": {
+    color: "#fb7185",
     classLevels: [5],
-    topic: 'From Tasting to Digesting',
-    archetype: 'immersive VR',
+    topic: "From Tasting to Digesting",
+    archetype: "immersive VR",
   },
-  'sim-c07-ch10-a02-the-breathing-process-in-human': {
-    color: '#38bdf8',
+  "sim-c07-ch10-a02-the-breathing-process-in-human": {
+    color: "#38bdf8",
     classLevels: [7],
-    topic: 'Respiration in Organisms',
-    archetype: 'interactive 3D',
+    topic: "Respiration in Organisms",
+    archetype: "interactive 3D",
   },
-  'sim-c08-ch10-a02-the-effects-of-force-on-object-s-motion-and-shape': {
-    color: '#4ade80',
+  "sim-c08-ch10-a02-the-effects-of-force-on-object-s-motion-and-shape": {
+    color: "#4ade80",
     classLevels: [8],
-    topic: 'Force and Pressure',
-    archetype: 'interactive 3D',
+    topic: "Force and Pressure",
+    archetype: "interactive 3D",
   },
-  'sim-c10-ch02-a01-introduction-to-acids-and-bases-and-litmus-test': {
-    color: '#22c55e',
+  "sim-c10-ch02-a01-introduction-to-acids-and-bases-and-litmus-test": {
+    color: "#22c55e",
     classLevels: [10],
-    topic: 'Acids, Bases and Salts',
-    archetype: 'experiment bench',
+    topic: "Acids, Bases and Salts",
+    archetype: "experiment bench",
   },
-  'sim-c1-art-a01-learning-of-colours': {
-    color: '#f472b6',
+  "sim-c1-art-a01-learning-of-colours": {
+    color: "#f472b6",
     classLevels: [1],
-    topic: 'Learning of colours',
-    archetype: 'immersive VR',
+    topic: "Learning of colours",
+    archetype: "immersive VR",
   },
-  'sim-c1-math-ch01-introduction-to-money': {
-    color: '#f59e0b',
+  "sim-c1-math-ch01-introduction-to-money": {
+    color: "#f59e0b",
     classLevels: [1],
-    topic: 'Money values and shopping',
-    archetype: 'interactive 3D',
+    topic: "Money values and shopping",
+    archetype: "interactive 3D",
   },
-  'sim-c2-english-ch01-prepositions': {
-    color: '#22c55e',
+  "sim-c2-english-ch01-prepositions": {
+    color: "#22c55e",
     classLevels: [2],
-    topic: 'Position words',
-    archetype: 'immersive VR',
+    topic: "Position words",
+    archetype: "immersive VR",
   },
-  'sim-c8-10-science-solar-system': {
-    color: '#60a5fa',
+  "sim-c8-10-science-solar-system": {
+    color: "#60a5fa",
     classLevels: [8, 9, 10],
-    topic: 'Stars and the Solar System',
-    archetype: 'immersive VR',
+    topic: "Stars and the Solar System",
+    archetype: "immersive VR",
   },
-  'sim-c08-ch01-a01-ploughing-preparation-of-soil': {
-    color: '#b7793f',
+  "sim-c08-ch01-a01-ploughing-preparation-of-soil": {
+    color: "#b7793f",
     classLevels: [8],
-    topic: 'Crop Production and Management',
-    archetype: 'immersive VR',
+    topic: "Crop Production and Management",
+    archetype: "immersive VR",
   },
-  'sim-c08-ch01-a02-sowing-of-seeds': {
-    color: '#6f8f45',
+  "sim-c08-ch01-a02-sowing-of-seeds": {
+    color: "#6f8f45",
     classLevels: [8],
-    topic: 'Crop Production and Management',
-    archetype: 'immersive VR',
+    topic: "Crop Production and Management",
+    archetype: "immersive VR",
   },
-  'sim-c07-ch02-a02-nutrition-in-amoeba': {
-    color: '#2aa198',
+  "sim-c07-ch02-a02-nutrition-in-amoeba": {
+    color: "#2aa198",
     classLevels: [7],
-    topic: 'Nutrition in Animals',
-    archetype: 'immersive VR',
+    topic: "Nutrition in Animals",
+    archetype: "immersive VR",
+  },
+  "sim-c07-ch03-a01-shearing-and-scouring-of-wool": {
+    color: "#b7793f",
+    classLevels: [7],
+    topic: "Fibre to Fabric",
+    archetype: "immersive VR",
   },
 };
 
-const DEFAULT_PRESENTATION_BY_FORMAT: Readonly<Record<
-  SimulationFormat,
-  Readonly<Pick<SimulationPresentationOverlay, 'color' | 'archetype'>>
->> = deepFreeze({
-  immersiveVr: { color: '#a78bfa', archetype: 'immersive VR' },
-  threeSixtyVr: { color: '#818cf8', archetype: '360-degree VR' },
-  interactive3d: { color: '#38bdf8', archetype: 'interactive 3D' },
-  guidedVisualization: { color: '#2dd4bf', archetype: 'guided visualization' },
-  practicalLabSimulation: { color: '#67e8f9', archetype: 'practical lab simulation' },
-  virtualFieldVisit: { color: '#34d399', archetype: 'virtual field visit' },
-  revisionMode: { color: '#fbbf24', archetype: 'revision mode' },
+const DEFAULT_PRESENTATION_BY_FORMAT: Readonly<
+  Record<
+    SimulationFormat,
+    Readonly<Pick<SimulationPresentationOverlay, "color" | "archetype">>
+  >
+> = deepFreeze({
+  immersiveVr: { color: "#a78bfa", archetype: "immersive VR" },
+  threeSixtyVr: { color: "#818cf8", archetype: "360-degree VR" },
+  interactive3d: { color: "#38bdf8", archetype: "interactive 3D" },
+  guidedVisualization: { color: "#2dd4bf", archetype: "guided visualization" },
+  practicalLabSimulation: {
+    color: "#67e8f9",
+    archetype: "practical lab simulation",
+  },
+  virtualFieldVisit: { color: "#34d399", archetype: "virtual field visit" },
+  revisionMode: { color: "#fbbf24", archetype: "revision mode" },
 });
 
 /**
@@ -242,7 +280,8 @@ export function deriveSimulationPresentationOverlay(
   definition: ImplementedSimulationDefinition,
 ): SimulationPresentationOverlay {
   const { module } = definition;
-  const formatPresentation = DEFAULT_PRESENTATION_BY_FORMAT[module.simulationFormat];
+  const formatPresentation =
+    DEFAULT_PRESENTATION_BY_FORMAT[module.simulationFormat];
   return {
     color: formatPresentation.color,
     topic: module.title,
@@ -251,16 +290,17 @@ export function deriveSimulationPresentationOverlay(
   };
 }
 
-export const SIMULATION_PRESENTATION_OVERLAYS: Readonly<Record<
-  string,
-  Readonly<SimulationPresentationOverlay>
->> = deepFreeze(Object.fromEntries(
-  RELEASED_SIMULATIONS.map(definition => [
-    definition.module.id,
-    AUTHORED_SIMULATION_PRESENTATION_OVERRIDES[definition.module.id]
-      ?? deriveSimulationPresentationOverlay(definition),
-  ]),
-));
+export const SIMULATION_PRESENTATION_OVERLAYS: Readonly<
+  Record<string, Readonly<SimulationPresentationOverlay>>
+> = deepFreeze(
+  Object.fromEntries(
+    RELEASED_SIMULATIONS.map((definition) => [
+      definition.module.id,
+      AUTHORED_SIMULATION_PRESENTATION_OVERRIDES[definition.module.id] ??
+        deriveSimulationPresentationOverlay(definition),
+    ]),
+  ),
+);
 
 export function assertSimulationPresentationOverlayIntegrity(
   overlays: Readonly<Record<string, SimulationPresentationOverlay>>,
@@ -268,21 +308,24 @@ export function assertSimulationPresentationOverlayIntegrity(
 ): void {
   const releasedIds = new Set(definitions.map(({ module }) => module.id));
   for (const id of releasedIds) {
-    if (!overlays[id]) throw new Error(`Missing overlay for released simulation "${id}"`);
+    if (!overlays[id])
+      throw new Error(`Missing overlay for released simulation "${id}"`);
   }
   for (const [id, overlay] of Object.entries(overlays)) {
-    if (!releasedIds.has(id)) throw new Error(`Unrecognized overlay for simulation "${id}"`);
+    if (!releasedIds.has(id))
+      throw new Error(`Unrecognized overlay for simulation "${id}"`);
     if (
-      !overlay.color.trim()
-      || !overlay.topic.trim()
-      || !overlay.archetype.trim()
+      !overlay.color.trim() ||
+      !overlay.topic.trim() ||
+      !overlay.archetype.trim()
     ) {
       throw new Error(`Overlay "${id}" requires color, topic, and archetype`);
     }
     if (
-      overlay.classLevels.length === 0
-      || overlay.classLevels.some(
-        classLevel => !Number.isInteger(classLevel) || classLevel < 1 || classLevel > 12,
+      overlay.classLevels.length === 0 ||
+      overlay.classLevels.some(
+        (classLevel) =>
+          !Number.isInteger(classLevel) || classLevel < 1 || classLevel > 12,
       )
     ) {
       throw new Error(`Overlay "${id}" requires valid class levels`);
@@ -293,26 +336,28 @@ export function assertSimulationPresentationOverlayIntegrity(
 assertSimulationPresentationOverlayIntegrity(SIMULATION_PRESENTATION_OVERLAYS);
 
 const COLORS: Record<string, string> = {
-  modelInspection: '#38bdf8',
-  scenario: '#fb7185',
-  sortingBoard: '#4ade80',
-  guidedTour: '#a78bfa',
-  experimentBench: '#67e8f9',
-  processTimeline: '#fb923c',
-  measurementGraph: '#f472b6',
-  systemMap: '#2dd4bf',
+  modelInspection: "#38bdf8",
+  scenario: "#fb7185",
+  sortingBoard: "#4ade80",
+  guidedTour: "#a78bfa",
+  experimentBench: "#67e8f9",
+  processTimeline: "#fb923c",
+  measurementGraph: "#f472b6",
+  systemMap: "#2dd4bf",
 };
 
 const implementedSet = new Set<string>(IMPLEMENTED_SIMULATION_SLUGS);
 
-export function isImplementedSimulationSlug(slug: string): slug is ImplementedSlug {
+export function isImplementedSimulationSlug(
+  slug: string,
+): slug is ImplementedSlug {
   return implementedSet.has(slug);
 }
 
 function toCataloguedCard(item: ScienceSimulationCatalogItem): CatalogCard {
   return {
     slug: item.slug,
-    color: COLORS[item.primaryArchetype] ?? '#38bdf8',
+    color: COLORS[item.primaryArchetype] ?? "#38bdf8",
     subject: item.subject,
     subjectTags: [item.subject],
     grade: `Class ${item.classLevel}`,
@@ -340,7 +385,7 @@ function toImplementedCard(
     slug: module.slug,
     title: module.title,
     topic: overlay.topic,
-    subject: module.subjects.join(', '),
+    subject: module.subjects.join(", "),
     subjectTags: [...module.subjects],
     grade: gradeLabel(overlay.classLevels),
     classLevels: [...overlay.classLevels],
@@ -353,10 +398,12 @@ function toImplementedCard(
   };
 }
 
-export function getSimulationCatalogSections(catalog: readonly ScienceSimulationCatalogItem[]) {
+export function getSimulationCatalogSections(
+  catalog: readonly ScienceSimulationCatalogItem[],
+) {
   const launchable = RELEASED_SIMULATIONS.map(toImplementedCard);
   const catalogued = catalog
-    .filter(item => !implementedSet.has(item.slug))
+    .filter((item) => !implementedSet.has(item.slug))
     .map(toCataloguedCard);
 
   return {
@@ -373,9 +420,24 @@ export interface CatalogCardFilters {
 
 /** Matches a card against the class/subject/release-maturity filter controls
  * without falling back to free-text curriculum search. */
-export function matchesCatalogFilters(card: CatalogCard, filters: CatalogCardFilters): boolean {
-  if (filters.classLevel !== undefined && !card.classLevels.includes(filters.classLevel)) return false;
-  if (filters.subject !== undefined && !card.subjectTags.includes(filters.subject)) return false;
-  if (filters.releaseMaturity !== undefined && card.releaseMaturity !== filters.releaseMaturity) return false;
+export function matchesCatalogFilters(
+  card: CatalogCard,
+  filters: CatalogCardFilters,
+): boolean {
+  if (
+    filters.classLevel !== undefined &&
+    !card.classLevels.includes(filters.classLevel)
+  )
+    return false;
+  if (
+    filters.subject !== undefined &&
+    !card.subjectTags.includes(filters.subject)
+  )
+    return false;
+  if (
+    filters.releaseMaturity !== undefined &&
+    card.releaseMaturity !== filters.releaseMaturity
+  )
+    return false;
   return true;
 }

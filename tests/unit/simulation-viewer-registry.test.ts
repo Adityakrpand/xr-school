@@ -9,9 +9,7 @@ import {
 } from "@xr-school/simulation-content";
 import GuidedSimulationViewer from "../../apps/web/components/simulations/shared/GuidedSimulationViewer";
 import InteractiveInvestigationViewer from "../../apps/web/components/simulations/shared/InteractiveInvestigationViewer";
-import {
-  INTERACTIVE_VIEWER_REGISTRATIONS,
-} from "../../apps/web/lib/simulations/interactive/registrations";
+import { INTERACTIVE_VIEWER_REGISTRATIONS } from "../../apps/web/lib/simulations/interactive/registrations";
 import {
   SIMULATION_VIEWER_KEYS,
   assertSimulationViewerCoverage,
@@ -23,7 +21,13 @@ import { EXPECTED_RELEASED_SIMULATION_COUNT } from "../../scripts/lib/simulation
 const EXPECTED_VIEWERS = {
   "amoeba-nutrition": {
     fileName: "AmoebaNutritionViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/AmoebaNutritionViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/AmoebaNutritionViewer"),
+  },
+  "wool-processing": {
+    fileName: "WoolProcessingViewer.tsx",
+    load: () =>
+      import("../../apps/web/components/simulations/WoolProcessingViewer"),
   },
   "acid-base": {
     fileName: "AcidBaseViewer.tsx",
@@ -31,7 +35,8 @@ const EXPECTED_VIEWERS = {
   },
   "breathing-process": {
     fileName: "BreathingProcessViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/BreathingProcessViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/BreathingProcessViewer"),
   },
   circuit: {
     fileName: "CircuitViewer.tsx",
@@ -39,19 +44,23 @@ const EXPECTED_VIEWERS = {
   },
   "colour-adventure": {
     fileName: "ColourAdventureViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/ColourAdventureViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/ColourAdventureViewer"),
   },
   "digestive-system": {
     fileName: "DigestiveSystemViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/DigestiveSystemViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/DigestiveSystemViewer"),
   },
   "force-motion": {
     fileName: "ForceMotionViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/ForceMotionViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/ForceMotionViewer"),
   },
   "fungi-development": {
     fileName: "FungiDevelopmentViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/FungiDevelopmentViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/FungiDevelopmentViewer"),
   },
   "money-town": {
     fileName: "MoneyTownViewer.tsx",
@@ -59,31 +68,38 @@ const EXPECTED_VIEWERS = {
   },
   "ploughing-preparation": {
     fileName: "PloughingPreparationViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/PloughingPreparationViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/PloughingPreparationViewer"),
   },
   "sowing-seeds": {
     fileName: "SowingSeedsViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/SowingSeedsViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/SowingSeedsViewer"),
   },
   pollination: {
     fileName: "PollinationViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/PollinationViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/PollinationViewer"),
   },
   "preposition-adventure": {
     fileName: "PrepositionAdventureViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/PrepositionAdventureViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/PrepositionAdventureViewer"),
   },
   "solar-system-mission": {
     fileName: "SolarSystemMissionViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/SolarSystemMissionViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/SolarSystemMissionViewer"),
   },
   "sources-of-food": {
     fileName: "FoodSourcesSortingViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/FoodSourcesSortingViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/FoodSourcesSortingViewer"),
   },
   "states-of-matter": {
     fileName: "StatesOfMatterViewer.tsx",
-    load: () => import("../../apps/web/components/simulations/StatesOfMatterViewer"),
+    load: () =>
+      import("../../apps/web/components/simulations/StatesOfMatterViewer"),
   },
 } as const;
 
@@ -105,11 +121,17 @@ describe("released simulation viewer registry", () => {
 
     expect(released).toHaveLength(EXPECTED_RELEASED_SIMULATION_COUNT);
     expect([...SIMULATION_VIEWER_KEYS].sort()).toEqual(releasedKeys);
-    expect(SIMULATION_VIEWER_KEYS).toHaveLength(EXPECTED_RELEASED_SIMULATION_COUNT);
-    expect(SIMULATION_VIEWER_KEYS).toEqual(expect.arrayContaining([
-      ...Object.keys(EXPECTED_VIEWERS),
-      ...GUIDED_SIMULATION_DEFINITIONS.map(definition => definition.viewerKey),
-    ]));
+    expect(SIMULATION_VIEWER_KEYS).toHaveLength(
+      EXPECTED_RELEASED_SIMULATION_COUNT,
+    );
+    expect(SIMULATION_VIEWER_KEYS).toEqual(
+      expect.arrayContaining([
+        ...Object.keys(EXPECTED_VIEWERS),
+        ...GUIDED_SIMULATION_DEFINITIONS.map(
+          (definition) => definition.viewerKey,
+        ),
+      ]),
+    );
 
     for (const definition of released) {
       const registration = getSimulationViewer(definition.module.viewerKey);
@@ -119,43 +141,52 @@ describe("released simulation viewer registry", () => {
     }
   });
 
-  it("loads the exact canonical viewer module bound to every viewer key", async () => {
-    for (const definition of IMPLEMENTED_SIMULATIONS) {
-      if (definition.module.publicationStatus !== "released") continue;
-      const viewerKey = definition.module.viewerKey;
-      const expected = expectedViewer(viewerKey);
-      const registeredModule = await getSimulationViewer(viewerKey).load();
-      if (expected) {
-        const expectedModule = await expected.load();
-        expect(registeredModule.default, viewerKey).toBe(expectedModule.default);
-        continue;
-      }
+  it(
+    "loads the exact canonical viewer module bound to every viewer key",
+    async () => {
+      for (const definition of IMPLEMENTED_SIMULATIONS) {
+        if (definition.module.publicationStatus !== "released") continue;
+        const viewerKey = definition.module.viewerKey;
+        const expected = expectedViewer(viewerKey);
+        const registeredModule = await getSimulationViewer(viewerKey).load();
+        if (expected) {
+          const expectedModule = await expected.load();
+          expect(registeredModule.default, viewerKey).toBe(
+            expectedModule.default,
+          );
+          continue;
+        }
 
-      const guidedDefinition = GUIDED_SIMULATION_DEFINITIONS.find(
-        definition => definition.viewerKey === viewerKey,
-      );
-      const interactiveRegistration = INTERACTIVE_VIEWER_REGISTRATIONS[
-        viewerKey as keyof typeof INTERACTIVE_VIEWER_REGISTRATIONS
-      ];
-      if (interactiveRegistration) {
+        const guidedDefinition = GUIDED_SIMULATION_DEFINITIONS.find(
+          (definition) => definition.viewerKey === viewerKey,
+        );
+        const interactiveRegistration =
+          INTERACTIVE_VIEWER_REGISTRATIONS[
+            viewerKey as keyof typeof INTERACTIVE_VIEWER_REGISTRATIONS
+          ];
+        if (interactiveRegistration) {
+          const element = (registeredModule.default as () => unknown)();
+          expect(isValidElement(element), viewerKey).toBe(true);
+          if (!isValidElement(element)) continue;
+          expect(element.type, viewerKey).toBe(InteractiveInvestigationViewer);
+          expect(element.props).toMatchObject({
+            registration: interactiveRegistration,
+          });
+          continue;
+        }
+        expect(guidedDefinition, viewerKey).toBeDefined();
         const element = (registeredModule.default as () => unknown)();
         expect(isValidElement(element), viewerKey).toBe(true);
         if (!isValidElement(element)) continue;
-        expect(element.type, viewerKey).toBe(InteractiveInvestigationViewer);
-        expect(element.props).toMatchObject({
-          registration: interactiveRegistration,
-        });
-        continue;
+        expect(element.type, viewerKey).toBe(GuidedSimulationViewer);
+        expect(element.props).toMatchObject({ definition: guidedDefinition });
+        expect(element.props.sceneAdapter.id).toBe(
+          `guided:${definition.module.id}`,
+        );
       }
-      expect(guidedDefinition, viewerKey).toBeDefined();
-      const element = (registeredModule.default as () => unknown)();
-      expect(isValidElement(element), viewerKey).toBe(true);
-      if (!isValidElement(element)) continue;
-      expect(element.type, viewerKey).toBe(GuidedSimulationViewer);
-      expect(element.props).toMatchObject({ definition: guidedDefinition });
-      expect(element.props.sceneAdapter.id).toBe(`guided:${definition.module.id}`);
-    }
-  }, VIEWER_LOAD_TIMEOUT_MS);
+    },
+    VIEWER_LOAD_TIMEOUT_MS,
+  );
 
   it("preserves diagnostic source-path metadata for every viewer", () => {
     for (const [viewerKey, expected] of Object.entries(EXPECTED_VIEWERS)) {
@@ -170,7 +201,9 @@ describe("released simulation viewer registry", () => {
         /^apps\/web\/lib\/simulations\/guided\/.+\.scene\.ts$/,
       );
     }
-    for (const [viewerKey] of Object.entries(INTERACTIVE_VIEWER_REGISTRATIONS)) {
+    for (const [viewerKey] of Object.entries(
+      INTERACTIVE_VIEWER_REGISTRATIONS,
+    )) {
       const registration = getSimulationViewer(viewerKey);
       expect(registration.sourcePath).toMatch(
         /^apps\/web\/lib\/simulations\/interactive\/.+\.scene\.ts$/,
@@ -180,7 +213,10 @@ describe("released simulation viewer registry", () => {
 
   it("routes every released simulation through a tested orbit-and-pan camera layer", () => {
     const hostSource = readFileSync(
-      resolve(process.cwd(), "packages/simulation-web/src/host/createSimulationHost.ts"),
+      resolve(
+        process.cwd(),
+        "packages/simulation-web/src/host/createSimulationHost.ts",
+      ),
       "utf8",
     );
     const guidedCameraSource = readFileSync(
@@ -189,16 +225,23 @@ describe("released simulation viewer registry", () => {
     );
     expect(hostSource).toContain("new OrbitControls(camera, domElement)");
     expect(hostSource).toContain("controls.enablePan = true");
-    expect(guidedCameraSource).toContain("new OrbitControls(camera, domElement)");
+    expect(guidedCameraSource).toContain(
+      "new OrbitControls(camera, domElement)",
+    );
     expect(guidedCameraSource).toContain("controls.enablePan = true");
 
     for (const viewerKey of SIMULATION_VIEWER_KEYS) {
       const registration = getSimulationViewer(viewerKey);
-      if (registration.sourcePath.includes("/simulations/guided/")
-        || registration.sourcePath.includes("/simulations/interactive/")) {
+      if (
+        registration.sourcePath.includes("/simulations/guided/") ||
+        registration.sourcePath.includes("/simulations/interactive/")
+      ) {
         continue;
       }
-      const source = readFileSync(resolve(process.cwd(), registration.sourcePath), "utf8");
+      const source = readFileSync(
+        resolve(process.cwd(), registration.sourcePath),
+        "utf8",
+      );
       if (viewerKey === "fungi-development") {
         expect(source, viewerKey).toContain("createFungiViewerController");
         continue;
@@ -222,11 +265,13 @@ describe("released simulation viewer registry", () => {
   });
 
   it("binds exactly 17 guided viewer keys without exposing legacy slugs as keys", () => {
-    const guidedKeys = GUIDED_SIMULATION_DEFINITIONS.map(item => item.viewerKey);
+    const guidedKeys = GUIDED_SIMULATION_DEFINITIONS.map(
+      (item) => item.viewerKey,
+    );
     expect(guidedKeys).toHaveLength(17);
     expect(new Set(guidedKeys).size).toBe(17);
     for (const definition of IMPLEMENTED_SIMULATIONS.filter(
-      item => item.kind === "guided",
+      (item) => item.kind === "guided",
     )) {
       expect(SIMULATION_VIEWER_KEYS).toContain(definition.module.viewerKey);
       for (const alias of definition.module.legacyAliases ?? []) {
@@ -241,15 +286,15 @@ describe("released simulation viewer registry", () => {
     );
     const keys = released.map(({ module }) => module.viewerKey);
 
-    expect(() => assertSimulationViewerCoverage(released, keys.slice(1))).toThrow(
-      /missing viewer key/i,
-    );
-    expect(() => assertSimulationViewerCoverage(released, [...keys, keys[0]])).toThrow(
-      /duplicate viewer key/i,
-    );
-    expect(() => assertSimulationViewerCoverage(released, [...keys, "unlisted-viewer"])).toThrow(
-      /viewer key outside content registry/i,
-    );
+    expect(() =>
+      assertSimulationViewerCoverage(released, keys.slice(1)),
+    ).toThrow(/missing viewer key/i);
+    expect(() =>
+      assertSimulationViewerCoverage(released, [...keys, keys[0]]),
+    ).toThrow(/duplicate viewer key/i);
+    expect(() =>
+      assertSimulationViewerCoverage(released, [...keys, "unlisted-viewer"]),
+    ).toThrow(/viewer key outside content registry/i);
   });
 
   it("has no default viewer for an unknown key", () => {

@@ -293,6 +293,51 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
     ]
   },
   {
+    "id": "course:course-cbse-c7-science",
+    "kind": "course",
+    "title": "CBSE Class 7 Science",
+    "summary": "Middle-school science connecting animal fibres, material processing, safety and everyday fabrics.",
+    "href": "/simulations#course-cbse-c7-science",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-sheep-fleece",
+      "concept-wool-shearing",
+      "concept-raw-wool-impurities",
+      "concept-wool-scouring"
+    ],
+    "tokens": [
+      "cbse",
+      "class",
+      "7",
+      "science",
+      "middle",
+      "school",
+      "connecting",
+      "animal",
+      "fibres",
+      "material",
+      "processing",
+      "safety",
+      "and",
+      "everyday",
+      "fabrics",
+      "fibre",
+      "to",
+      "fabric",
+      "wool",
+      "sheep",
+      "fleece",
+      "shearing",
+      "scouring",
+      "lanolin"
+    ]
+  },
+  {
     "id": "course:course-cbse-c8-physics",
     "kind": "course",
     "title": "CBSE Class 8 Physics",
@@ -725,6 +770,39 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "2",
       "topic",
       "amoeba"
+    ]
+  },
+  {
+    "id": "chapter:chapter-cbse-c7-fibre-to-fabric",
+    "kind": "chapter",
+    "title": "Fibre to Fabric",
+    "summary": "CBSE Class 7 Science · Chapter 3",
+    "href": "/simulations#chapter-cbse-c7-fibre-to-fabric",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-sheep-fleece",
+      "concept-wool-shearing",
+      "concept-raw-wool-impurities",
+      "concept-wool-scouring"
+    ],
+    "tokens": [
+      "fibre",
+      "to",
+      "fabric",
+      "cbse",
+      "class",
+      "7",
+      "science",
+      "chapter",
+      "3",
+      "topic",
+      "wool",
+      "processing"
     ]
   },
   {
@@ -2614,6 +2692,201 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "animals",
       "of",
       "sequence"
+    ]
+  },
+  {
+    "id": "concept:concept-sheep-fleece",
+    "kind": "concept",
+    "title": "Sheep fleece",
+    "summary": "The thick coat of hair covering a sheep, which insulates the animal and supplies wool fibre.",
+    "href": "/simulations#concept-sheep-fleece",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-sheep-fleece"
+    ],
+    "tokens": [
+      "sheep",
+      "fleece",
+      "the",
+      "thick",
+      "coat",
+      "of",
+      "hair",
+      "covering",
+      "a",
+      "which",
+      "insulates",
+      "animal",
+      "and",
+      "supplies",
+      "wool",
+      "fibre",
+      "connects",
+      "in",
+      "clothing",
+      "to",
+      "an",
+      "humane",
+      "care",
+      "insulation"
+    ]
+  },
+  {
+    "id": "concept:concept-wool-shearing",
+    "kind": "concept",
+    "title": "Shearing wool",
+    "summary": "Careful removal of a sheep's fleece by a trained person using maintained shearing equipment.",
+    "href": "/simulations#concept-wool-shearing",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-wool-shearing"
+    ],
+    "tokens": [
+      "shearing",
+      "wool",
+      "careful",
+      "removal",
+      "of",
+      "a",
+      "sheep",
+      "s",
+      "fleece",
+      "by",
+      "trained",
+      "person",
+      "using",
+      "maintained",
+      "equipment",
+      "explains",
+      "the",
+      "first",
+      "farm",
+      "stage",
+      "production",
+      "and",
+      "why",
+      "animal",
+      "welfare",
+      "season",
+      "matter",
+      "removing",
+      "electric",
+      "shears",
+      "summer",
+      "care"
+    ]
+  },
+  {
+    "id": "concept:concept-raw-wool-impurities",
+    "kind": "concept",
+    "title": "Impurities in raw wool",
+    "summary": "Raw fleece can contain dust, soil, sweat, plant material and protective natural grease called lanolin.",
+    "href": "/simulations#concept-raw-wool-impurities",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-raw-wool-impurities"
+    ],
+    "tokens": [
+      "impurities",
+      "in",
+      "raw",
+      "wool",
+      "fleece",
+      "can",
+      "contain",
+      "dust",
+      "soil",
+      "sweat",
+      "plant",
+      "material",
+      "and",
+      "protective",
+      "natural",
+      "grease",
+      "called",
+      "lanolin",
+      "explains",
+      "why",
+      "must",
+      "be",
+      "cleaned",
+      "before",
+      "it",
+      "processed",
+      "into",
+      "yarn",
+      "greasy",
+      "dirty",
+      "grass"
+    ]
+  },
+  {
+    "id": "concept:concept-wool-scouring",
+    "kind": "concept",
+    "title": "Scouring wool",
+    "summary": "Controlled washing of sheared wool to remove dirt, sweat and grease, followed by gentle rinsing, squeezing and drying.",
+    "href": "/simulations#concept-wool-scouring",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-wool-scouring"
+    ],
+    "tokens": [
+      "scouring",
+      "wool",
+      "controlled",
+      "washing",
+      "of",
+      "sheared",
+      "to",
+      "remove",
+      "dirt",
+      "sweat",
+      "and",
+      "grease",
+      "followed",
+      "by",
+      "gentle",
+      "rinsing",
+      "squeezing",
+      "drying",
+      "connects",
+      "safe",
+      "temperature",
+      "cleaning",
+      "solution",
+      "handling",
+      "the",
+      "quality",
+      "fibres",
+      "used",
+      "for",
+      "yarn",
+      "fleece",
+      "warm",
+      "water",
+      "rinse",
+      "dry",
+      "lanolin"
     ]
   },
   {
@@ -6289,6 +6562,98 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "solid",
       "cycle",
       "sequence"
+    ]
+  },
+  {
+    "id": "simulation:c7-ch03-a01-shearing-and-scouring-of-wool",
+    "kind": "simulation",
+    "title": "Shearing and Scouring of Wool",
+    "summary": "Join Woolly and Dr Asha in Flock Valley to choose a safe shearing season, remove the fleece carefully, investigate raw-wool impurities and operate a complete scouring station.",
+    "href": "/simulations/c7-ch03-a01-shearing-and-scouring-of-wool",
+    "classLevels": [
+      7
+    ],
+    "subjects": [
+      "science"
+    ],
+    "conceptIds": [
+      "concept-sheep-fleece",
+      "concept-wool-shearing",
+      "concept-raw-wool-impurities",
+      "concept-wool-scouring"
+    ],
+    "releaseMaturity": "internalQA",
+    "moduleId": "sim-c07-ch03-a01-shearing-and-scouring-of-wool",
+    "publicationStatus": "released",
+    "evidenceMaturity": "internalQA",
+    "tokens": [
+      "shearing",
+      "and",
+      "scouring",
+      "of",
+      "wool",
+      "join",
+      "woolly",
+      "dr",
+      "asha",
+      "in",
+      "flock",
+      "valley",
+      "to",
+      "choose",
+      "a",
+      "safe",
+      "season",
+      "remove",
+      "the",
+      "fleece",
+      "carefully",
+      "investigate",
+      "raw",
+      "impurities",
+      "operate",
+      "complete",
+      "station",
+      "students",
+      "will",
+      "distinguish",
+      "from",
+      "explain",
+      "why",
+      "sheep",
+      "are",
+      "generally",
+      "sheared",
+      "warm",
+      "weather",
+      "identify",
+      "common",
+      "sequence",
+      "washing",
+      "rinsing",
+      "drying",
+      "science",
+      "coat",
+      "fibre",
+      "animal",
+      "insulation",
+      "removing",
+      "electric",
+      "shears",
+      "summer",
+      "care",
+      "removal",
+      "greasy",
+      "lanolin",
+      "dirty",
+      "dust",
+      "sweat",
+      "grass",
+      "cleaning",
+      "water",
+      "rinse",
+      "dry",
+      "solution"
     ]
   },
   {
@@ -11375,44 +11740,6 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "explode",
       "compare",
       "and",
-      "vocabulary",
-      "layer"
-    ]
-  },
-  {
-    "id": "simulation:c7-ch03-a01-shearing-and-scouring-of-wool",
-    "kind": "simulation",
-    "title": "Shearing and Scouring of Wool",
-    "summary": "Fiber to Fabric · Class 7 biology",
-    "href": "/simulations#c7-ch03-a01-shearing-and-scouring-of-wool",
-    "classLevels": [
-      7
-    ],
-    "subjects": [
-      "biology"
-    ],
-    "conceptIds": [],
-    "releaseMaturity": "catalogued",
-    "tokens": [
-      "shearing",
-      "and",
-      "scouring",
-      "of",
-      "wool",
-      "fiber",
-      "to",
-      "fabric",
-      "biology",
-      "modelinspection",
-      "use",
-      "labeled",
-      "3d",
-      "inspection",
-      "with",
-      "isolate",
-      "zoom",
-      "explode",
-      "compare",
       "vocabulary",
       "layer"
     ]
