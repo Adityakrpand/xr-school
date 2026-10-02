@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "auditDate": "2026-09-28",
-  "method": "Rendered first, middle, and final pages with Poppler and inspected contact sheets.",
+  "auditDate": "2026-10-02",
+  "method": "Rendered all pages with Poppler, inspected five complete contact sheets, and reviewed the first, middle, appendix, and final pages at full size.",
   "reports": [
     {
       "file": "aditya-contribution-improvement-report.pdf",
@@ -22,13 +22,13 @@
     },
     {
       "file": "xr-school-implemented-simulations-quality-report.pdf",
-      "pages": 44,
+      "pages": 49,
       "representativePages": [
         1,
-        22,
-        44
+        25,
+        49
       ],
-      "sha256": "48de4637ae34d4dca06631c123aefa89ad3c930193c2b7c0029c7b6d032e908a",
+      "sha256": "188df0ca54d43e5e89c07535c41d53671cb6d0a2b859b4e7568a0cfc5948e44a",
       "checks": [
         "no clipping",
         "readable hierarchy",
