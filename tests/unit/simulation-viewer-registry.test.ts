@@ -209,10 +209,10 @@ describe("released simulation viewer registry", () => {
     }
   });
 
-  it("binds exactly 17 guided viewer keys without exposing legacy slugs as keys", () => {
+  it("binds exactly 22 guided viewer keys without exposing legacy slugs as keys", () => {
     const guidedKeys = GUIDED_SIMULATION_DEFINITIONS.map(item => item.viewerKey);
-    expect(guidedKeys).toHaveLength(17);
-    expect(new Set(guidedKeys).size).toBe(17);
+    expect(guidedKeys).toHaveLength(22);
+    expect(new Set(guidedKeys).size).toBe(22);
     for (const definition of IMPLEMENTED_SIMULATIONS.filter(
       item => item.kind === "guided",
     )) {

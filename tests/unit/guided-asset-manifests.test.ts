@@ -41,11 +41,50 @@ describe('guided asset manifests', () => {
         height: 887,
         byteSize: bytes.byteLength,
         sha256: sha256(bytes),
-        compression: 'WebP lossy q75; cwebp 1.6.0 method 6',
-        author: 'unverified-contributor-supplied',
-        license: 'unverified-contributor-supplied',
       });
-      expect(environment.source).toContain('PR #8 621dfb61');
+      if (record.module.slug === 'c7-ch03-a01-shearing-and-scouring-of-wool') {
+        expect(environment).toMatchObject({
+          compression: 'WebP lossy q75; sharp/libvips effort 6',
+          author: 'OpenAI image generation directed by Aditya K. R. Pandey',
+          license: 'project-generated',
+        });
+        expect(environment.source).toContain('Mission Wool');
+      } else if (record.module.slug === 'c7-ch03-a03-spinning-and-rolling-of-wool') {
+        expect(environment).toMatchObject({
+          compression: 'WebP lossy q76; sharp/libvips effort 6',
+          author: 'OpenAI image generation directed by Aditya K. R. Pandey',
+          license: 'project-generated',
+        });
+        expect(environment.source).toContain('Yarn Maker Mission');
+      } else if (record.module.slug === 'c8-ch02-a02-virus-introduction-spreading-and-its-effects') {
+        expect(environment).toMatchObject({
+          compression: 'WebP lossy q76; sharp/libvips effort 6',
+          author: 'OpenAI image generation directed by Aditya K. R. Pandey',
+          license: 'project-generated',
+        });
+        expect(environment.source).toContain('Invisible Invader');
+      } else if (record.module.slug === 'c8-ch01-a03-irrigation-methods') {
+        expect(environment).toMatchObject({
+          compression: 'WebP lossy q76; sharp/libvips effort 6',
+          author: 'OpenAI image generation directed by Aditya K. R. Pandey',
+          license: 'project-generated',
+        });
+        expect(environment.source).toContain('Irrigation Methods');
+      } else if (record.module.slug === 'c8-ch01-a05-harvesting-threshing-and-storage-of-crops') {
+        expect(environment).toMatchObject({
+          compression: 'WebP lossy q76; sharp/libvips effort 6',
+          author: 'OpenAI image generation directed by Aditya K. R. Pandey',
+          license: 'project-generated',
+        });
+        expect(environment.source).toContain('Harvesting');
+      } else {
+        expect(environment).toMatchObject({
+          compression: 'WebP lossy q75; cwebp 1.6.0 method 6',
+          author: 'unverified-contributor-supplied',
+          license: 'unverified-contributor-supplied',
+        });
+        expect(environment.source).toContain('PR #8 621dfb61');
+      }
     }
   });
 
