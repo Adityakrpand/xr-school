@@ -34,6 +34,36 @@ function guidedConcept(input: {
 
 export const GUIDED_LEARNING_CONCEPTS: LearningConceptRecord[] = [
   guidedConcept({
+    id: 'concept-smell-detection',
+    name: 'Smell detection in humans',
+    aliases: ['sense of smell', 'odour detection', 'olfaction'],
+    description: 'Some molecules released by a source travel through air and activate smell receptors high inside the nose; the brain helps interpret the resulting signals.',
+    misconception: 'Smells are visible coloured trails, or the tongue alone identifies every flavour.',
+    relevance: 'Connects familiar food, flower and wet-soil smells with a safe scientific model of how airborne chemicals can be detected.',
+    keywords: ['smell', 'odour molecules', 'nose', 'receptors', 'brain'],
+    related: ['concept-animal-chemical-signals', 'concept-animal-odour-tracking'],
+  }),
+  guidedConcept({
+    id: 'concept-animal-chemical-signals',
+    name: 'Animal chemical signals',
+    aliases: ['pheromone communication', 'ant scent trail', 'silkmoth pheromone'],
+    description: 'A pheromone is a chemical signal between members of the same species; many ants use trail pheromones, and male domesticated silkmoths detect female sex pheromones with sensitive antennae.',
+    misconception: 'Every odour is a pheromone, or insects literally see a coloured pheromone trail.',
+    relevance: 'Explains how chemical information can guide feeding, communication and mate location even though the signal is invisible to people.',
+    keywords: ['pheromone', 'ant trail', 'silkmoth', 'antennae', 'chemical signal'],
+    related: ['concept-smell-detection', 'concept-animal-odour-tracking'],
+  }),
+  guidedConcept({
+    id: 'concept-animal-odour-tracking',
+    name: 'Animal odour tracking',
+    aliases: ['dog scent tracking', 'target odour', 'search dog smell'],
+    description: 'Dogs can distinguish mixtures of odours, and trained dogs may follow a selected target scent under conditions affected by wind, weather, terrain and scent age.',
+    misconception: 'A dog sees a scent path or can track every target perfectly without training and suitable conditions.',
+    relevance: 'Connects animal sensory ability with responsible examples such as trained search work while preserving the limits of the simulation model.',
+    keywords: ['dog', 'scent tracking', 'odour mixture', 'wind', 'training'],
+    related: ['concept-smell-detection', 'concept-animal-chemical-signals'],
+  }),
+  guidedConcept({
     id: 'concept-food-spoilage',
     name: 'Food spoilage and preservation',
     aliases: ['mango spoilage', 'slowing food spoilage'],
@@ -249,6 +279,15 @@ export const GUIDED_LEARNING_CONCEPTS: LearningConceptRecord[] = [
 ];
 
 export const GUIDED_CURRICULUM_CHAPTERS: CurriculumChapterRecord[] = [
+  {
+    id: 'chapter-cbse-c5-super-senses',
+    courseId: 'course-cbse-c5-environmental-science',
+    chapterNumber: 1,
+    title: 'Super Senses',
+    topicIds: ['topic-animal-senses'],
+    conceptIds: ['concept-smell-detection', 'concept-animal-chemical-signals', 'concept-animal-odour-tracking'],
+    simulationIds: ['sim-c05-ch01-a01-supersense-of-smell'],
+  },
   {
     id: 'chapter-cbse-c5-mangoes-round-year',
     courseId: 'course-cbse-c5-environmental-science',

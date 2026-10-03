@@ -181,6 +181,12 @@ const VIEWER_INPUTS = {
     'interactive-shape-sorting',
     'apps/web/lib/simulations/interactive/shape-sorting.scene.ts',
   ),
+  'guided-super-senses-smell': bespokeGuidedViewerInput(
+    'sim-c05-ch01-a01-supersense-of-smell',
+    'apps/web/lib/simulations/guided/c5-ch01-a01-supersense-of-smell.scene.ts',
+    () => import('./guided/c5-ch01-a01-supersense-of-smell.scene'),
+    () => import('../../components/simulations/SuperSensesSmellViewer'),
+  ),
   'guided-food-spoilage': bespokeGuidedViewerInput('sim-c05-ch04-a01-food-spoilage', 'apps/web/lib/simulations/guided/c5-ch04-a01-food-spoilage.scene.ts', () => import('./guided/c5-ch04-a01-food-spoilage.scene'), () => import('../../components/simulations/FoodSpoilageViewer')),
   'guided-milk-spoilage': bespokeGuidedViewerInput('sim-c05-ch04-a02-milk-spoilage', 'apps/web/lib/simulations/guided/c5-ch04-a02-milk-spoilage.scene.ts', () => import('./guided/c5-ch04-a02-milk-spoilage.scene'), () => import('../../components/simulations/MilkSpoilageViewer')),
   'guided-aam-papad': bespokeGuidedViewerInput('sim-c05-ch04-a03-the-making-of-aam-papad', 'apps/web/lib/simulations/guided/c5-ch04-a03-the-making-of-aam-papad.scene.ts', () => import('./guided/c5-ch04-a03-the-making-of-aam-papad.scene'), () => import('../../components/simulations/AamPapadViewer')),

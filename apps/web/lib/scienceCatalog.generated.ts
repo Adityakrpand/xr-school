@@ -15,7 +15,7 @@ export const SCIENCE_SIMULATION_CATALOG = [
     "simulationFormat": "interactive3d",
     "xrFitType": "strongVrFit",
     "comfortRiskLevel": "low",
-    "expectedDurationMinutes": 8,
+    "expectedDurationMinutes": 5,
     "reuseGroup": "environmentalScience:super-senses",
     "implementationNotes": "Use labeled 3D inspection with isolate, zoom, explode, compare, and vocabulary layer.",
     "releaseMaturity": "catalogued"
@@ -10620,6 +10620,15 @@ export const RELEASED_SIMULATION_CATALOG = [
     "slug": "c7-ch03-a03-spinning-and-rolling-of-wool",
     "title": "Spinning and Rolling of Wool",
     "href": "/simulations/c7-ch03-a03-spinning-and-rolling-of-wool",
+    "releaseMaturity": "internalQA",
+    "publicationStatus": "released",
+    "evidenceMaturity": "internalQA"
+  },
+  {
+    "id": "sim-c05-ch01-a01-supersense-of-smell",
+    "slug": "c5-ch01-a01-supersense-of-smell",
+    "title": "Super Senses: The Sense of Smell",
+    "href": "/simulations/c5-ch01-a01-supersense-of-smell",
     "releaseMaturity": "internalQA",
     "publicationStatus": "released",
     "evidenceMaturity": "internalQA"

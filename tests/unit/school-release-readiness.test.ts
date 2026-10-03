@@ -30,6 +30,7 @@ const bespokeGuidedViewers = [
   'VirusInvasionViewer',
   'IrrigationMethodsViewer',
   'HarvestingStorageViewer',
+  'SuperSensesSmellViewer',
 ];
 
 const coreViewers = [
@@ -53,7 +54,7 @@ describe('school release readiness contract', () => {
     const released = IMPLEMENTED_SIMULATIONS.filter(
       record => record.module.publicationStatus === 'released',
     );
-    expect(released).toHaveLength(41);
+    expect(released).toHaveLength(42);
     for (const record of released) {
       expect(record.narration.cues.length, record.module.slug).toBeGreaterThan(0);
       for (const cue of record.narration.cues) {
