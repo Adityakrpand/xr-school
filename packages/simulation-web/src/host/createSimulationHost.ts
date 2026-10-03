@@ -1,6 +1,5 @@
 import type * as THREE from 'three';
 import * as THREE_RUNTIME from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import {
   createResourceRegistry,
   createWorldRuntime,
@@ -27,6 +26,10 @@ import {
   createWebInputRouter,
   type WebInputRouter as SimulationInputRouter,
 } from '../input/createWebInputRouter.js';
+import {
+  createOrbitCameraControls,
+  type OrbitCameraControls,
+} from '../input/createOrbitCameraControls.js';
 import { detectDeviceProfile } from '../device/detectDeviceProfile.js';
 import { createPresentationPipeline } from '../presentation/createPresentationPipeline.js';
 import { createVrLocomotion } from '../vr/vrLocomotion.js';
@@ -35,13 +38,6 @@ export interface SimulationPresentation {
   render(scene: THREE.Scene, camera: THREE.Camera): void;
   resize(width: number, height: number, pixelRatio: number): void;
   setQualityProfile(profileId: QualityProfileId): void;
-  dispose(): void;
-}
-
-export interface SimulationBrowserCameraControls {
-  enabled: boolean;
-  target: THREE.Vector3;
-  update(deltaSeconds?: number): boolean | void;
   dispose(): void;
 }
 
@@ -91,10 +87,6 @@ export interface SimulationHostDependencies {
     renderer: THREE.WebGLRenderer,
     initialProfile: QualityProfileId,
   ): SimulationPresentation;
-  createCameraControls(
-    camera: THREE.PerspectiveCamera,
-    domElement: HTMLElement,
-  ): SimulationBrowserCameraControls;
   createNarration(
     manifest: SimulationNarrationManifest,
   ): SimulationNarrationController;
@@ -106,6 +98,11 @@ export interface SimulationHostDependencies {
     xrControllers: THREE.XRTargetRaySpace[];
     now(): number;
   }): SimulationInputRouter;
+  createOrbitControls(config: {
+    domElement: HTMLElement;
+    camera: THREE.PerspectiveCamera;
+    isPresenting(): boolean;
+  }): OrbitCameraControls;
   createResizeObserver(callback: () => void): {
     observe(target: Element): void;
     disconnect(): void;
@@ -135,22 +132,9 @@ export function createBrowserSimulationHostDependencies(): SimulationHostDepende
   return {
     createRenderer: options => new THREE_RUNTIME.WebGLRenderer(options),
     createPresentation: createPresentationPipeline,
-    createCameraControls(camera, domElement) {
-      const controls = new OrbitControls(camera, domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.08;
-      controls.enableRotate = true;
-      controls.enablePan = true;
-      controls.screenSpacePanning = true;
-      controls.enableZoom = true;
-      controls.minDistance = 0.45;
-      controls.maxDistance = 18;
-      controls.minPolarAngle = 0.04;
-      controls.maxPolarAngle = Math.PI - 0.04;
-      return controls;
-    },
     createNarration: createNarrationController,
     createInput: createWebInputRouter,
+    createOrbitControls: createOrbitCameraControls,
     createResizeObserver(callback) {
       if (typeof ResizeObserver === 'undefined') {
         throw new Error('ResizeObserver is unavailable in this browser');
@@ -211,15 +195,14 @@ export function createSimulationHost(
   let browserProfileId!: QualityProfileId;
   let profileId!: QualityProfileId;
   let presentation!: SimulationPresentation;
-  let cameraControls!: SimulationBrowserCameraControls;
   let narration!: SimulationNarrationController;
   let input!: SimulationInputRouter;
+  let orbit: OrbitCameraControls | undefined;
   let resizeObserver!: ReturnType<SimulationHostDependencies['createResizeObserver']>;
   let onSessionStart = () => {};
   let onSessionEnd = () => {};
   let snapshot: LessonSnapshot | undefined;
   let sceneHandle: Awaited<ReturnType<SimulationSceneAdapter['create']>> | undefined;
-  let browserFocusTarget: THREE.Object3D | undefined;
   let runtime: WorldRuntime | undefined;
   let initialized = false;
   let disposed = false;
@@ -228,18 +211,7 @@ export function createSimulationHost(
   const desktopCameraPosition = new THREE_RUNTIME.Vector3();
   const desktopCameraQuaternion = new THREE_RUNTIME.Quaternion();
   const desktopCameraTarget = new THREE_RUNTIME.Vector3();
-  const focusWorldPosition = new THREE_RUNTIME.Vector3();
   const frameListeners = new Set<(deltaSeconds: number) => void>();
-
-  const syncBrowserCameraFocus = (force = false) => {
-    const focusTarget = sceneHandle?.focusTarget?.();
-    if (!focusTarget || (!force && focusTarget === browserFocusTarget)) return;
-    browserFocusTarget = focusTarget;
-    focusTarget.updateWorldMatrix(true, false);
-    focusTarget.getWorldPosition(focusWorldPosition);
-    cameraControls.target.copy(focusWorldPosition);
-    cameraControls.update();
-  };
 
   const dispatch = (action: NormalizedAction) => {
     const errors = validateNormalizedAction(action);
@@ -354,16 +326,6 @@ export function createSimulationHost(
       id: 'presentation',
       dispose: () => presentation.dispose(),
     });
-    cameraControls = resolvedDependencies.createCameraControls(
-      camera,
-      renderer.domElement,
-    );
-    cameraControls.target.set(0, 1, 0);
-    cameraControls.update();
-    constructionResources.push({
-      id: 'browser-camera-controls',
-      dispose: () => cameraControls.dispose(),
-    });
     narration = resolvedDependencies.createNarration(config.narration);
     constructionResources.push({
       id: 'narration',
@@ -383,6 +345,14 @@ export function createSimulationHost(
       now: resolvedDependencies.now,
     });
     constructionResources.push({ id: 'input', dispose: () => input.dispose() });
+    // Flat-screen camera control. Locomotion only moves the rig inside an
+    // immersive session, so without this a browser learner cannot look around.
+    orbit = resolvedDependencies.createOrbitControls({
+      domElement: renderer.domElement,
+      camera,
+      isPresenting: () => renderer.xr.isPresenting,
+    });
+    constructionResources.push({ id: 'orbit', dispose: () => orbit?.dispose() });
     resizeObserver = resolvedDependencies.createResizeObserver(resize);
     constructionResources.push({
       id: 'resize-observer',
@@ -400,8 +370,8 @@ export function createSimulationHost(
       setProfile('questBaseline');
       desktopCameraPosition.copy(camera.position);
       desktopCameraQuaternion.copy(camera.quaternion);
-      desktopCameraTarget.copy(cameraControls.target);
-      cameraControls.enabled = false;
+      desktopCameraTarget.copy(orbit?.target() ?? initialOrbitTarget());
+      orbit?.setEnabled(false);
       camera.position.set(0, 0, 0);
       camera.quaternion.identity();
       navigationRig.position.set(0, 0, 2.6);
@@ -410,15 +380,45 @@ export function createSimulationHost(
       setProfile(browserProfileId);
       camera.position.copy(desktopCameraPosition);
       camera.quaternion.copy(desktopCameraQuaternion);
-      cameraControls.target.copy(desktopCameraTarget);
       navigationRig.position.set(0, 0, 0);
-      cameraControls.enabled = true;
-      cameraControls.update();
+      orbit?.setTarget(desktopCameraTarget);
+      orbit?.setEnabled(true);
+      orbit?.sync();
     };
     renderer.xr.addEventListener('sessionstart', onSessionStart);
     renderer.xr.addEventListener('sessionend', onSessionEnd);
   } catch (error) {
     rollbackConstruction(error);
+  }
+
+  /**
+   * Aims the browser orbit at whatever the lesson is currently highlighting.
+   *
+   * Guided scenes only know their focus once a snapshot names a cue, so this
+   * runs again on each snapshot — but never after the learner has moved the
+   * camera themselves, so a stage change cannot yank the view out of their
+   * hands.
+   */
+  function refocusOrbit() {
+    if (!orbit || orbit.interacted()) return;
+    const focus = sceneHandle?.focusTarget?.();
+    if (!focus) return;
+    orbit.setTarget(focus.getWorldPosition(new THREE_RUNTIME.Vector3()));
+  }
+
+  /**
+   * The starting pivot, used before any cue names a focus.
+   *
+   * Picks a point along the camera's forward axis rather than the centre of
+   * the scene's bounding box, because an environment dome or ground plane
+   * would drag that centre far away from the authored subject.
+   */
+  function initialOrbitTarget(): THREE.Vector3 {
+    camera.updateWorldMatrix(true, false);
+    const forward = camera.getWorldDirection(new THREE_RUNTIME.Vector3());
+    return camera
+      .getWorldPosition(new THREE_RUNTIME.Vector3())
+      .add(forward.multiplyScalar(3));
   }
 
   const releaseRegisteredResources: (() => void)[] = [];
@@ -448,7 +448,8 @@ export function createSimulationHost(
           dispatch,
           recordEvidence,
         });
-        syncBrowserCameraFocus(true);
+        orbit?.setTarget(initialOrbitTarget());
+        refocusOrbit();
       },
       fixedUpdate(context) {
         sceneHandle?.fixedUpdate?.(context);
@@ -488,7 +489,6 @@ export function createSimulationHost(
             : Math.max(0, (timeMs - previousTimeMs) / 1000);
           previousTimeMs = timeMs;
           navigation!.update(deltaSeconds);
-          if (!renderer.xr.isPresenting) cameraControls.update(deltaSeconds);
           runtime!.advance(deltaSeconds);
         });
       } catch (error) {
@@ -509,7 +509,7 @@ export function createSimulationHost(
       if (!sceneHandle) throw new Error('Initialize the simulation host before applying a snapshot');
       snapshot = nextSnapshot;
       sceneHandle.applySnapshot(nextSnapshot);
-      if (!renderer.xr.isPresenting) syncBrowserCameraFocus();
+      refocusOrbit();
     },
     async enterVr() {
       if (disposed) throw new Error('Simulation host is disposed');

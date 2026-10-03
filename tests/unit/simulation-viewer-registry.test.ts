@@ -175,8 +175,19 @@ describe("released simulation viewer registry", () => {
       resolve(process.cwd(), "apps/web/lib/world-builder/guidedCamera.ts"),
       "utf8",
     );
-    expect(hostSource).toContain("new OrbitControls(camera, domElement)");
-    expect(hostSource).toContain("controls.enablePan = true");
+    const sharedOrbitSource = readFileSync(
+      resolve(
+        process.cwd(),
+        "packages/simulation-web/src/input/createOrbitCameraControls.ts",
+      ),
+      "utf8",
+    );
+    expect(hostSource).toContain("createOrbitControls: createOrbitCameraControls");
+    expect(hostSource).toContain("resolvedDependencies.createOrbitControls");
+    expect(sharedOrbitSource).toContain("mode: 'orbit' | 'pan'");
+    expect(sharedOrbitSource).toContain("event.button === 2");
+    expect(sharedOrbitSource).toContain("event.shiftKey");
+    expect(sharedOrbitSource).toContain("targetWorld.add(panOffset)");
     expect(guidedCameraSource).toContain("new OrbitControls(camera, domElement)");
     expect(guidedCameraSource).toContain("controls.enablePan = true");
 
