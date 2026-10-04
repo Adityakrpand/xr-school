@@ -35,12 +35,13 @@ describe('curriculum search', () => {
     expect(results.map(result => result.href)).toEqual(expect.arrayContaining([
       '/simulations/c5-ch01-a01-supersense-of-smell',
       '/simulations/c5-ch01-a02-supersense-of-sights',
+      '/simulations/c5-ch01-a03-super-sense-of-danger',
       '/simulations/c5-ch03-a02-introduction-of-digestive-system',
       '/simulations/c5-ch07-a03-soluble-and-insoluble-substances',
     ]));
-    // The smell and sight investigations join the integrated Class 5 guided
+    // The three Super Senses investigations join the integrated Class 5 guided
     // classes while preserving every previously released Class 5 activity.
-    expect(results).toHaveLength(20);
+    expect(results).toHaveLength(21);
     expect(results.every(result => result.releaseMaturity === 'internalQA')).toBe(true);
   });
 
@@ -64,5 +65,16 @@ describe('curriculum search', () => {
     expect(candidate?.title).toBe('Super Senses: The Super Sense of Sight');
     expect(candidate?.releaseMaturity).toBe('internalQA');
     expect(candidate?.href).toBe('/simulations/c5-ch01-a02-supersense-of-sights');
+  });
+
+  it('promotes the canonical danger-sense investigation to its launch route', () => {
+    const results = searchCurriculum(CURRICULUM_SEARCH_DOCUMENTS, 'sense of danger');
+    const candidate = results.find(
+      result => result.id === 'simulation:c5-ch01-a03-super-sense-of-danger',
+    );
+
+    expect(candidate?.title).toBe('Super Senses: The Sense of Danger');
+    expect(candidate?.releaseMaturity).toBe('internalQA');
+    expect(candidate?.href).toBe('/simulations/c5-ch01-a03-super-sense-of-danger');
   });
 });

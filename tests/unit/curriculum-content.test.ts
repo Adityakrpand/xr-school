@@ -44,12 +44,15 @@ describe('canonical curriculum content', () => {
       'chapter-cbse-c5-up-you-go',
       'chapter-cbse-c5-walls-tell-stories',
     ]));
-    expect(class5?.simulationIds).toHaveLength(20);
+    expect(class5?.simulationIds).toHaveLength(21);
     expect(class5?.simulationIds).toContain(
       'sim-c05-ch01-a01-supersense-of-smell',
     );
     expect(class5?.simulationIds).toContain(
       'sim-c05-ch01-a02-supersense-of-sights',
+    );
+    expect(class5?.simulationIds).toContain(
+      'sim-c05-ch01-a03-super-sense-of-danger',
     );
     expect(CURRICULUM_CHAPTERS.find(
       item => item.id === 'chapter-cbse-c5-super-senses',
@@ -59,6 +62,7 @@ describe('canonical curriculum content', () => {
       simulationIds: [
         'sim-c05-ch01-a01-supersense-of-smell',
         'sim-c05-ch01-a02-supersense-of-sights',
+        'sim-c05-ch01-a03-super-sense-of-danger',
       ],
     });
     expect(class6?.simulationIds).toEqual(expect.arrayContaining([
