@@ -28,16 +28,16 @@ export const SCIENCE_SIMULATION_CATALOG = [
     "chapter": 1,
     "topic": "Super Senses",
     "activityNumber": 2,
-    "title": "Supersense of sights",
+    "title": "The Super Sense of Sight",
     "subject": "environmentalScience",
     "primaryArchetype": "modelInspection",
     "secondaryArchetypes": [],
     "simulationFormat": "interactive3d",
     "xrFitType": "strongVrFit",
     "comfortRiskLevel": "low",
-    "expectedDurationMinutes": 8,
+    "expectedDurationMinutes": 5,
     "reuseGroup": "environmentalScience:super-senses",
-    "implementationNotes": "Use labeled 3D inspection with isolate, zoom, explode, compare, and vocabulary layer.",
+    "implementationNotes": "Use a timed immersive investigation to compare eagle distance vision, nocturnal low-light adaptations, and chameleon panoramic vision.",
     "releaseMaturity": "catalogued"
   },
   {
@@ -10629,6 +10629,15 @@ export const RELEASED_SIMULATION_CATALOG = [
     "slug": "c5-ch01-a01-supersense-of-smell",
     "title": "Super Senses: The Sense of Smell",
     "href": "/simulations/c5-ch01-a01-supersense-of-smell",
+    "releaseMaturity": "internalQA",
+    "publicationStatus": "released",
+    "evidenceMaturity": "internalQA"
+  },
+  {
+    "id": "sim-c05-ch01-a02-supersense-of-sights",
+    "slug": "c5-ch01-a02-supersense-of-sights",
+    "title": "Super Senses: The Super Sense of Sight",
+    "href": "/simulations/c5-ch01-a02-supersense-of-sights",
     "releaseMaturity": "internalQA",
     "publicationStatus": "released",
     "evidenceMaturity": "internalQA"

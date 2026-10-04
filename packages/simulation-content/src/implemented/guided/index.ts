@@ -1,6 +1,7 @@
 export * from './builders.js';
 export * from './curriculum.js';
 export * from './super-senses-smell.js';
+export * from './super-senses-sight.js';
 export * from './food-spoilage.js';
 export * from './milk-spoilage.js';
 export * from './aam-papad.js';
@@ -60,6 +61,11 @@ import {
   SUPER_SENSES_SMELL_SCENE_METADATA,
   SUPER_SENSES_SMELL_SIMULATION,
 } from './super-senses-smell.js';
+import {
+  SUPER_SENSES_SIGHT_GUIDANCE,
+  SUPER_SENSES_SIGHT_SCENE_METADATA,
+  SUPER_SENSES_SIGHT_SIMULATION,
+} from './super-senses-sight.js';
 
 export const GUIDED_SIMULATION_DEFINITIONS = [
   ...GENERATED_GUIDED_SIMULATION_DEFINITIONS,
@@ -69,6 +75,7 @@ export const GUIDED_SIMULATION_DEFINITIONS = [
   HARVESTING_THRESHING_STORAGE_GUIDANCE,
   YARN_MAKER_GUIDANCE,
   SUPER_SENSES_SMELL_GUIDANCE,
+  SUPER_SENSES_SIGHT_GUIDANCE,
 ] as const;
 
 export const GUIDED_IMPLEMENTED_SIMULATIONS = [
@@ -79,6 +86,7 @@ export const GUIDED_IMPLEMENTED_SIMULATIONS = [
   HARVESTING_THRESHING_STORAGE_SIMULATION,
   YARN_MAKER_SIMULATION,
   SUPER_SENSES_SMELL_SIMULATION,
+  SUPER_SENSES_SIGHT_SIMULATION,
 ] as const;
 
 export const GUIDED_SCENE_METADATA_BY_MODULE_ID = Object.freeze({
@@ -89,4 +97,5 @@ export const GUIDED_SCENE_METADATA_BY_MODULE_ID = Object.freeze({
   [HARVESTING_THRESHING_STORAGE_SIMULATION.module.id]: HARVESTING_THRESHING_STORAGE_SCENE_METADATA,
   [YARN_MAKER_SIMULATION.module.id]: YARN_MAKER_SCENE_METADATA,
   [SUPER_SENSES_SMELL_SIMULATION.module.id]: SUPER_SENSES_SMELL_SCENE_METADATA,
+  [SUPER_SENSES_SIGHT_SIMULATION.module.id]: SUPER_SENSES_SIGHT_SCENE_METADATA,
 });

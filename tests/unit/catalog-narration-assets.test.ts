@@ -18,11 +18,11 @@ describe("catalog narration assets", () => {
       definition.narration.cues.map((cue) => ({ definition, cue })),
     );
 
-    expect(cues).toHaveLength(287);
+    expect(cues).toHaveLength(291);
     expect(cues.every(({ cue }) => Boolean(cue.audioUrl))).toBe(true);
     expect(
       cues.filter(({ cue }) => cue.audioUrl?.startsWith("/narration/")),
-    ).toHaveLength(251);
+    ).toHaveLength(255);
 
     for (const { cue } of cues) {
       if (!cue.audioUrl?.startsWith("/narration/")) continue;

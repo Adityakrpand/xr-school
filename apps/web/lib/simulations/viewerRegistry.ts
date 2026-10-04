@@ -187,6 +187,12 @@ const VIEWER_INPUTS = {
     () => import('./guided/c5-ch01-a01-supersense-of-smell.scene'),
     () => import('../../components/simulations/SuperSensesSmellViewer'),
   ),
+  'guided-super-senses-sight': bespokeGuidedViewerInput(
+    'sim-c05-ch01-a02-supersense-of-sights',
+    'apps/web/lib/simulations/guided/c5-ch01-a02-supersense-of-sights.scene.ts',
+    () => import('./guided/c5-ch01-a02-supersense-of-sights.scene'),
+    () => import('../../components/simulations/SuperSensesSightViewer'),
+  ),
   'guided-food-spoilage': bespokeGuidedViewerInput('sim-c05-ch04-a01-food-spoilage', 'apps/web/lib/simulations/guided/c5-ch04-a01-food-spoilage.scene.ts', () => import('./guided/c5-ch04-a01-food-spoilage.scene'), () => import('../../components/simulations/FoodSpoilageViewer')),
   'guided-milk-spoilage': bespokeGuidedViewerInput('sim-c05-ch04-a02-milk-spoilage', 'apps/web/lib/simulations/guided/c5-ch04-a02-milk-spoilage.scene.ts', () => import('./guided/c5-ch04-a02-milk-spoilage.scene'), () => import('../../components/simulations/MilkSpoilageViewer')),
   'guided-aam-papad': bespokeGuidedViewerInput('sim-c05-ch04-a03-the-making-of-aam-papad', 'apps/web/lib/simulations/guided/c5-ch04-a03-the-making-of-aam-papad.scene.ts', () => import('./guided/c5-ch04-a03-the-making-of-aam-papad.scene'), () => import('../../components/simulations/AamPapadViewer')),

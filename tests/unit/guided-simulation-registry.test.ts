@@ -42,10 +42,10 @@ function unique(values: readonly string[]) {
 }
 
 describe('guided simulation inventory', () => {
-  it('publishes the 17 PR #8 classes plus six new evidence-backed guided simulations with 171 stages', () => {
-    expect(GUIDED_SIMULATION_DEFINITIONS).toHaveLength(23);
-    expect(GUIDED_IMPLEMENTED_SIMULATIONS).toHaveLength(23);
-    expect(GUIDED_SIMULATION_DEFINITIONS.flatMap(item => item.stages)).toHaveLength(171);
+  it('publishes the 17 PR #8 classes plus seven new evidence-backed guided simulations with 175 stages', () => {
+    expect(GUIDED_SIMULATION_DEFINITIONS).toHaveLength(24);
+    expect(GUIDED_IMPLEMENTED_SIMULATIONS).toHaveLength(24);
+    expect(GUIDED_SIMULATION_DEFINITIONS.flatMap(item => item.stages)).toHaveLength(175);
 
     for (const [slug, moduleId, viewerKey, legacyPath, stageCount] of EXPECTED_GUIDED) {
       const record = GUIDED_IMPLEMENTED_SIMULATIONS.find(
@@ -153,6 +153,21 @@ describe('guided simulation inventory', () => {
       canonicalPath: '/simulations/c5-ch01-a01-supersense-of-smell',
       redirect: false,
     });
+
+    const superSensesSight = GUIDED_IMPLEMENTED_SIMULATIONS.find(
+      item => item.module.slug === 'c5-ch01-a02-supersense-of-sights',
+    );
+    expect(superSensesSight).toMatchObject({
+      kind: 'guided',
+      contribution: { source: 'user-story', integration: 'new-class' },
+      module: {
+        id: 'sim-c05-ch01-a02-supersense-of-sights',
+        viewerKey: 'guided-super-senses-sight',
+        expectedDurationMinutes: 5,
+        maxSessionDurationMinutes: 5,
+      },
+    });
+    expect(superSensesSight?.experience.stages).toHaveLength(4);
   });
 
   it('keeps every identifier, caption, path, and asset identity unique', () => {
