@@ -163,7 +163,12 @@ export default function FoodSpoilageViewer() {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x25130a);
     scene.fog = new THREE.Fog(0x25130a, 11, 25);
-    const realisticEnvironment = applyRealisticEnvironment(scene, renderer, "/environments/food-courtyard-360.png", { exposure: 1.02 });
+    const realisticEnvironment = applyRealisticEnvironment(
+      scene,
+      renderer,
+      "/simulations/c5-ch04-a01-food-spoilage/environment.webp",
+      { exposure: 1.02 },
+    );
     const camera = new THREE.PerspectiveCamera(66, mount.clientWidth / mount.clientHeight, 0.05, 60);
     camera.position.set(0, 2.4, 6.2);
     camera.lookAt(0, 1.2, 0);
@@ -312,7 +317,12 @@ export default function FoodSpoilageViewer() {
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh", overflow: "hidden", background: "#25130a" }}>
-      <div ref={mountRef} style={{ width: "100%", height: "100%" }} />
+      <div
+        ref={mountRef}
+        data-testid="simulation-canvas"
+        aria-label="Food spoilage investigation scene"
+        style={{ width: "100%", height: "100%" }}
+      />
       {!started && (
         <div style={{ position: "absolute", inset: 0, zIndex: 10, display: "grid", placeItems: "center", background: "radial-gradient(circle at 50% 35%, #9a3412 0%, #25130a 72%)" }}>
           <div style={{ maxWidth: 650, padding: 28, textAlign: "center" }}>
