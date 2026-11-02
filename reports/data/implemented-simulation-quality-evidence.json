@@ -1,16 +1,16 @@
 {
   "auditDate": "2026-08-01",
   "portfolio": {
-    "publiclyLaunchableSimulations": 44,
+    "publiclyLaunchableSimulations": 45,
     "evidenceMaturityDistribution": {
-      "internalQA": 44,
+      "internalQA": 45,
       "deviceVerified": 0,
       "classroomVerified": 0
     },
-    "narrationCues": 295,
-    "packagedNarrationClips": 295,
+    "narrationCues": 299,
+    "packagedNarrationClips": 299,
     "missingNarrationFiles": 0,
-    "assets": 111,
+    "assets": 112,
     "signedQuestAcceptanceRuns": 0,
     "classroomStudies": 0
   },
@@ -4111,6 +4111,116 @@
         },
         {
           "id": "c5-ch01-a03-super-sense-of-danger:release-build",
+          "kind": "build",
+          "ref": "npm --workspace apps/web run build",
+          "finding": "The route is included in the static production build and canonical registry coverage gate.",
+          "dimensions": [
+            "stability",
+            "deployment"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "c5-ch03-a01-a-sense-of-taste",
+      "title": "From Tasting to Digesting: A Sense of Taste",
+      "route": "/simulations/c5-ch03-a01-a-sense-of-taste",
+      "publicationStatus": "released",
+      "evidenceMaturity": "internalQA",
+      "legacyPaths": [],
+      "kind": "guided",
+      "contribution": "user-story",
+      "counts": {
+        "stages": 4,
+        "actions": 4,
+        "evidence": 4,
+        "assessmentPrompts": 2
+      },
+      "narration": {
+        "cues": 4,
+        "captions": 4,
+        "packagedAudio": 4,
+        "missingFiles": 0,
+        "hashValidated": 4,
+        "fallback": "browserTts"
+      },
+      "assets": {
+        "count": 1,
+        "visualSource": "manifest-assets",
+        "provenanceComplete": true,
+        "fallback": "shared declarative scene remains usable without panorama texture",
+        "pathValidated": true,
+        "hashValidated": true
+      },
+      "tests": [
+        "c5-ch03-a01-a-sense-of-taste:behavior",
+        "implemented-registry:coverage",
+        "viewer-registry:coverage"
+      ],
+      "lastVerifiedCommand": "npm run verify",
+      "browserEvidence": {
+        "status": "build-and-contract-verified",
+        "finding": "Static production route generation and shared-host contract checks pass; final deployed browser acceptance is recorded in production release evidence."
+      },
+      "questDeviceEvidence": "not-run",
+      "classroomEvidence": "not-run",
+      "references": [
+        {
+          "id": "c5-ch03-a01-a-sense-of-taste:definition",
+          "kind": "source",
+          "ref": "packages/simulation-content/src/implemented/guided/sense-of-taste.ts",
+          "finding": "4 canonical stages, 2 assessment prompts, and release metadata are declared in the shared content contract.",
+          "dimensions": [
+            "education",
+            "integrity"
+          ]
+        },
+        {
+          "id": "c5-ch03-a01-a-sense-of-taste:behavior",
+          "kind": "test",
+          "ref": "tests/unit/sense-of-taste.test.ts",
+          "finding": "Behavior tests execute declared actions, evidence gates, assessment behavior, or canonical registry resolution.",
+          "dimensions": [
+            "education",
+            "integrity",
+            "interactivity",
+            "usability",
+            "stability"
+          ]
+        },
+        {
+          "id": "c5-ch03-a01-a-sense-of-taste:assets",
+          "kind": "asset",
+          "ref": "assets:sim-c05-ch03-a01-a-sense-of-taste",
+          "finding": "1 declared assets; path, digest, and provenance validation passes.",
+          "dimensions": [
+            "visuals",
+            "stability"
+          ]
+        },
+        {
+          "id": "c5-ch03-a01-a-sense-of-taste:narration",
+          "kind": "narration",
+          "ref": "narration:guided-sense-of-taste",
+          "finding": "4 exact captions; 4 packaged clips; fallback browserTts.",
+          "dimensions": [
+            "audio",
+            "usability"
+          ]
+        },
+        {
+          "id": "c5-ch03-a01-a-sense-of-taste:browser-contract",
+          "kind": "browser",
+          "ref": "/simulations/c5-ch03-a01-a-sense-of-taste",
+          "finding": "The canonical route delegates to the shared experience shell and registered viewer; production observation remains separate from this contract evidence.",
+          "dimensions": [
+            "interactivity",
+            "usability",
+            "stability"
+          ]
+        },
+        {
+          "id": "c5-ch03-a01-a-sense-of-taste:release-build",
           "kind": "build",
           "ref": "npm --workspace apps/web run build",
           "finding": "The route is included in the static production build and canonical registry coverage gate.",

@@ -44,7 +44,7 @@ describe('canonical curriculum content', () => {
       'chapter-cbse-c5-up-you-go',
       'chapter-cbse-c5-walls-tell-stories',
     ]));
-    expect(class5?.simulationIds).toHaveLength(21);
+    expect(class5?.simulationIds).toHaveLength(22);
     expect(class5?.simulationIds).toContain(
       'sim-c05-ch01-a01-supersense-of-smell',
     );
@@ -108,12 +108,18 @@ describe('canonical curriculum content', () => {
 
     expect(course?.chapterIds).toContain('chapter-cbse-c5-from-tasting-to-digesting');
     expect(course?.simulationIds).toContain(
+      'sim-c05-ch03-a01-a-sense-of-taste',
+    );
+    expect(course?.simulationIds).toContain(
       'sim-c05-ch03-a02-introduction-of-digestive-system',
     );
     expect(chapter).toMatchObject({
       chapterNumber: 3,
       title: 'From Tasting to Digesting',
-      simulationIds: ['sim-c05-ch03-a02-introduction-of-digestive-system'],
+      simulationIds: [
+        'sim-c05-ch03-a01-a-sense-of-taste',
+        'sim-c05-ch03-a02-introduction-of-digestive-system',
+      ],
     });
   });
 

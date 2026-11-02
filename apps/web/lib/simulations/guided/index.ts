@@ -4,6 +4,7 @@ export * from './createDeclarativeGuidedSceneWorld';
 export * from './c5-ch01-a01-supersense-of-smell.scene';
 export * from './c5-ch01-a02-supersense-of-sights.scene';
 export * from './c5-ch01-a03-super-sense-of-danger.scene';
+export * from './c5-ch03-a01-a-sense-of-taste.scene';
 export * from './c5-ch04-a01-food-spoilage.scene';
 export * from './c5-ch04-a02-milk-spoilage.scene';
 export * from './c5-ch04-a03-the-making-of-aam-papad.scene';
@@ -30,6 +31,7 @@ export * from './c8-ch01-a05-harvesting-threshing-and-storage-of-crops.scene';
 import { SUPER_SENSES_SMELL_SCENE_ENTRY } from './c5-ch01-a01-supersense-of-smell.scene';
 import { SUPER_SENSES_SIGHT_SCENE_ENTRY } from './c5-ch01-a02-supersense-of-sights.scene';
 import { SUPER_SENSES_DANGER_SCENE_ENTRY } from './c5-ch01-a03-super-sense-of-danger.scene';
+import { SENSE_OF_TASTE_SCENE_ENTRY } from './c5-ch03-a01-a-sense-of-taste.scene';
 import { FOOD_SPOILAGE_SCENE_ENTRY } from './c5-ch04-a01-food-spoilage.scene';
 import { MILK_SPOILAGE_SCENE_ENTRY } from './c5-ch04-a02-milk-spoilage.scene';
 import { AAM_PAPAD_SCENE_ENTRY } from './c5-ch04-a03-the-making-of-aam-papad.scene';
@@ -57,6 +59,7 @@ export const GUIDED_SCENE_ENTRIES = [
   SUPER_SENSES_SMELL_SCENE_ENTRY,
   SUPER_SENSES_SIGHT_SCENE_ENTRY,
   SUPER_SENSES_DANGER_SCENE_ENTRY,
+  SENSE_OF_TASTE_SCENE_ENTRY,
   FOOD_SPOILAGE_SCENE_ENTRY,
   MILK_SPOILAGE_SCENE_ENTRY,
   AAM_PAPAD_SCENE_ENTRY,

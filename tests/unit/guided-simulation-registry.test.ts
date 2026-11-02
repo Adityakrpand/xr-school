@@ -42,10 +42,10 @@ function unique(values: readonly string[]) {
 }
 
 describe('guided simulation inventory', () => {
-  it('publishes the 17 PR #8 classes plus eight new evidence-backed guided simulations with 179 stages', () => {
-    expect(GUIDED_SIMULATION_DEFINITIONS).toHaveLength(25);
-    expect(GUIDED_IMPLEMENTED_SIMULATIONS).toHaveLength(25);
-    expect(GUIDED_SIMULATION_DEFINITIONS.flatMap(item => item.stages)).toHaveLength(179);
+  it('publishes the 17 PR #8 classes plus nine new evidence-backed guided simulations with 183 stages', () => {
+    expect(GUIDED_SIMULATION_DEFINITIONS).toHaveLength(26);
+    expect(GUIDED_IMPLEMENTED_SIMULATIONS).toHaveLength(26);
+    expect(GUIDED_SIMULATION_DEFINITIONS.flatMap(item => item.stages)).toHaveLength(183);
 
     for (const [slug, moduleId, viewerKey, legacyPath, stageCount] of EXPECTED_GUIDED) {
       const record = GUIDED_IMPLEMENTED_SIMULATIONS.find(
@@ -183,6 +183,21 @@ describe('guided simulation inventory', () => {
       },
     });
     expect(superSensesDanger?.experience.stages).toHaveLength(4);
+
+    const senseOfTaste = GUIDED_IMPLEMENTED_SIMULATIONS.find(
+      item => item.module.slug === 'c5-ch03-a01-a-sense-of-taste',
+    );
+    expect(senseOfTaste).toMatchObject({
+      kind: 'guided',
+      contribution: { source: 'user-story', integration: 'new-class' },
+      module: {
+        id: 'sim-c05-ch03-a01-a-sense-of-taste',
+        viewerKey: 'guided-sense-of-taste',
+        expectedDurationMinutes: 5,
+        maxSessionDurationMinutes: 5,
+      },
+    });
+    expect(senseOfTaste?.experience.stages).toHaveLength(4);
   });
 
   it('keeps every identifier, caption, path, and asset identity unique', () => {

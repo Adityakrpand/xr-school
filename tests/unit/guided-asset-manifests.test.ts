@@ -98,6 +98,13 @@ describe('guided asset manifests', () => {
           license: 'project-generated',
         });
         expect(environment.source).toContain('Super Senses');
+      } else if (record.module.slug === 'c5-ch03-a01-a-sense-of-taste') {
+        expect(environment).toMatchObject({
+          compression: 'WebP lossy q80; sharp/libvips',
+          author: 'XR School project team',
+          license: 'project-generated',
+        });
+        expect(environment.source).toContain('taste simulation');
       } else {
         expect(environment).toMatchObject({
           compression: 'WebP lossy q75; cwebp 1.6.0 method 6',

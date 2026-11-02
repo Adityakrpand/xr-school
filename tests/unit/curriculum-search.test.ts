@@ -36,12 +36,13 @@ describe('curriculum search', () => {
       '/simulations/c5-ch01-a01-supersense-of-smell',
       '/simulations/c5-ch01-a02-supersense-of-sights',
       '/simulations/c5-ch01-a03-super-sense-of-danger',
+      '/simulations/c5-ch03-a01-a-sense-of-taste',
       '/simulations/c5-ch03-a02-introduction-of-digestive-system',
       '/simulations/c5-ch07-a03-soluble-and-insoluble-substances',
     ]));
-    // The three Super Senses investigations join the integrated Class 5 guided
-    // classes while preserving every previously released Class 5 activity.
-    expect(results).toHaveLength(21);
+    // The new Taste investigation joins the three Super Senses classes while
+    // preserving every previously released Class 5 activity.
+    expect(results).toHaveLength(22);
     expect(results.every(result => result.releaseMaturity === 'internalQA')).toBe(true);
   });
 

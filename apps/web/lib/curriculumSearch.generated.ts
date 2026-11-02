@@ -135,6 +135,9 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "environmentalScience"
     ],
     "conceptIds": [
+      "concept-basic-tastes",
+      "concept-taste-buds",
+      "concept-flavour-and-smell",
       "concept-digestive-system",
       "concept-food-journey",
       "concept-nutrient-absorption",
@@ -627,6 +630,9 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "environmentalScience"
     ],
     "conceptIds": [
+      "concept-basic-tastes",
+      "concept-taste-buds",
+      "concept-flavour-and-smell",
       "concept-digestive-system",
       "concept-food-journey",
       "concept-nutrient-absorption",
@@ -2767,6 +2773,152 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "layer",
       "cloudy",
       "test"
+    ]
+  },
+  {
+    "id": "concept:concept-basic-tastes",
+    "kind": "concept",
+    "title": "Five basic taste qualities",
+    "summary": "Five broad qualities detected when dissolved food chemicals activate taste-receptor cells: sweet, sour, salty, bitter, and umami.",
+    "href": "/simulations#concept-basic-tastes",
+    "classLevels": [
+      5
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-basic-tastes"
+    ],
+    "tokens": [
+      "five",
+      "basic",
+      "taste",
+      "qualities",
+      "broad",
+      "detected",
+      "when",
+      "dissolved",
+      "food",
+      "chemicals",
+      "activate",
+      "receptor",
+      "cells",
+      "sweet",
+      "sour",
+      "salty",
+      "bitter",
+      "and",
+      "umami",
+      "helps",
+      "learners",
+      "describe",
+      "foods",
+      "accurately",
+      "understand",
+      "one",
+      "part",
+      "of",
+      "flavour",
+      "perception",
+      "tastes"
+    ]
+  },
+  {
+    "id": "concept:concept-taste-buds",
+    "kind": "concept",
+    "title": "Taste buds and saliva",
+    "summary": "Taste buds contain receptor cells that respond after food chemicals dissolve in saliva.",
+    "href": "/simulations#concept-taste-buds",
+    "classLevels": [
+      5
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-taste-buds"
+    ],
+    "tokens": [
+      "taste",
+      "buds",
+      "and",
+      "saliva",
+      "contain",
+      "receptor",
+      "cells",
+      "that",
+      "respond",
+      "after",
+      "food",
+      "chemicals",
+      "dissolve",
+      "in",
+      "connects",
+      "safe",
+      "eating",
+      "chewing",
+      "the",
+      "mouth",
+      "to",
+      "first",
+      "stage",
+      "of",
+      "digestion",
+      "receptors",
+      "papillae",
+      "tongue"
+    ]
+  },
+  {
+    "id": "concept:concept-flavour-and-smell",
+    "kind": "concept",
+    "title": "Flavour combines several senses",
+    "summary": "The brain combines basic taste with smell, texture and temperature to create the experience of flavour.",
+    "href": "/simulations#concept-flavour-and-smell",
+    "classLevels": [
+      5
+    ],
+    "subjects": [
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-flavour-and-smell"
+    ],
+    "tokens": [
+      "flavour",
+      "combines",
+      "several",
+      "senses",
+      "the",
+      "brain",
+      "basic",
+      "taste",
+      "with",
+      "smell",
+      "texture",
+      "and",
+      "temperature",
+      "to",
+      "create",
+      "experience",
+      "of",
+      "explains",
+      "why",
+      "food",
+      "may",
+      "seem",
+      "less",
+      "flavourful",
+      "when",
+      "is",
+      "reduced",
+      "by",
+      "a",
+      "blocked",
+      "nose",
+      "multisensory",
+      "aroma"
     ]
   },
   {
@@ -8592,6 +8744,97 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
     ]
   },
   {
+    "id": "simulation:c5-ch03-a01-a-sense-of-taste",
+    "kind": "simulation",
+    "title": "From Tasting to Digesting: A Sense of Taste",
+    "summary": "Become a taste detective in a realistic virtual sensory laboratory and discover how saliva, taste buds, smell and texture work together.",
+    "href": "/simulations/c5-ch03-a01-a-sense-of-taste",
+    "classLevels": [
+      5
+    ],
+    "subjects": [
+      "environmentalScience",
+      "biology"
+    ],
+    "conceptIds": [
+      "concept-basic-tastes",
+      "concept-taste-buds",
+      "concept-flavour-and-smell",
+      "concept-digestive-system"
+    ],
+    "releaseMaturity": "internalQA",
+    "moduleId": "sim-c05-ch03-a01-a-sense-of-taste",
+    "publicationStatus": "released",
+    "evidenceMaturity": "internalQA",
+    "tokens": [
+      "from",
+      "tasting",
+      "to",
+      "digesting",
+      "a",
+      "sense",
+      "of",
+      "taste",
+      "become",
+      "detective",
+      "in",
+      "realistic",
+      "virtual",
+      "sensory",
+      "laboratory",
+      "and",
+      "discover",
+      "how",
+      "saliva",
+      "buds",
+      "smell",
+      "texture",
+      "work",
+      "together",
+      "explain",
+      "dissolved",
+      "food",
+      "chemicals",
+      "activate",
+      "receptors",
+      "the",
+      "brain",
+      "combines",
+      "with",
+      "temperature",
+      "create",
+      "flavour",
+      "environmentalscience",
+      "biology",
+      "five",
+      "basic",
+      "qualities",
+      "sweet",
+      "sour",
+      "salty",
+      "bitter",
+      "umami",
+      "tastes",
+      "papillae",
+      "receptor",
+      "cells",
+      "tongue",
+      "several",
+      "senses",
+      "multisensory",
+      "aroma",
+      "human",
+      "digestive",
+      "system",
+      "organs",
+      "digestion",
+      "mouth",
+      "esophagus",
+      "stomach",
+      "intestine"
+    ]
+  },
+  {
     "id": "simulation:c5-ch07-a01-a-concept-about-what-floats-what-sinks",
     "kind": "simulation",
     "title": "What Floats, What Sinks?",
@@ -9167,45 +9410,6 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "instructor",
       "review",
       "mode"
-    ]
-  },
-  {
-    "id": "simulation:c5-ch03-a01-a-sense-of-taste",
-    "kind": "simulation",
-    "title": "A Sense of Taste",
-    "summary": "From Tasting to Digesting · Class 5 environmentalScience",
-    "href": "/simulations#c5-ch03-a01-a-sense-of-taste",
-    "classLevels": [
-      5
-    ],
-    "subjects": [
-      "environmentalScience"
-    ],
-    "conceptIds": [],
-    "releaseMaturity": "catalogued",
-    "tokens": [
-      "a",
-      "sense",
-      "of",
-      "taste",
-      "from",
-      "tasting",
-      "to",
-      "digesting",
-      "environmentalscience",
-      "modelinspection",
-      "use",
-      "labeled",
-      "3d",
-      "inspection",
-      "with",
-      "isolate",
-      "zoom",
-      "explode",
-      "compare",
-      "and",
-      "vocabulary",
-      "layer"
     ]
   },
   {

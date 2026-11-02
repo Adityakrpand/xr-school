@@ -3,6 +3,7 @@ export * from './curriculum.js';
 export * from './super-senses-smell.js';
 export * from './super-senses-sight.js';
 export * from './super-senses-danger.js';
+export * from './sense-of-taste.js';
 export * from './food-spoilage.js';
 export * from './milk-spoilage.js';
 export * from './aam-papad.js';
@@ -72,6 +73,11 @@ import {
   SUPER_SENSES_DANGER_SCENE_METADATA,
   SUPER_SENSES_DANGER_SIMULATION,
 } from './super-senses-danger.js';
+import {
+  SENSE_OF_TASTE_GUIDANCE,
+  SENSE_OF_TASTE_SCENE_METADATA,
+  SENSE_OF_TASTE_SIMULATION,
+} from './sense-of-taste.js';
 
 export const GUIDED_SIMULATION_DEFINITIONS = [
   ...GENERATED_GUIDED_SIMULATION_DEFINITIONS,
@@ -83,6 +89,7 @@ export const GUIDED_SIMULATION_DEFINITIONS = [
   SUPER_SENSES_SMELL_GUIDANCE,
   SUPER_SENSES_SIGHT_GUIDANCE,
   SUPER_SENSES_DANGER_GUIDANCE,
+  SENSE_OF_TASTE_GUIDANCE,
 ] as const;
 
 export const GUIDED_IMPLEMENTED_SIMULATIONS = [
@@ -95,6 +102,7 @@ export const GUIDED_IMPLEMENTED_SIMULATIONS = [
   SUPER_SENSES_SMELL_SIMULATION,
   SUPER_SENSES_SIGHT_SIMULATION,
   SUPER_SENSES_DANGER_SIMULATION,
+  SENSE_OF_TASTE_SIMULATION,
 ] as const;
 
 export const GUIDED_SCENE_METADATA_BY_MODULE_ID = Object.freeze({
@@ -107,4 +115,5 @@ export const GUIDED_SCENE_METADATA_BY_MODULE_ID = Object.freeze({
   [SUPER_SENSES_SMELL_SIMULATION.module.id]: SUPER_SENSES_SMELL_SCENE_METADATA,
   [SUPER_SENSES_SIGHT_SIMULATION.module.id]: SUPER_SENSES_SIGHT_SCENE_METADATA,
   [SUPER_SENSES_DANGER_SIMULATION.module.id]: SUPER_SENSES_DANGER_SCENE_METADATA,
+  [SENSE_OF_TASTE_SIMULATION.module.id]: SENSE_OF_TASTE_SCENE_METADATA,
 });

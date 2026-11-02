@@ -199,6 +199,11 @@ const VIEWER_INPUTS = {
     () => import('./guided/c5-ch01-a03-super-sense-of-danger.scene'),
     () => import('../../components/simulations/SuperSensesDangerViewer'),
   ),
+  'guided-sense-of-taste': guidedViewerInput(
+    'sim-c05-ch03-a01-a-sense-of-taste',
+    'apps/web/lib/simulations/guided/c5-ch03-a01-a-sense-of-taste.scene.ts',
+    () => import('./guided/c5-ch03-a01-a-sense-of-taste.scene'),
+  ),
   'guided-food-spoilage': bespokeGuidedViewerInput('sim-c05-ch04-a01-food-spoilage', 'apps/web/lib/simulations/guided/c5-ch04-a01-food-spoilage.scene.ts', () => import('./guided/c5-ch04-a01-food-spoilage.scene'), () => import('../../components/simulations/FoodSpoilageViewer')),
   'guided-milk-spoilage': bespokeGuidedViewerInput('sim-c05-ch04-a02-milk-spoilage', 'apps/web/lib/simulations/guided/c5-ch04-a02-milk-spoilage.scene.ts', () => import('./guided/c5-ch04-a02-milk-spoilage.scene'), () => import('../../components/simulations/MilkSpoilageViewer')),
   'guided-aam-papad': bespokeGuidedViewerInput('sim-c05-ch04-a03-the-making-of-aam-papad', 'apps/web/lib/simulations/guided/c5-ch04-a03-the-making-of-aam-papad.scene.ts', () => import('./guided/c5-ch04-a03-the-making-of-aam-papad.scene'), () => import('../../components/simulations/AamPapadViewer')),

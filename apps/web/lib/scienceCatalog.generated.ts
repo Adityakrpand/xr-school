@@ -10652,6 +10652,15 @@ export const RELEASED_SIMULATION_CATALOG = [
     "evidenceMaturity": "internalQA"
   },
   {
+    "id": "sim-c05-ch03-a01-a-sense-of-taste",
+    "slug": "c5-ch03-a01-a-sense-of-taste",
+    "title": "From Tasting to Digesting: A Sense of Taste",
+    "href": "/simulations/c5-ch03-a01-a-sense-of-taste",
+    "releaseMaturity": "internalQA",
+    "publicationStatus": "released",
+    "evidenceMaturity": "internalQA"
+  },
+  {
     "id": "sim-c05-ch07-a01-a-concept-about-what-floats-what-sinks",
     "slug": "c5-ch07-a01-a-concept-about-what-floats-what-sinks",
     "title": "What Floats, What Sinks?",
