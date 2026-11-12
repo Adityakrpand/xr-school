@@ -60,10 +60,12 @@ enum GradeBand {
 
 enum Subject {
   science,
+  english,
   physics,
   chemistry,
   biology,
   mathematics,
+  art,
   geography,
   history,
   environmentalScience,
@@ -105,6 +107,14 @@ enum EvidenceConfidenceLevel {
   internallyPiloted,
   schoolValidated,
   researchBacked
+}
+
+enum ReleaseMaturity {
+  catalogued,
+  inDevelopment,
+  internalQA,
+  pilotReady,
+  schoolValidated
 }
 
 enum OfflineSyncStatus {
@@ -360,6 +370,7 @@ model SimulationModule {
   conceptIds: string[];
   simulationFormat: SimulationFormat;
   evidenceConfidenceLevel: EvidenceConfidenceLevel;
+  releaseMaturity: ReleaseMaturity;
   xrFitType: XrFitType;
   xrFitJustification: string;
   learningObjective: string;
@@ -646,6 +657,7 @@ model CreateSimulationModuleRequest {
   conceptIds: string[];
   simulationFormat: SimulationFormat;
   evidenceConfidenceLevel: EvidenceConfidenceLevel;
+  releaseMaturity: ReleaseMaturity;
   xrFitType: XrFitType;
   xrFitJustification: string;
   learningObjective: string;
