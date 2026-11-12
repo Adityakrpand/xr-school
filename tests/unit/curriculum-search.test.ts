@@ -32,10 +32,11 @@ describe('curriculum search', () => {
     });
 
     expect(results.map(result => result.href)).toEqual(expect.arrayContaining([
+      '/simulations/human-body-anatomy',
       '/simulations/c5-ch03-a02-introduction-of-digestive-system',
       '/simulations/c5-ch07-a03-soluble-and-insoluble-substances',
     ]));
-    expect(results).toHaveLength(2);
+    expect(results).toHaveLength(3);
   });
 
   it('keeps catalogued candidates searchable without launch URLs', () => {

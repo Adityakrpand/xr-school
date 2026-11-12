@@ -156,6 +156,45 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
     ]
   },
   {
+    "id": "course:course-cbse-c6-mathematics",
+    "kind": "course",
+    "title": "CBSE Class 6 Mathematics",
+    "summary": "Middle-school mathematics connecting shape recognition, properties, comparison, and spatial reasoning.",
+    "href": "/simulations#course-cbse-c6-mathematics",
+    "classLevels": [
+      6
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-geometry-basics",
+      "concept-2d-shapes",
+      "concept-3d-shapes",
+      "concept-shape-properties"
+    ],
+    "tokens": [
+      "cbse",
+      "class",
+      "6",
+      "mathematics",
+      "middle",
+      "school",
+      "connecting",
+      "shape",
+      "recognition",
+      "properties",
+      "comparison",
+      "and",
+      "spatial",
+      "reasoning",
+      "geometry",
+      "shapes",
+      "2d",
+      "3d"
+    ]
+  },
+  {
     "id": "course:course-cbse-c7-biology",
     "kind": "course",
     "title": "CBSE Class 7 Biology",
@@ -503,6 +542,36 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "1",
       "topic",
       "origins"
+    ]
+  },
+  {
+    "id": "chapter:chapter-cbse-c6-geometry",
+    "kind": "chapter",
+    "title": "Geometry",
+    "summary": "CBSE Class 6 Mathematics · Chapter 4",
+    "href": "/simulations#chapter-cbse-c6-geometry",
+    "classLevels": [
+      6
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-geometry-basics",
+      "concept-2d-shapes",
+      "concept-3d-shapes",
+      "concept-shape-properties"
+    ],
+    "tokens": [
+      "geometry",
+      "cbse",
+      "class",
+      "6",
+      "mathematics",
+      "chapter",
+      "4",
+      "topic",
+      "basic"
     ]
   },
   {
@@ -1727,6 +1796,182 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
     ]
   },
   {
+    "id": "concept:concept-geometry-basics",
+    "kind": "concept",
+    "title": "Geometry basics",
+    "summary": "Recognizing that geometry studies shapes, space, and the visible structure of objects.",
+    "href": "/simulations#concept-geometry-basics",
+    "classLevels": [
+      6
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-geometry-basics"
+    ],
+    "tokens": [
+      "geometry",
+      "basics",
+      "recognizing",
+      "that",
+      "studies",
+      "shapes",
+      "space",
+      "and",
+      "the",
+      "visible",
+      "structure",
+      "of",
+      "objects",
+      "helps",
+      "students",
+      "observe",
+      "classroom",
+      "diagrams",
+      "models",
+      "more",
+      "accurately",
+      "basic",
+      "shape",
+      "awareness",
+      "maths",
+      "lab"
+    ]
+  },
+  {
+    "id": "concept:concept-2d-shapes",
+    "kind": "concept",
+    "title": "Two-dimensional shapes",
+    "summary": "Flat shapes with length and width, such as circle, triangle, square, and rectangle.",
+    "href": "/simulations#concept-2d-shapes",
+    "classLevels": [
+      6
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-2d-shapes"
+    ],
+    "tokens": [
+      "two",
+      "dimensional",
+      "shapes",
+      "flat",
+      "with",
+      "length",
+      "and",
+      "width",
+      "such",
+      "as",
+      "circle",
+      "triangle",
+      "square",
+      "rectangle",
+      "supports",
+      "drawing",
+      "measuring",
+      "pattern",
+      "work",
+      "recognizing",
+      "in",
+      "signs",
+      "surfaces",
+      "2d"
+    ]
+  },
+  {
+    "id": "concept:concept-3d-shapes",
+    "kind": "concept",
+    "title": "Three-dimensional shapes",
+    "summary": "Solid shapes with length, width, and height, such as cube, cuboid, cylinder, and sphere.",
+    "href": "/simulations#concept-3d-shapes",
+    "classLevels": [
+      6
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-3d-shapes"
+    ],
+    "tokens": [
+      "three",
+      "dimensional",
+      "shapes",
+      "solid",
+      "with",
+      "length",
+      "width",
+      "and",
+      "height",
+      "such",
+      "as",
+      "cube",
+      "cuboid",
+      "cylinder",
+      "sphere",
+      "helps",
+      "students",
+      "understand",
+      "packaging",
+      "containers",
+      "balls",
+      "buildings",
+      "models",
+      "3d"
+    ]
+  },
+  {
+    "id": "concept:concept-shape-properties",
+    "kind": "concept",
+    "title": "Shape properties",
+    "summary": "The features used to identify shapes, including sides, corners, faces, edges, vertices, and curved surfaces.",
+    "href": "/simulations#concept-shape-properties",
+    "classLevels": [
+      6
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-shape-properties"
+    ],
+    "tokens": [
+      "shape",
+      "properties",
+      "the",
+      "features",
+      "used",
+      "to",
+      "identify",
+      "shapes",
+      "including",
+      "sides",
+      "corners",
+      "faces",
+      "edges",
+      "vertices",
+      "and",
+      "curved",
+      "surfaces",
+      "supports",
+      "correct",
+      "classification",
+      "comparison",
+      "explanation",
+      "of",
+      "in",
+      "school",
+      "maths",
+      "daily",
+      "life",
+      "geometry",
+      "surface"
+    ]
+  },
+  {
     "id": "concept:concept-position-words",
     "kind": "concept",
     "title": "Position words",
@@ -2856,6 +3101,94 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
     ]
   },
   {
+    "id": "simulation:explore-our-galaxy",
+    "kind": "simulation",
+    "title": "Explore Our Galaxy",
+    "summary": "Enter a separate immersive galaxy video tour to compare stars, planets, deep-space clouds, and the Milky Way.",
+    "href": "/simulations/explore-our-galaxy",
+    "classLevels": [
+      8
+    ],
+    "subjects": [
+      "science",
+      "physics",
+      "geography"
+    ],
+    "conceptIds": [
+      "concept-solar-system",
+      "concept-planet-order",
+      "concept-orbits-gravity",
+      "concept-planet-features"
+    ],
+    "releaseMaturity": "internalQA",
+    "tokens": [
+      "explore",
+      "our",
+      "galaxy",
+      "enter",
+      "a",
+      "separate",
+      "immersive",
+      "video",
+      "tour",
+      "to",
+      "compare",
+      "stars",
+      "planets",
+      "deep",
+      "space",
+      "clouds",
+      "and",
+      "the",
+      "milky",
+      "way",
+      "students",
+      "will",
+      "distinguish",
+      "solar",
+      "systems",
+      "galaxies",
+      "explain",
+      "that",
+      "system",
+      "is",
+      "small",
+      "part",
+      "of",
+      "science",
+      "physics",
+      "geography",
+      "sun",
+      "planetary",
+      "planet",
+      "moon",
+      "asteroid",
+      "comet",
+      "order",
+      "mercury",
+      "neptune",
+      "venus",
+      "earth",
+      "mars",
+      "jupiter",
+      "saturn",
+      "uranus",
+      "orbits",
+      "gravity",
+      "in",
+      "orbit",
+      "path",
+      "satellite",
+      "features",
+      "properties",
+      "rocky",
+      "gas",
+      "giant",
+      "rings",
+      "atmosphere"
+    ]
+  },
+  {
     "id": "simulation:c10-ch07-a02-microscopic-life-observation",
     "kind": "simulation",
     "title": "Microscopic Life Observation Lab",
@@ -2935,6 +3268,169 @@ export const CURRICULUM_SEARCH_DOCUMENTS = [
       "amoeba",
       "paramecium",
       "euglena"
+    ]
+  },
+  {
+    "id": "simulation:human-body-anatomy",
+    "kind": "simulation",
+    "title": "Human Body Anatomy",
+    "summary": "Enter a separate immersive body-anatomy video tour to study bones, muscles, major organs, and whole-body systems.",
+    "href": "/simulations/human-body-anatomy",
+    "classLevels": [
+      5
+    ],
+    "subjects": [
+      "biology",
+      "environmentalScience",
+      "science"
+    ],
+    "conceptIds": [
+      "concept-digestive-system",
+      "concept-food-journey",
+      "concept-digestive-health"
+    ],
+    "releaseMaturity": "internalQA",
+    "tokens": [
+      "human",
+      "body",
+      "anatomy",
+      "enter",
+      "a",
+      "separate",
+      "immersive",
+      "video",
+      "tour",
+      "to",
+      "study",
+      "bones",
+      "muscles",
+      "major",
+      "organs",
+      "and",
+      "whole",
+      "systems",
+      "students",
+      "will",
+      "identify",
+      "structures",
+      "distinguish",
+      "support",
+      "movement",
+      "organ",
+      "functions",
+      "explain",
+      "that",
+      "work",
+      "together",
+      "biology",
+      "environmentalscience",
+      "science",
+      "digestive",
+      "system",
+      "digestion",
+      "mouth",
+      "esophagus",
+      "stomach",
+      "intestine",
+      "journey",
+      "of",
+      "food",
+      "pathway",
+      "alimentary",
+      "canal",
+      "pipe",
+      "peristalsis",
+      "chyme",
+      "waste",
+      "healthy",
+      "habits",
+      "health",
+      "eating",
+      "fruit",
+      "vegetables",
+      "water",
+      "chewing",
+      "exercise"
+    ]
+  },
+  {
+    "id": "simulation:c6-math-geometry-maths-lab",
+    "kind": "simulation",
+    "title": "Geometry Maths Lab",
+    "summary": "Step into an immersive Class 6 maths lab to explore 2D and 3D shapes, compare their properties, and match them with real-world objects.",
+    "href": "/simulations/c6-math-geometry-maths-lab",
+    "classLevels": [
+      6
+    ],
+    "subjects": [
+      "mathematics"
+    ],
+    "conceptIds": [
+      "concept-geometry-basics",
+      "concept-2d-shapes",
+      "concept-3d-shapes",
+      "concept-shape-properties"
+    ],
+    "releaseMaturity": "internalQA",
+    "tokens": [
+      "geometry",
+      "maths",
+      "lab",
+      "step",
+      "into",
+      "an",
+      "immersive",
+      "class",
+      "6",
+      "to",
+      "explore",
+      "2d",
+      "and",
+      "3d",
+      "shapes",
+      "compare",
+      "their",
+      "properties",
+      "match",
+      "them",
+      "with",
+      "real",
+      "world",
+      "objects",
+      "students",
+      "will",
+      "identify",
+      "important",
+      "describe",
+      "similar",
+      "connect",
+      "everyday",
+      "mathematics",
+      "basics",
+      "basic",
+      "shape",
+      "awareness",
+      "space",
+      "two",
+      "dimensional",
+      "flat",
+      "circle",
+      "triangle",
+      "square",
+      "rectangle",
+      "three",
+      "solid",
+      "cube",
+      "cuboid",
+      "cylinder",
+      "sphere",
+      "sides",
+      "corners",
+      "faces",
+      "edges",
+      "vertices",
+      "curved",
+      "surface"
     ]
   },
   {
