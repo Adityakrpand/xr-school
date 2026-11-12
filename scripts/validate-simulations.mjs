@@ -60,6 +60,7 @@ for (const slug of slugs) {
 const viewerNameMap = {
   pollination: 'PollinationViewer',
   circuit: 'CircuitViewer',
+  'float-sink-water': 'WaterFloatSinkViewer',
 };
 
 for (const slug of slugs) {

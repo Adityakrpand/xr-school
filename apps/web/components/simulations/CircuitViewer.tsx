@@ -604,7 +604,7 @@ export default function CircuitViewer() {
           <div style={{ textAlign: 'center', maxWidth: 520, padding: '0 24px' }}>
             <div style={{ fontSize: 80, lineHeight: 1, marginBottom: 16, filter: 'drop-shadow(0 0 24px rgba(96,165,250,0.6))' }}>⚡</div>
             <h1 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#f9fafb', margin: '0 0 10px', letterSpacing: '-0.02em' }}>Electric Circuits</h1>
-            <p style={{ fontSize: '1.05rem', color: '#60a5fa', fontWeight: 600, marginBottom: 8 }}>& Ohm's Law</p>
+            <p style={{ fontSize: '1.05rem', color: '#60a5fa', fontWeight: 600, marginBottom: 8 }}>& Ohm&apos;s Law</p>
             <p style={{ color: '#6b7280', fontSize: '0.92rem', lineHeight: 1.6, marginBottom: 32 }}>Stand at a real workbench. Toggle the switch, watch electrons flow, change resistance, and discover V = I × R from inside the circuit.</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
               {vrSupported && (

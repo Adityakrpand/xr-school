@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'linear-gradient(135deg, #0a0f1a 0%, #0d1f35 100%)' }}>
       <div style={{ maxWidth: 720, width: '100%', textAlign: 'center' }}>
-        <div style={{ fontSize: 48, marginBottom: 12 }}>🌿⚡</div>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>🌿⚡💧</div>
         <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.1, marginBottom: 16, background: 'linear-gradient(135deg, #4f8ef7, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
           XR School Lab Platform
         </h1>
@@ -30,6 +30,15 @@ export default function Home() {
             title="Electric Circuits & Resistance"
             desc="Toggle switches, change resistors, and watch electrons flow in real-time. Discover Ohm's Law through hands-on interaction."
             tags={['CBSE', 'ICSE', 'Interactive']}
+          />
+          <SimCard
+            href="/simulations/float-sink-water"
+            emoji="💧"
+            color="#38bdf8"
+            subject="Science · Class 5"
+            title="What Floats, What Sinks?"
+            desc="Predict, grab, and drop everyday objects into a transparent tank. Observe buoyancy and discover how density explains the evidence."
+            tags={['CBSE', 'Class 5', 'VR Ready']}
           />
         </div>
 

@@ -50,6 +50,23 @@ const SIMULATIONS = [
     stages: 4,
     status: 'released',
   },
+  {
+    id: 'sim-float-sink-water-001',
+    slug: 'float-sink-water',
+    title: 'What Floats, What Sinks?',
+    gradeBands: ['class3To5'],
+    subjects: ['science'],
+    applicableBoards: ['cbse', 'icse', 'stateBoard'],
+    simulationFormat: 'immersiveVr',
+    xrFitType: 'strongVrFit',
+    xrFitJustification: 'Learners physically conduct repeated buoyancy trials and observe the full path above, at, and below the water surface from any angle.',
+    learningObjective: 'Students will predict, test, and correctly classify familiar objects as floating or sinking, then explain the observations using average density relative to water.',
+    evidenceConfidenceLevel: 'expertDesigned',
+    comfortRiskLevel: 'low',
+    expectedDurationMinutes: 5,
+    stages: 5,
+    status: 'approved',
+  },
 ];
 
 describe('Simulation module contracts', () => {

@@ -5,29 +5,39 @@
   "description": "Offline-first K-12 XR simulation curriculum platform for Indian schools",
   "type": "module",
   "scripts": {
+    "dev:web": "npm run dev -w @xr-school/web",
+    "dev:api": "npm run dev -w @xr-school/api",
+    "dev:https": "node scripts/https-proxy.mjs",
+    "build": "npm run build -w @xr-school/api && npm run build -w @xr-school/web",
     "contract:compile": "tsp compile contracts/typespec",
-    "quality": "npm run contract:compile && npm run test",
+    "quality": "npm run contract:compile && npm run test && npm run type-check && npm run lint && npm run validate:simulations",
     "test": "vitest run",
+    "type-check": "npm run type-check -w @xr-school/web && npm run build -w @xr-school/api",
+    "validate:simulations": "node scripts/validate-simulations.mjs",
     "spec:drift": "node scripts/spec-drift-check.mjs",
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write \"**/*.{ts,tsx,json,md,yaml}\"",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.61.0",
     "@typespec/compiler": "^1.13.0",
     "@typespec/http": "^1.13.0",
     "@typespec/openapi3": "^1.13.0",
     "@typespec/rest": "^0.83.0",
     "eslint": "^9.39.4",
+    "eslint-config-next": "^15.5.19",
+    "globals": "^17.14.0",
     "husky": "^9.1.7",
     "prettier": "^3.8.4",
     "tsx": "^4.22.4",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.2",
     "vitest": "^2.1.9"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.13.0"
   },
   "workspaces": [
     "apps/*",

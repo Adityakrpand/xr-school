@@ -23,6 +23,17 @@ const SIMS = [
     stages: 4,
     minutes: 8,
   },
+  {
+    slug: 'float-sink-water',
+    emoji: '💧',
+    color: '#38bdf8',
+    subject: 'Science',
+    grade: 'Class 5',
+    title: 'What Floats, What Sinks?',
+    xrFit: 'Strong VR Fit',
+    stages: 5,
+    minutes: 5,
+  },
 ];
 
 export default function SimulationsPage() {
@@ -31,7 +42,7 @@ export default function SimulationsPage() {
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
         <Link href="/" style={{ color: '#6b7280', fontSize: '0.875rem', display: 'inline-block', marginBottom: 32 }}>← Back</Link>
         <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: 8 }}>Simulation Catalog</h1>
-        <p style={{ color: '#6b7280', marginBottom: 40 }}>2 simulations · MVP release</p>
+        <p style={{ color: '#6b7280', marginBottom: 40 }}>{SIMS.length} simulations · MVP release</p>
 
         <div style={{ display: 'grid', gap: 16 }}>
           {SIMS.map(s => (
