@@ -72,6 +72,7 @@ const viewerNameMap = {
   circuit: "CircuitViewer",
   "float-sink-water": "WaterFloatSinkViewer",
   "dead-sea-salt-water": "DeadSeaSaltViewer",
+  "soluble-insoluble-substances": "SolubleInsolubleViewer",
 };
 
 for (const slug of slugs) {

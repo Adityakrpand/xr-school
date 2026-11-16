@@ -45,6 +45,17 @@ const SIMS = [
     stages: 5,
     minutes: 5,
   },
+  {
+    slug: "soluble-insoluble-substances",
+    emoji: "🧪",
+    color: "#22d3ee",
+    subject: "Science",
+    grade: "Class 5",
+    title: "Soluble & Insoluble: The Disappearing Mystery",
+    xrFit: "Strong VR Fit",
+    stages: 5,
+    minutes: 5,
+  },
 ];
 
 export default function SimulationsPage() {

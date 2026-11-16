@@ -93,6 +93,27 @@ const SIMULATIONS = [
     stages: 5,
     status: "approved",
   },
+  {
+    id: "sim-soluble-insoluble-substances-001",
+    slug: "soluble-insoluble-substances",
+    title: "Soluble & Insoluble: The Disappearing Mystery",
+    summary:
+      "Pour and stir sugar, salt, sand, cooking oil, flour, and stones, then compare dissolving, settling, clouding, and floating outcomes.",
+    gradeBands: ["class3To5"],
+    subjects: ["science"],
+    applicableBoards: ["cbse", "icse", "stateBoard"],
+    simulationFormat: "immersiveVr",
+    xrFitType: "strongVrFit",
+    xrFitJustification:
+      "Each learner conducts six controlled pour-and-stir trials and observes particle-scale dissolving, sediment settling, suspended flour, and a floating oil layer from any angle. VR makes the contrasting outcomes close, repeatable, and safe while avoiding spills, consumables, cleanup, and limited classroom visibility.",
+    learningObjective:
+      "Students will test and classify six familiar substances as soluble or insoluble in water and explain that a dissolved substance still exists even when it is no longer visible.",
+    evidenceConfidenceLevel: "expertDesigned",
+    comfortRiskLevel: "low",
+    expectedDurationMinutes: 5,
+    stages: 5,
+    status: "approved",
+  },
 ];
 
 app.get("/v1/simulation-modules", async () => ({

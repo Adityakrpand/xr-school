@@ -131,6 +131,25 @@ const SIMULATIONS = [
     stages: 5,
     status: "approved",
   },
+  {
+    id: "sim-soluble-insoluble-substances-001",
+    slug: "soluble-insoluble-substances",
+    title: "Soluble & Insoluble: The Disappearing Mystery",
+    gradeBands: ["class3To5"],
+    subjects: ["science"],
+    applicableBoards: ["cbse", "icse", "stateBoard"],
+    simulationFormat: "immersiveVr",
+    xrFitType: "strongVrFit",
+    xrFitJustification:
+      "Learners conduct six controlled trials and compare dissolving, settling, clouding, and floating outcomes from any angle.",
+    learningObjective:
+      "Students will test and classify six familiar substances as soluble or insoluble and explain that dissolved matter still exists.",
+    evidenceConfidenceLevel: "expertDesigned",
+    comfortRiskLevel: "low",
+    expectedDurationMinutes: 5,
+    stages: 5,
+    status: "approved",
+  },
 ];
 
 describe("Simulation module contracts", () => {

@@ -14,7 +14,7 @@ export default function Home() {
       }}
     >
       <div style={{ maxWidth: 720, width: "100%", textAlign: "center" }}>
-        <div style={{ fontSize: 48, marginBottom: 12 }}>🌿⚡💧🧂</div>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>🌿⚡💧🧂🧪</div>
         <h1
           style={{
             fontSize: "clamp(2rem, 5vw, 3.5rem)",
@@ -83,6 +83,15 @@ export default function Home() {
             subject="Science · Class 5"
             title="Dead Sea: Salt Water & Its Effects"
             desc="Compare ordinary and salty water, dissolve salt, and watch the same egg rise as water density and buoyant support increase."
+            tags={["CBSE", "Class 5", "VR Ready"]}
+          />
+          <SimCard
+            href="/simulations/soluble-insoluble-substances"
+            emoji="🧪"
+            color="#22d3ee"
+            subject="Science · Class 5"
+            title="Soluble & Insoluble: The Disappearing Mystery"
+            desc="Pour and stir six substances. Watch crystals dissolve, sediment settle, flour cloud the water, and oil form a separate layer."
             tags={["CBSE", "Class 5", "VR Ready"]}
           />
         </div>
