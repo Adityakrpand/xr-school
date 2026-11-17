@@ -74,6 +74,7 @@ const viewerNameMap = {
   "dead-sea-salt-water": "DeadSeaSaltViewer",
   "soluble-insoluble-substances": "SolubleInsolubleViewer",
   "synthetic-fibres-types": "SyntheticFibresViewer",
+  "thermoplastics-thermosetting": "PlasticMouldingViewer",
 };
 
 for (const slug of slugs) {

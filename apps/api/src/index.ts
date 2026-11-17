@@ -135,6 +135,27 @@ const SIMULATIONS = [
     stages: 8,
     status: "approved",
   },
+  {
+    id: "sim-thermoplastics-thermosetting-001",
+    slug: "thermoplastics-thermosetting",
+    title: "Thermoplastics & Thermosetting Plastics",
+    summary:
+      "Mould two identical plastic discs, reheat them, reveal polymer-chain movement and permanent cross-links, then choose the disc that can become a star badge.",
+    gradeBands: ["class6To8"],
+    subjects: ["science", "chemistry"],
+    applicableBoards: ["cbse", "icse", "stateBoard"],
+    simulationFormat: "immersiveVr",
+    xrFitType: "strongVrFit",
+    xrFitJustification:
+      "The stationary virtual workshop makes invisible chain movement and cross-linking visible while each learner safely repeats heating, pressing, cooling, and remoulding tests. VR provides close-up evidence from identical-looking samples without hot machinery, fumes, damaged materials, or burn risk.",
+    learningObjective:
+      "Students will distinguish thermoplastics from thermosetting plastics by their response to reheating, explain the role of permanent cross-links, and classify common plastic objects.",
+    evidenceConfidenceLevel: "expertDesigned",
+    comfortRiskLevel: "low",
+    expectedDurationMinutes: 5,
+    stages: 7,
+    status: "approved",
+  },
 ];
 
 app.get("/v1/simulation-modules", async () => ({

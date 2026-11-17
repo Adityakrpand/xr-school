@@ -169,6 +169,25 @@ const SIMULATIONS = [
     stages: 8,
     status: "approved",
   },
+  {
+    id: "sim-thermoplastics-thermosetting-001",
+    slug: "thermoplastics-thermosetting",
+    title: "Thermoplastics & Thermosetting Plastics",
+    gradeBands: ["class6To8"],
+    subjects: ["science", "chemistry"],
+    applicableBoards: ["cbse", "icse", "stateBoard"],
+    simulationFormat: "immersiveVr",
+    xrFitType: "strongVrFit",
+    xrFitJustification:
+      "Learners safely repeat virtual heating and remoulding tests while observing chain movement and permanent cross-links inside identical samples.",
+    learningObjective:
+      "Students will distinguish thermoplastics from thermosetting plastics, explain cross-links, and classify common plastic objects.",
+    evidenceConfidenceLevel: "expertDesigned",
+    comfortRiskLevel: "low",
+    expectedDurationMinutes: 5,
+    stages: 7,
+    status: "approved",
+  },
 ];
 
 describe("Simulation module contracts", () => {

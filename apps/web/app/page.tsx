@@ -14,7 +14,7 @@ export default function Home() {
       }}
     >
       <div style={{ maxWidth: 720, width: "100%", textAlign: "center" }}>
-        <div style={{ fontSize: 48, marginBottom: 12 }}>🌿⚡💧🧂🧪🧵</div>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>🌿⚡💧🧂🧪🧵⭐</div>
         <h1
           style={{
             fontSize: "clamp(2rem, 5vw, 3.5rem)",
@@ -101,6 +101,15 @@ export default function Home() {
             subject="Science · Class 8"
             title="Synthetic Fibres: Introduction & Types"
             desc="Turn polymers into fibres, test rayon, nylon, polyester, and acrylic, compare their uses, and unlock the fibre vault safely."
+            tags={["CBSE", "Class 8", "VR Ready"]}
+          />
+          <SimCard
+            href="/simulations/thermoplastics-thermosetting"
+            emoji="⭐"
+            color="#fb923c"
+            subject="Science · Class 8"
+            title="Thermoplastics & Thermosetting Plastics"
+            desc="Mould two identical plastic discs, reheat them, reveal permanent cross-links, and choose the material that can become a star badge."
             tags={["CBSE", "Class 8", "VR Ready"]}
           />
         </div>

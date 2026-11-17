@@ -67,6 +67,17 @@ const SIMS = [
     stages: 8,
     minutes: 5,
   },
+  {
+    slug: "thermoplastics-thermosetting",
+    emoji: "⭐",
+    color: "#fb923c",
+    subject: "Science",
+    grade: "Class 8",
+    title: "Thermoplastics & Thermosetting Plastics",
+    xrFit: "Strong VR Fit",
+    stages: 7,
+    minutes: 5,
+  },
 ];
 
 export default function SimulationsPage() {
