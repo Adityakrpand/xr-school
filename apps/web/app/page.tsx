@@ -14,7 +14,7 @@ export default function Home() {
       }}
     >
       <div style={{ maxWidth: 720, width: "100%", textAlign: "center" }}>
-        <div style={{ fontSize: 48, marginBottom: 12 }}>🌿⚡💧🧂🧪</div>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>🌿⚡💧🧂🧪🧵</div>
         <h1
           style={{
             fontSize: "clamp(2rem, 5vw, 3.5rem)",
@@ -93,6 +93,15 @@ export default function Home() {
             title="Soluble & Insoluble: The Disappearing Mystery"
             desc="Pour and stir six substances. Watch crystals dissolve, sediment settle, flour cloud the water, and oil form a separate layer."
             tags={["CBSE", "Class 5", "VR Ready"]}
+          />
+          <SimCard
+            href="/simulations/synthetic-fibres-types"
+            emoji="🧵"
+            color="#a78bfa"
+            subject="Science · Class 8"
+            title="Synthetic Fibres: Introduction & Types"
+            desc="Turn polymers into fibres, test rayon, nylon, polyester, and acrylic, compare their uses, and unlock the fibre vault safely."
+            tags={["CBSE", "Class 8", "VR Ready"]}
           />
         </div>
 

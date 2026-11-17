@@ -73,6 +73,7 @@ const viewerNameMap = {
   "float-sink-water": "WaterFloatSinkViewer",
   "dead-sea-salt-water": "DeadSeaSaltViewer",
   "soluble-insoluble-substances": "SolubleInsolubleViewer",
+  "synthetic-fibres-types": "SyntheticFibresViewer",
 };
 
 for (const slug of slugs) {

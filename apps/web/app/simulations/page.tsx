@@ -56,6 +56,17 @@ const SIMS = [
     stages: 5,
     minutes: 5,
   },
+  {
+    slug: "synthetic-fibres-types",
+    emoji: "🧵",
+    color: "#a78bfa",
+    subject: "Science",
+    grade: "Class 8",
+    title: "Synthetic Fibres: Introduction & Types",
+    xrFit: "Strong VR Fit",
+    stages: 8,
+    minutes: 5,
+  },
 ];
 
 export default function SimulationsPage() {

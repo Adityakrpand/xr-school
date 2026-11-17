@@ -150,6 +150,25 @@ const SIMULATIONS = [
     stages: 5,
     status: "approved",
   },
+  {
+    id: "sim-synthetic-fibres-types-001",
+    slug: "synthetic-fibres-types",
+    title: "Synthetic Fibres: Introduction & Types",
+    gradeBands: ["class6To8"],
+    subjects: ["science", "chemistry"],
+    applicableBoards: ["cbse", "icse", "stateBoard"],
+    simulationFormat: "immersiveVr",
+    xrFitType: "strongVrFit",
+    xrFitJustification:
+      "Learners make the invisible polymer-to-fibre process visible and compare four fibres through safe, repeatable material tests.",
+    learningObjective:
+      "Students will explain fibre manufacture, distinguish rayon, nylon, polyester, and acrylic, and apply fire-safety guidance.",
+    evidenceConfidenceLevel: "expertDesigned",
+    comfortRiskLevel: "low",
+    expectedDurationMinutes: 5,
+    stages: 8,
+    status: "approved",
+  },
 ];
 
 describe("Simulation module contracts", () => {

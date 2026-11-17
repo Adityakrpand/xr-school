@@ -114,6 +114,27 @@ const SIMULATIONS = [
     stages: 5,
     status: "approved",
   },
+  {
+    id: "sim-synthetic-fibres-types-001",
+    slug: "synthetic-fibres-types",
+    title: "Synthetic Fibres: Introduction & Types",
+    summary:
+      "Make fibre from polymer, then test rayon, nylon, polyester, and acrylic to compare their origins, properties, blends, uses, and fire safety.",
+    gradeBands: ["class6To8"],
+    subjects: ["science", "chemistry"],
+    applicableBoards: ["cbse", "icse", "stateBoard"],
+    simulationFormat: "immersiveVr",
+    xrFitType: "strongVrFit",
+    xrFitJustification:
+      "The stationary textile laboratory makes the invisible polymer-to-fibre process visible, lets every learner compare four fibre types through repeatable strength, warmth, drying, and wrinkle tests, and demonstrates the fire hazard safely without specialist machinery or open flame.",
+    learningObjective:
+      "Students will explain how polymers become fibres, distinguish rayon, nylon, polyester, and acrylic by properties and uses, identify rayon as semi-synthetic, and apply fire-safety guidance.",
+    evidenceConfidenceLevel: "expertDesigned",
+    comfortRiskLevel: "low",
+    expectedDurationMinutes: 5,
+    stages: 8,
+    status: "approved",
+  },
 ];
 
 app.get("/v1/simulation-modules", async () => ({
