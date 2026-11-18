@@ -386,6 +386,8 @@ export default function DeadSeaSaltViewer() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.xr.enabled = true;
+    renderer.domElement.setAttribute("aria-hidden", "true");
+    renderer.domElement.tabIndex = -1;
     renderer.xr.setReferenceSpaceType("local-floor");
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     mount.appendChild(renderer.domElement);
@@ -1085,7 +1087,12 @@ export default function DeadSeaSaltViewer() {
         color: "#f8fafc",
       }}
     >
-      <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
+      <div
+        ref={mountRef}
+        role="img"
+        aria-label={`Interactive salt-water laboratory. ${STAGES[stage].title}. ${feedback}`}
+        style={{ position: "absolute", inset: 0 }}
+      />
 
       {!started ? (
         <div
@@ -1254,6 +1261,23 @@ export default function DeadSeaSaltViewer() {
             >
               {STAGES[stage].cue}
             </p>
+            <button
+              onClick={() => speak(NARRATIONS[stage])}
+              style={{
+                width: "100%",
+                minHeight: 44,
+                padding: "9px 11px",
+                borderRadius: 9,
+                border: "1px solid rgba(103,232,249,.28)",
+                background: "rgba(45,212,191,.1)",
+                color: "#ccfbf1",
+                cursor: "pointer",
+                fontWeight: 700,
+                marginBottom: 9,
+              }}
+            >
+              🔊 Replay narration
+            </button>
             <div
               aria-live="polite"
               style={{

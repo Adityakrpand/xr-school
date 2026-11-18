@@ -202,6 +202,7 @@ export default function SolubleInsolubleViewer() {
   const scoreRef = useRef(0);
   const activeRef = useRef<SubstanceKey>("sugar");
   const phaseRef = useRef<ExperimentPhase>("idle");
+  const predictionsRef = useRef<Partial<Record<SubstanceKey, Category>>>({});
   const testedRef = useRef<Partial<Record<SubstanceKey, boolean>>>({});
   const sortedRef = useRef<Partial<Record<SubstanceKey, Category>>>({});
   const explanationRef = useRef(false);
@@ -258,6 +259,17 @@ export default function SolubleInsolubleViewer() {
     stageVisualRef.current(next);
     speak(NARRATIONS[next]);
   }, []);
+
+  const predictSubstance = useCallback(
+    (key: SubstanceKey, category: Category) => {
+      predictionsRef.current = { ...predictionsRef.current, [key]: category };
+      setPredictions(predictionsRef.current);
+      setFeedback(
+        `${SUBSTANCES[key].label}: prediction recorded as ${category}. You will test it next.`,
+      );
+    },
+    [],
+  );
 
   const selectSubstance = useCallback((key: SubstanceKey) => {
     activeRef.current = key;
@@ -380,6 +392,8 @@ export default function SolubleInsolubleViewer() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.xr.enabled = true;
+    renderer.domElement.setAttribute("aria-hidden", "true");
+    renderer.domElement.tabIndex = -1;
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -480,6 +494,22 @@ export default function SolubleInsolubleViewer() {
     });
 
     const interactive: THREE.Object3D[] = [];
+    const makeActionButton = (
+      group: THREE.Group | THREE.Scene,
+      label: string,
+      action: string,
+      x: number,
+      y: number,
+      width = 1.7,
+      accent = "#22d3ee",
+    ) => {
+      const button = labelSprite(label, accent, width);
+      button.position.set(x, y, -2.65);
+      setAction(button, action);
+      interactive.push(button);
+      group.add(button);
+      return button;
+    };
     const jarsGroup = new THREE.Group();
     const jarX = [-2.75, -1.68, -0.61, 0.61, 1.68, 2.75];
     SUBSTANCE_KEYS.forEach((key, index) => {
@@ -675,6 +705,153 @@ export default function SolubleInsolubleViewer() {
     badgeGroup.visible = false;
     scene.add(badgeGroup);
 
+    const predictionLabels = SUBSTANCE_KEYS.map((key) => {
+      const label = labelSprite(
+        `PREDICT: ${SUBSTANCES[key].label.toUpperCase()}`,
+        "#fbbf24",
+        2.15,
+      );
+      label.position.set(0, 0.86, -2.66);
+      jarsGroup.add(label);
+      return label;
+    });
+    const predictSolubleButton = makeActionButton(
+      jarsGroup,
+      "WILL DISSOLVE",
+      "predict:soluble",
+      -1.05,
+      0.45,
+      1.55,
+      "#34d399",
+    );
+    const predictInsolubleButton = makeActionButton(
+      jarsGroup,
+      "STAY SEPARATE",
+      "predict:insoluble",
+      1.05,
+      0.45,
+      1.55,
+      "#fb923c",
+    );
+    const predictionContinueButton = makeActionButton(
+      jarsGroup,
+      "TEST THE PREDICTIONS",
+      "stage:1",
+      0,
+      0.45,
+      1.95,
+      "#22d3ee",
+    );
+    const addSelectedButton = makeActionButton(
+      experimentGroup,
+      "ADD SELECTED SAMPLE",
+      "experiment:add",
+      -1.05,
+      0.42,
+      1.8,
+      "#fbbf24",
+    );
+    const stirSelectedButton = makeActionButton(
+      experimentGroup,
+      "STIR THE WATER",
+      "experiment:stir",
+      1.05,
+      0.42,
+      1.65,
+      "#22d3ee",
+    );
+    const experimentContinueButton = makeActionButton(
+      experimentGroup,
+      "EXPLAIN THE RESULT",
+      "stage:2",
+      0,
+      0.42,
+      1.9,
+      "#34d399",
+    );
+    const vanishedButton = makeActionButton(
+      doorsGroup,
+      "SUGAR VANISHED",
+      "explain:vanished",
+      -1.05,
+      0.45,
+      1.55,
+      "#fb923c",
+    );
+    const spreadButton = makeActionButton(
+      doorsGroup,
+      "PARTICLES SPREAD",
+      "explain:spread",
+      1.05,
+      0.45,
+      1.65,
+      "#34d399",
+    );
+    const explanationContinueButton = makeActionButton(
+      doorsGroup,
+      "SORT THE SAMPLES",
+      "stage:3",
+      0,
+      0.45,
+      1.8,
+      "#22d3ee",
+    );
+    const sortingLabels = SUBSTANCE_KEYS.map((key) => {
+      const label = labelSprite(
+        `SORT: ${SUBSTANCES[key].label.toUpperCase()}`,
+        "#fbbf24",
+        2,
+      );
+      label.position.set(0, 0.87, -2.66);
+      doorsGroup.add(label);
+      return label;
+    });
+    const sortSolubleButton = makeActionButton(
+      doorsGroup,
+      "SOLUBLE",
+      "sort:soluble",
+      -1.05,
+      0.45,
+      1.45,
+      "#34d399",
+    );
+    const sortInsolubleButton = makeActionButton(
+      doorsGroup,
+      "INSOLUBLE",
+      "sort:insoluble",
+      1.05,
+      0.45,
+      1.45,
+      "#fb923c",
+    );
+    const sortingContinueButton = makeActionButton(
+      doorsGroup,
+      "SHOW THE SCIENCE BADGE",
+      "stage:4",
+      0,
+      0.45,
+      2.15,
+      "#fde68a",
+    );
+    const restartButton = makeActionButton(
+      badgeGroup,
+      "RUN THE MYSTERY AGAIN",
+      "restart",
+      0,
+      0.45,
+      2,
+      "#fde68a",
+    );
+    makeActionButton(
+      scene,
+      "REPLAY NARRATION",
+      "narration:replay",
+      -2.35,
+      3.4,
+      1.55,
+      "#67e8f9",
+    );
+
     const boardCanvas = document.createElement("canvas");
     boardCanvas.width = 900;
     boardCanvas.height = 330;
@@ -749,6 +926,43 @@ export default function SolubleInsolubleViewer() {
         }
       } else if (action === "stir" && stageRef.current === 1) {
         stirSubstance();
+      } else if (action === "narration:replay") {
+        speak(NARRATIONS[stageRef.current]);
+      } else if (stageRef.current === 0 && action.startsWith("predict:")) {
+        const key = SUBSTANCE_KEYS.find(
+          (substance) => !predictionsRef.current[substance],
+        );
+        if (key) predictSubstance(key, action.slice(8) as Category);
+      } else if (
+        action === "stage:1" &&
+        SUBSTANCE_KEYS.every((key) => predictionsRef.current[key])
+      ) {
+        goToStage(1);
+      } else if (stageRef.current === 1 && action === "experiment:add") {
+        addSubstance();
+      } else if (stageRef.current === 1 && action === "experiment:stir") {
+        stirSubstance();
+      } else if (
+        action === "stage:2" &&
+        SUBSTANCE_KEYS.every((key) => testedRef.current[key])
+      ) {
+        goToStage(2);
+      } else if (stageRef.current === 2 && action.startsWith("explain:")) {
+        answerExplanation(action.slice(8) as "vanished" | "spread");
+      } else if (action === "stage:3" && explanationRef.current) {
+        goToStage(3);
+      } else if (stageRef.current === 3 && action.startsWith("sort:")) {
+        const key = SUBSTANCE_KEYS.find(
+          (substance) => !sortedRef.current[substance],
+        );
+        if (key) sortSubstance(key, action.slice(5) as Category);
+      } else if (
+        action === "stage:4" &&
+        SUBSTANCE_KEYS.every((key) => sortedRef.current[key])
+      ) {
+        goToStage(4);
+      } else if (action === "restart") {
+        window.location.reload();
       }
     };
     actionRef.current = handleAction;
@@ -862,6 +1076,49 @@ export default function SolubleInsolubleViewer() {
         }
       });
 
+      const predictionIndex = SUBSTANCE_KEYS.findIndex(
+        (key) => !predictionsRef.current[key],
+      );
+      predictionLabels.forEach((label, index) => {
+        label.visible = stageRef.current === 0 && predictionIndex === index;
+      });
+      const predictionPending = predictionIndex >= 0;
+      predictSolubleButton.visible =
+        stageRef.current === 0 && predictionPending;
+      predictInsolubleButton.visible =
+        stageRef.current === 0 && predictionPending;
+      predictionContinueButton.visible =
+        stageRef.current === 0 && !predictionPending;
+      const experimentsDone = SUBSTANCE_KEYS.every(
+        (key) => testedRef.current[key],
+      );
+      addSelectedButton.visible =
+        stageRef.current === 1 &&
+        !experimentsDone &&
+        phaseRef.current === "idle";
+      stirSelectedButton.visible =
+        stageRef.current === 1 &&
+        !experimentsDone &&
+        phaseRef.current === "adding";
+      experimentContinueButton.visible =
+        stageRef.current === 1 && experimentsDone;
+      vanishedButton.visible =
+        stageRef.current === 2 && !explanationRef.current;
+      spreadButton.visible = stageRef.current === 2 && !explanationRef.current;
+      explanationContinueButton.visible =
+        stageRef.current === 2 && explanationRef.current;
+      const sortingIndex = SUBSTANCE_KEYS.findIndex(
+        (key) => !sortedRef.current[key],
+      );
+      sortingLabels.forEach((label, index) => {
+        label.visible = stageRef.current === 3 && sortingIndex === index;
+      });
+      const sortingPending = sortingIndex >= 0;
+      sortSolubleButton.visible = stageRef.current === 3 && sortingPending;
+      sortInsolubleButton.visible = stageRef.current === 3 && sortingPending;
+      sortingContinueButton.visible = stageRef.current === 3 && !sortingPending;
+      restartButton.visible = stageRef.current === 4;
+
       renderer.render(scene, camera);
     });
 
@@ -902,7 +1159,15 @@ export default function SolubleInsolubleViewer() {
       controllerModels.length = 0;
       window.speechSynthesis?.cancel();
     };
-  }, [selectSubstance, stirSubstance]);
+  }, [
+    addSubstance,
+    answerExplanation,
+    goToStage,
+    predictSubstance,
+    selectSubstance,
+    sortSubstance,
+    stirSubstance,
+  ]);
 
   const enterVR = useCallback(async () => {
     const renderer = rendererRef.current;
@@ -942,6 +1207,7 @@ export default function SolubleInsolubleViewer() {
     accent = "#22d3ee",
   ): React.CSSProperties => ({
     padding: "9px 10px",
+    minHeight: 44,
     borderRadius: 8,
     border: `1px solid ${activeButton ? accent : "rgba(255,255,255,.13)"}`,
     background: activeButton ? `${accent}22` : "rgba(255,255,255,.04)",
@@ -961,7 +1227,12 @@ export default function SolubleInsolubleViewer() {
         color: "#f8fafc",
       }}
     >
-      <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
+      <div
+        ref={mountRef}
+        role="img"
+        aria-label={`Interactive solubility laboratory. ${STAGES[stage].title}. ${feedback}`}
+        style={{ position: "absolute", inset: 0 }}
+      />
 
       {!started ? (
         <div
@@ -1131,6 +1402,16 @@ export default function SolubleInsolubleViewer() {
             >
               {STAGES[stage].cue}
             </p>
+            <button
+              onClick={() => speak(NARRATIONS[stage])}
+              style={{
+                ...controlButton(false, "#67e8f9"),
+                width: "100%",
+                marginBottom: 9,
+              }}
+            >
+              🔊 Replay narration
+            </button>
             <div
               aria-live="polite"
               style={{
@@ -1165,13 +1446,13 @@ export default function SolubleInsolubleViewer() {
                         (category) => (
                           <button
                             key={category}
-                            onClick={() =>
-                              setPredictions((current) => ({
-                                ...current,
-                                [key]: category,
-                              }))
-                            }
+                            onClick={() => predictSubstance(key, category)}
                             aria-pressed={predictions[key] === category}
+                            aria-label={`${SUBSTANCES[key].label}: ${
+                              category === "soluble"
+                                ? "will dissolve"
+                                : "will stay separate"
+                            }`}
                             style={{
                               ...controlButton(
                                 predictions[key] === category,

@@ -274,6 +274,7 @@ function hierarchyVisible(object: THREE.Object3D | null) {
 function choiceStyle(selected: boolean, accent = "#a78bfa"): CSSProperties {
   return {
     padding: "8px 9px",
+    minHeight: 44,
     borderRadius: 8,
     border: `1px solid ${selected ? accent : "rgba(255,255,255,.13)"}`,
     background: selected ? `${accent}24` : "rgba(255,255,255,.04)",
@@ -568,6 +569,8 @@ export default function SyntheticFibresViewer() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.xr.enabled = true;
+    renderer.domElement.setAttribute("aria-hidden", "true");
+    renderer.domElement.tabIndex = -1;
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -613,6 +616,22 @@ export default function SyntheticFibresViewer() {
     }
 
     const interactive: THREE.Object3D[] = [];
+    const makeActionButton = (
+      group: THREE.Group | THREE.Scene,
+      label: string,
+      action: string,
+      x: number,
+      y: number,
+      width = 1.7,
+      accent = "#a78bfa",
+    ) => {
+      const button = labelSprite(label, accent, width);
+      button.position.set(x, y, -2.72);
+      setAction(button, action);
+      interactive.push(button);
+      group.add(button);
+      return button;
+    };
 
     const scanGroup = new THREE.Group();
     const podPositions: Array<[number, number]> = [
@@ -931,6 +950,224 @@ export default function SyntheticFibresViewer() {
     vaultGroup.visible = false;
     scene.add(vaultGroup);
 
+    const scanContinueButton = makeActionButton(
+      scanGroup,
+      "CONTINUE — MAKE A FIBRE",
+      "stage:1",
+      0,
+      0.38,
+      2.1,
+    );
+    const manufacturingButtons = [
+      ["SOFTEN POLYMER", "manufacture:1"],
+      ["USE THE SPINNERET", "manufacture:2"],
+      ["STRETCH THE STRANDS", "manufacture:3"],
+      ["WIND FIBRE ONTO SPOOL", "manufacture:4"],
+    ].map(([label, action]) =>
+      makeActionButton(machineGroup, label, action, 0, 0.42, 2.15),
+    );
+    const manufacturingContinueButton = makeActionButton(
+      machineGroup,
+      "EXPLORE RAYON",
+      "stage:2",
+      0,
+      0.42,
+      1.65,
+      FIBRES.rayon.accent,
+    );
+    const rayonButtons = [
+      ["INSPECT WOOD PULP", "rayon:1"],
+      ["REGENERATE CELLULOSE", "rayon:2"],
+      ["COMPARE RAYON WITH SILK", "rayon:3"],
+      ["TEST WATER ABSORPTION", "rayon:4"],
+    ].map(([label, action]) =>
+      makeActionButton(
+        rayonGroup,
+        label,
+        action,
+        0,
+        0.42,
+        2.25,
+        FIBRES.rayon.accent,
+      ),
+    );
+    const rayonContinueButton = makeActionButton(
+      rayonGroup,
+      "TEST NYLON",
+      "stage:3",
+      0,
+      0.42,
+      1.55,
+      FIBRES.nylon.accent,
+    );
+    const nylonStretchButton = makeActionButton(
+      testsGroup,
+      "STRETCH AND RELEASE NYLON",
+      "nylon:stretch",
+      -1.25,
+      0.78,
+      2,
+      FIBRES.nylon.accent,
+    );
+    const nylonWeightButton = makeActionButton(
+      testsGroup,
+      "ADD NYLON WEIGHT",
+      "nylon:weight",
+      1.25,
+      0.78,
+      1.65,
+      FIBRES.nylon.accent,
+    );
+    const nylonUseNames = [
+      "Rope",
+      "Parachute",
+      "Fishing net",
+      "Toothbrush",
+      "Seat belt",
+    ];
+    const nylonUseButtons = nylonUseNames.map((use, index) =>
+      makeActionButton(
+        testsGroup,
+        use.toUpperCase(),
+        `nylon:use:${use}`,
+        -1.6 + (index % 3) * 1.6,
+        index < 3 ? 0.38 : 0.02,
+        1.25,
+        FIBRES.nylon.accent,
+      ),
+    );
+    const nylonContinueButton = makeActionButton(
+      testsGroup,
+      "TEST POLYESTER",
+      "stage:4",
+      0,
+      0.4,
+      1.7,
+      FIBRES.polyester.accent,
+    );
+    const polyesterTasksList: PolyesterTask[] = [
+      "wrinkle",
+      "dry",
+      "polycot",
+      "polywool",
+    ];
+    const polyesterButtons = polyesterTasksList.map((task, index) =>
+      makeActionButton(
+        testsGroup,
+        task === "wrinkle"
+          ? "WRINKLE TEST"
+          : task === "dry"
+            ? "DRYING TEST"
+            : task.toUpperCase(),
+        `polyester:${task}`,
+        index % 2 === 0 ? -1.15 : 1.15,
+        index < 2 ? 0.68 : 0.3,
+        1.55,
+        FIBRES.polyester.accent,
+      ),
+    );
+    const polyesterContinueButton = makeActionButton(
+      testsGroup,
+      "TEST ACRYLIC",
+      "stage:5",
+      0,
+      0.4,
+      1.6,
+      FIBRES.acrylic.accent,
+    );
+    const acrylicTasksList: AcrylicTask[] = ["weight", "warmth", "product"];
+    const acrylicButtons = acrylicTasksList.map((task, index) =>
+      makeActionButton(
+        testsGroup,
+        task === "weight"
+          ? "COMPARE WEIGHT"
+          : task === "warmth"
+            ? "SCAN WARMTH"
+            : "INSPECT PRODUCTS",
+        `acrylic:${task}`,
+        -1.5 + index * 1.5,
+        0.45,
+        1.55,
+        FIBRES.acrylic.accent,
+      ),
+    );
+    const acrylicContinueButton = makeActionButton(
+      testsGroup,
+      "COMPARE ALL FIBRES",
+      "stage:6",
+      0,
+      0.4,
+      1.8,
+      "#fde68a",
+    );
+    const comparisonChoiceButtons = FIBRE_KEYS.map((fibre, index) =>
+      makeActionButton(
+        comparisonGroup,
+        FIBRES[fibre].label.toUpperCase(),
+        `compare:${fibre}`,
+        -2.1 + index * 1.4,
+        0.5,
+        1.22,
+        FIBRES[fibre].accent,
+      ),
+    );
+    const safetyButton = makeActionButton(
+      comparisonGroup,
+      "KEEP FABRIC AWAY FROM FIRE",
+      "compare:safety",
+      0,
+      0.12,
+      2.25,
+      "#ef4444",
+    );
+    const comparisonContinueButton = makeActionButton(
+      comparisonGroup,
+      "OPEN THE FIBRE VAULT",
+      "stage:7",
+      0,
+      0.4,
+      2,
+      "#fde68a",
+    );
+    const vaultChoiceButtons = FIBRE_KEYS.map((fibre, index) =>
+      makeActionButton(
+        vaultGroup,
+        FIBRES[fibre].label.toUpperCase(),
+        `vault:${fibre}`,
+        -2.1 + index * 1.4,
+        0.5,
+        1.22,
+        FIBRES[fibre].accent,
+      ),
+    );
+    const safetyLockButton = makeActionButton(
+      vaultGroup,
+      "NEXT SAFETY-LOCK STEP",
+      "vault:safety",
+      0,
+      0.12,
+      2,
+      "#ef4444",
+    );
+    const restartButton = makeActionButton(
+      vaultGroup,
+      "RUN THE LAB AGAIN",
+      "restart",
+      0,
+      0.42,
+      1.8,
+      "#fde68a",
+    );
+    makeActionButton(
+      scene,
+      "REPLAY NARRATION",
+      "narration:replay",
+      -2.35,
+      3.45,
+      1.55,
+      "#67e8f9",
+    );
+
     const boardCanvas = document.createElement("canvas");
     boardCanvas.width = 900;
     boardCanvas.height = 330;
@@ -970,6 +1207,106 @@ export default function SyntheticFibresViewer() {
     const handleAction = (action: string) => {
       if (action.startsWith("scan:") && stageRef.current === 0) {
         scanItem(action.slice(5) as ScanKey);
+        return;
+      }
+      if (action === "narration:replay") {
+        speak(NARRATIONS[stageRef.current]);
+        return;
+      }
+      if (action === "stage:1" && Object.keys(scannedRef.current).length >= 3) {
+        goToStage(1);
+        return;
+      }
+      if (stageRef.current === 1 && action.startsWith("manufacture:")) {
+        advanceManufacturing(Number(action.slice(12)));
+        return;
+      }
+      if (action === "stage:2" && manufacturingRef.current >= 4) {
+        goToStage(2);
+        return;
+      }
+      if (stageRef.current === 2 && action.startsWith("rayon:")) {
+        advanceRayon(Number(action.slice(6)));
+        return;
+      }
+      if (action === "stage:3" && rayonRef.current >= 4) {
+        goToStage(3);
+        return;
+      }
+      if (stageRef.current === 3 && action === "nylon:stretch") {
+        stretchNylon();
+        return;
+      }
+      if (stageRef.current === 3 && action === "nylon:weight") {
+        addNylonWeight();
+        return;
+      }
+      if (stageRef.current === 3 && action.startsWith("nylon:use:")) {
+        selectNylonUse(action.slice(10));
+        return;
+      }
+      const nylonReady =
+        nylonStretchedRef.current &&
+        nylonWeightsRef.current >= 3 &&
+        Object.keys(nylonUsesRef.current).length >= 2;
+      if (action === "stage:4" && nylonReady) {
+        goToStage(4);
+        return;
+      }
+      if (stageRef.current === 4 && action.startsWith("polyester:")) {
+        runPolyesterTask(action.slice(10) as PolyesterTask);
+        return;
+      }
+      if (
+        action === "stage:5" &&
+        polyesterTasksList.every((task) => polyesterRef.current[task])
+      ) {
+        goToStage(5);
+        return;
+      }
+      if (stageRef.current === 5 && action.startsWith("acrylic:")) {
+        runAcrylicTask(action.slice(8) as AcrylicTask);
+        return;
+      }
+      if (
+        action === "stage:6" &&
+        acrylicTasksList.every((task) => acrylicRef.current[task])
+      ) {
+        goToStage(6);
+        return;
+      }
+      if (stageRef.current === 6 && action.startsWith("compare:")) {
+        if (action === "compare:safety") completeSafety();
+        else {
+          const currentProperty = FIBRE_KEYS.find(
+            (fibre) => !comparisonRef.current[fibre],
+          );
+          if (currentProperty)
+            matchComparison(action.slice(8) as FibreKey, currentProperty);
+        }
+        return;
+      }
+      if (
+        action === "stage:7" &&
+        FIBRE_KEYS.every((fibre) => comparisonRef.current[fibre]) &&
+        safetyRef.current
+      ) {
+        goToStage(7);
+        return;
+      }
+      if (stageRef.current === 7 && action.startsWith("vault:")) {
+        if (action === "vault:safety") advanceSafetyLock();
+        else {
+          const currentItem = VAULT_ITEMS.findIndex(
+            (_, index) => !vaultRef.current[index],
+          );
+          if (currentItem >= 0)
+            answerVault(currentItem, action.slice(6) as FibreKey);
+        }
+        return;
+      }
+      if (action === "restart") {
+        window.location.reload();
       }
     };
     const onPointerDown = (event: PointerEvent) => {
@@ -1076,6 +1413,65 @@ export default function SyntheticFibresViewer() {
           material.emissiveIntensity = 1.6;
         });
       }
+      scanContinueButton.visible = Object.keys(scannedRef.current).length >= 3;
+      manufacturingButtons.forEach((button, index) => {
+        button.visible = manufacturingRef.current === index;
+      });
+      manufacturingContinueButton.visible = manufacturingRef.current >= 4;
+      rayonButtons.forEach((button, index) => {
+        button.visible = rayonRef.current === index;
+      });
+      rayonContinueButton.visible = rayonRef.current >= 4;
+      const selectedNylonUses = Object.keys(nylonUsesRef.current).length;
+      nylonStretchButton.visible =
+        stageRef.current === 3 && !nylonStretchedRef.current;
+      nylonWeightButton.visible =
+        stageRef.current === 3 && nylonWeightsRef.current < 3;
+      nylonUseButtons.forEach((button, index) => {
+        button.visible =
+          stageRef.current === 3 &&
+          selectedNylonUses < 2 &&
+          !nylonUsesRef.current[nylonUseNames[index]];
+      });
+      nylonContinueButton.visible =
+        stageRef.current === 3 &&
+        nylonStretchedRef.current &&
+        nylonWeightsRef.current >= 3 &&
+        selectedNylonUses >= 2;
+      polyesterButtons.forEach((button, index) => {
+        button.visible =
+          stageRef.current === 4 &&
+          !polyesterRef.current[polyesterTasksList[index]];
+      });
+      polyesterContinueButton.visible =
+        stageRef.current === 4 &&
+        polyesterTasksList.every((task) => polyesterRef.current[task]);
+      acrylicButtons.forEach((button, index) => {
+        button.visible =
+          stageRef.current === 5 &&
+          !acrylicRef.current[acrylicTasksList[index]];
+      });
+      acrylicContinueButton.visible =
+        stageRef.current === 5 &&
+        acrylicTasksList.every((task) => acrylicRef.current[task]);
+      const comparisonPending = FIBRE_KEYS.some(
+        (fibre) => !comparisonRef.current[fibre],
+      );
+      comparisonChoiceButtons.forEach((button) => {
+        button.visible = stageRef.current === 6 && comparisonPending;
+      });
+      safetyButton.visible = stageRef.current === 6 && !safetyRef.current;
+      comparisonContinueButton.visible =
+        stageRef.current === 6 && !comparisonPending && safetyRef.current;
+      const vaultPending = VAULT_ITEMS.some(
+        (_, index) => !vaultRef.current[index],
+      );
+      vaultChoiceButtons.forEach((button) => {
+        button.visible = stageRef.current === 7 && vaultPending;
+      });
+      safetyLockButton.visible =
+        stageRef.current === 7 && safetyStepsRef.current < 3;
+      restartButton.visible = stageRef.current === 7 && vaultComplete;
       renderer.render(scene, camera);
     });
 
@@ -1120,7 +1516,21 @@ export default function SyntheticFibresViewer() {
       boardUpdateRef.current = () => undefined;
       window.speechSynthesis?.cancel();
     };
-  }, [scanItem]);
+  }, [
+    addNylonWeight,
+    advanceManufacturing,
+    advanceRayon,
+    advanceSafetyLock,
+    answerVault,
+    completeSafety,
+    goToStage,
+    matchComparison,
+    runAcrylicTask,
+    runPolyesterTask,
+    scanItem,
+    selectNylonUse,
+    stretchNylon,
+  ]);
 
   const enterVR = useCallback(async () => {
     const renderer = rendererRef.current;
@@ -1166,6 +1576,7 @@ export default function SyntheticFibresViewer() {
 
   const nextButton = (enabled: boolean): CSSProperties => ({
     padding: 11,
+    minHeight: 44,
     borderRadius: 9,
     border: 0,
     background: enabled ? "#7c3aed" : "#334155",
@@ -1185,7 +1596,12 @@ export default function SyntheticFibresViewer() {
         color: "#f8fafc",
       }}
     >
-      <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
+      <div
+        ref={mountRef}
+        role="img"
+        aria-label={`Interactive synthetic-fibre laboratory. ${STAGES[stage].title}. ${feedback}`}
+        style={{ position: "absolute", inset: 0 }}
+      />
 
       {!started ? (
         <div
@@ -1355,6 +1771,16 @@ export default function SyntheticFibresViewer() {
             >
               {STAGES[stage].cue}
             </p>
+            <button
+              onClick={() => speak(NARRATIONS[stage])}
+              style={{
+                ...choiceStyle(false, "#67e8f9"),
+                width: "100%",
+                marginBottom: 9,
+              }}
+            >
+              🔊 Replay narration
+            </button>
             <div
               aria-live="polite"
               style={{
