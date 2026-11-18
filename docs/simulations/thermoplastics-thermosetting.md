@@ -11,6 +11,7 @@
 - **Duration:** 5 minutes; guided completion remains available if a learner needs longer
 - **Comfort risk:** `low` — stationary viewpoint with optional desktop orbit
 - **Performance target:** 72 FPS on Meta Quest using procedural geometry and no external assets
+- **Timing:** A visible five-minute timer provides a non-scoring guided result when the learning slot expires.
 
 ## XR fit justification
 
@@ -44,4 +45,6 @@ Students will distinguish thermoplastics from thermosetting plastics by their re
 - Stationary VR camera with no artificial locomotion or sudden camera movement.
 - Spoken narration is duplicated in the in-world mission board and browser control panel.
 - Point-and-select controls duplicate every grab or machine action.
-- High contrast, visible progress, retryable hints, and `aria-live` feedback.
+- In-world ray controls cover every guided action, classification choice, sample test, stage transition, narration replay, and restart inside immersive VR.
+- High contrast, visible progress, one corrective retry, and `aria-live` feedback.
+- Narration replay/mute controls and an explicit reduced-motion mode are available in the browser panel; the operating-system reduced-motion preference is respected automatically.

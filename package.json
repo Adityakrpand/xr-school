@@ -12,6 +12,7 @@
     "contract:compile": "tsp compile contracts/typespec",
     "quality": "npm run contract:compile && npm run test && npm run type-check && npm run lint && npm run validate:simulations",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "type-check": "npm run type-check -w @xr-school/web && npm run build -w @xr-school/api",
     "validate:simulations": "node scripts/validate-simulations.mjs",
     "spec:drift": "node scripts/spec-drift-check.mjs",

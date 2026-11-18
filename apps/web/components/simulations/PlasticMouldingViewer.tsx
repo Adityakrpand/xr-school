@@ -87,6 +87,7 @@ const EXAMPLES: Record<
 };
 
 const EXAMPLE_KEYS = Object.keys(EXAMPLES) as ExampleKey[];
+const SIMULATION_DURATION_SECONDS = 5 * 60;
 
 function speak(text: string) {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
@@ -152,6 +153,7 @@ function drawMissionBoard(
   canvas: HTMLCanvasElement,
   stage: number,
   points: number,
+  secondsRemaining: number,
 ) {
   const context = canvas.getContext("2d");
   if (!context) return;
@@ -164,6 +166,11 @@ function drawMissionBoard(
   context.fillStyle = "#fdba74";
   context.font = "700 27px sans-serif";
   context.fillText(`MOULDING LAB  •  ${stage + 1}/7`, 34, 46);
+  const minutes = Math.floor(secondsRemaining / 60);
+  const seconds = String(secondsRemaining % 60).padStart(2, "0");
+  context.textAlign = "right";
+  context.fillText(`TIME ${minutes}:${seconds}`, canvas.width - 34, 46);
+  context.textAlign = "left";
   context.fillStyle = "#fff7ed";
   context.font = "800 38px sans-serif";
   context.fillText(STAGES[stage].title, 34, 98);
@@ -186,7 +193,7 @@ function drawMissionBoard(
   if (stage >= 5) {
     context.fillStyle = "#fde68a";
     context.font = "700 24px sans-serif";
-    context.fillText(`Challenge points: ${points}/3`, canvas.width - 260, 46);
+    context.fillText(`Challenge points: ${points}/3`, 34, 302);
   }
 }
 
@@ -215,7 +222,7 @@ function starGeometry(outer = 0.72, inner = 0.34, depth = 0.2) {
 function choiceStyle(selected: boolean, accent = "#fb923c"): CSSProperties {
   return {
     padding: "9px 10px",
-    minHeight: 40,
+    minHeight: 44,
     borderRadius: 9,
     border: `1px solid ${selected ? accent : "rgba(255,255,255,.14)"}`,
     background: selected ? `${accent}2b` : "rgba(255,255,255,.045)",
@@ -229,7 +236,7 @@ function nextStyle(enabled: boolean): CSSProperties {
   return {
     width: "100%",
     padding: 11,
-    minHeight: 42,
+    minHeight: 44,
     borderRadius: 9,
     border: 0,
     background: enabled ? "#ea580c" : "#475569",
@@ -253,6 +260,11 @@ export default function PlasticMouldingViewer() {
   const sortedRef = useRef<Partial<Record<SortKey, PlasticKind>>>({});
   const finalHeatedRef = useRef(false);
   const badgeCompleteRef = useRef(false);
+  const retryCountRef = useRef(0);
+  const mutedRef = useRef(false);
+  const reducedMotionRef = useRef(false);
+  const deadlineRef = useRef<number | null>(null);
+  const secondsRemainingRef = useRef(SIMULATION_DURATION_SECONDS);
   const stageVisualRef = useRef<(stage: number) => void>(() => undefined);
   const boardUpdateRef = useRef<() => void>(() => undefined);
 
@@ -275,6 +287,12 @@ export default function PlasticMouldingViewer() {
   const [finalHeated, setFinalHeated] = useState(false);
   const [badgeComplete, setBadgeComplete] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [muted, setMuted] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [secondsRemaining, setSecondsRemaining] = useState(
+    SIMULATION_DURATION_SECONDS,
+  );
+  const [guidedCompletion, setGuidedCompletion] = useState(false);
   const [feedback, setFeedback] = useState(
     "Start with the PET bottle, then inspect both round discs.",
   );
@@ -283,6 +301,27 @@ export default function PlasticMouldingViewer() {
     pointsRef.current += 1;
     setPoints(pointsRef.current);
     boardUpdateRef.current();
+  }, []);
+
+  const narrate = useCallback((text: string) => {
+    if (!mutedRef.current) speak(text);
+  }, []);
+
+  const toggleMuted = useCallback(() => {
+    setMuted((current) => {
+      const next = !current;
+      mutedRef.current = next;
+      if (next) window.speechSynthesis?.cancel();
+      return next;
+    });
+  }, []);
+
+  const toggleReducedMotion = useCallback(() => {
+    setReducedMotion((current) => {
+      const next = !current;
+      reducedMotionRef.current = next;
+      return next;
+    });
   }, []);
 
   useEffect(() => {
@@ -296,13 +335,27 @@ export default function PlasticMouldingViewer() {
       .catch(() => setVrSupported(false));
   }, []);
 
-  const goToStage = useCallback((next: number) => {
-    stageRef.current = next;
-    setStage(next);
-    setFeedback(STAGES[next].cue);
-    stageVisualRef.current(next);
-    speak(NARRATIONS[next]);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const applyPreference = () => {
+      reducedMotionRef.current = media.matches;
+      setReducedMotion(media.matches);
+    };
+    applyPreference();
+    media.addEventListener("change", applyPreference);
+    return () => media.removeEventListener("change", applyPreference);
   }, []);
+
+  const goToStage = useCallback(
+    (next: number) => {
+      stageRef.current = next;
+      setStage(next);
+      setFeedback(STAGES[next].cue);
+      stageVisualRef.current(next);
+      narrate(NARRATIONS[next]);
+    },
+    [narrate],
+  );
 
   const scanItem = useCallback((key: ScanKey) => {
     const messages: Record<ScanKey, string> = {
@@ -434,7 +487,14 @@ export default function PlasticMouldingViewer() {
         return;
       }
       if (sample === "b") {
-        setRetryCount((current) => current + 1);
+        if (retryCountRef.current >= 1) {
+          setFeedback(
+            "The retry has already been used. Choose the sample that softened during the test.",
+          );
+          return;
+        }
+        retryCountRef.current = 1;
+        setRetryCount(1);
         setFeedback(
           "The mould remains empty. Which sample softened during the test? Try once more.",
         );
@@ -451,6 +511,42 @@ export default function PlasticMouldingViewer() {
     },
     [awardPoint],
   );
+
+  const showGuidedResult = useCallback(() => {
+    if (badgeCompleteRef.current) return;
+    stageRef.current = 6;
+    finalHeatedRef.current = true;
+    badgeCompleteRef.current = true;
+    setStage(6);
+    setFinalHeated(true);
+    setBadgeComplete(true);
+    setGuidedCompletion(true);
+    setFeedback(
+      "Five-minute guided result: Sample A softened, filled the star mould, and cooled into the missing badge.",
+    );
+    stageVisualRef.current(6);
+    narrate(
+      "Time is complete, so here is the guided result. Both samples started round. Only the thermoplastic softened and could be reshaped into the star badge.",
+    );
+  }, [narrate]);
+
+  useEffect(() => {
+    if (!started || badgeComplete) return;
+    deadlineRef.current ??= Date.now() + SIMULATION_DURATION_SECONDS * 1000;
+    const updateTimer = () => {
+      const remaining = Math.max(
+        0,
+        Math.ceil(((deadlineRef.current ?? Date.now()) - Date.now()) / 1000),
+      );
+      setSecondsRemaining(remaining);
+      secondsRemainingRef.current = remaining;
+      boardUpdateRef.current();
+      if (remaining === 0) showGuidedResult();
+    };
+    updateTimer();
+    const timer = window.setInterval(updateTimer, 1000);
+    return () => window.clearInterval(timer);
+  }, [badgeComplete, showGuidedResult, started]);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -475,6 +571,8 @@ export default function PlasticMouldingViewer() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.xr.enabled = true;
+    renderer.domElement.setAttribute("aria-hidden", "true");
+    renderer.domElement.tabIndex = -1;
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -522,6 +620,22 @@ export default function PlasticMouldingViewer() {
     }
 
     const interactive: THREE.Object3D[] = [];
+    const makeActionButton = (
+      group: THREE.Group | THREE.Scene,
+      label: string,
+      action: string,
+      x: number,
+      y: number,
+      width = 1.75,
+      accent = "#22d3ee",
+    ) => {
+      const button = labelSprite(label, accent, width);
+      button.position.set(x, y, -2.7);
+      setAction(button, action);
+      interactive.push(button);
+      group.add(button);
+      return button;
+    };
     const makeBench = (group: THREE.Group, width = 6.4) => {
       const top = new THREE.Mesh(
         new THREE.BoxGeometry(width, 0.22, 2.25),
@@ -653,6 +767,16 @@ export default function PlasticMouldingViewer() {
     );
     scanLabel.position.set(-1.65, 4.0, -1.5);
     scanGroup.add(scanLabel);
+    const scanContinueButton = makeActionButton(
+      scanGroup,
+      "CONTINUE TO MOULDING",
+      "stage:1",
+      0,
+      0.55,
+      2.1,
+      "#fb923c",
+    );
+    scanContinueButton.visible = false;
     scene.add(scanGroup);
 
     const mouldGroup = new THREE.Group();
@@ -694,6 +818,7 @@ export default function PlasticMouldingViewer() {
         1.23 + Math.floor(index / 6) * 0.15,
         -0.5 + (index % 3) * 0.15,
       );
+      pellet.userData.baseY = pellet.position.y;
       pellets.push(pellet);
       mouldGroup.add(pellet);
     }
@@ -722,6 +847,23 @@ export default function PlasticMouldingViewer() {
     );
     mouldLabel.position.set(0, 4.05, -1.55);
     mouldGroup.add(mouldLabel);
+    const mouldActionButtons = [
+      ["LOAD POLYTHENE PELLETS", "mould:1"],
+      ["PULL THE MOULD LEVER", "mould:2"],
+      ["COOL AND OPEN", "mould:3"],
+      ["TRACE THE ROUND EDGE", "mould:4"],
+    ].map(([label, action]) =>
+      makeActionButton(mouldGroup, label, action, 0, 0.55, 2.15, "#fbbf24"),
+    );
+    const mouldContinueButton = makeActionButton(
+      mouldGroup,
+      "RESHAPE DISC A",
+      "stage:2",
+      0,
+      0.55,
+      1.75,
+      "#fb923c",
+    );
     mouldGroup.visible = false;
     scene.add(mouldGroup);
 
@@ -802,6 +944,23 @@ export default function PlasticMouldingViewer() {
     );
     reshapeLabel.position.set(0, 4.25, -1.65);
     reshapeGroup.add(reshapeLabel);
+    const reshapeActionButtons = [
+      ["PRESS WITH HEAT OFF", "reshape:1"],
+      ["TURN ON SIMULATED HEAT", "reshape:2"],
+      ["PRESS INTO STAR MOULD", "reshape:3"],
+      ["SWITCH HEAT OFF AND COOL", "reshape:4"],
+    ].map(([label, action]) =>
+      makeActionButton(reshapeGroup, label, action, 0, 0.55, 2.25, "#fb923c"),
+    );
+    const reshapeContinueButton = makeActionButton(
+      reshapeGroup,
+      "TEST DISC B",
+      "stage:3",
+      0,
+      0.55,
+      1.65,
+      "#c084fc",
+    );
     reshapeGroup.visible = false;
     scene.add(reshapeGroup);
 
@@ -872,6 +1031,23 @@ export default function PlasticMouldingViewer() {
     );
     crossLabel.position.set(0, 4.15, -1.6);
     crossGroup.add(crossLabel);
+    const crossActionButtons = [
+      ["MOVE SLIDER: AFTER SETTING", "cross:1"],
+      ["TURN ON SIMULATED HEAT", "cross:2"],
+      ["PRESS INTO STAR MOULD", "cross:3"],
+      ["MAGNIFY THE CROSS-LINKS", "cross:4"],
+    ].map(([label, action]) =>
+      makeActionButton(crossGroup, label, action, 0, 0.55, 2.35, "#c084fc"),
+    );
+    const crossContinueButton = makeActionButton(
+      crossGroup,
+      "COMPARE PLASTICS",
+      "stage:4",
+      0,
+      0.55,
+      1.8,
+      "#22d3ee",
+    );
     crossGroup.visible = false;
     scene.add(crossGroup);
 
@@ -911,6 +1087,35 @@ export default function PlasticMouldingViewer() {
       label.position.set(sample.position.x, 0.62, -0.15);
       compareGroup.add(sample, label);
     });
+    const replayButton = makeActionButton(
+      compareGroup,
+      "REPLAY BOTH TESTS",
+      "compare:replay",
+      0,
+      0.35,
+      1.85,
+      "#fbbf24",
+    );
+    const exampleButtons = EXAMPLE_KEYS.map((key, index) =>
+      makeActionButton(
+        compareGroup,
+        `SCAN ${EXAMPLES[key].label.toUpperCase()}`,
+        `compare:${key}`,
+        index % 2 === 0 ? -1.25 : 1.25,
+        index < 2 ? 0.9 : 0.45,
+        1.55,
+        EXAMPLES[key].kind === "thermoplastic" ? "#fb923c" : "#c084fc",
+      ),
+    );
+    const compareContinueButton = makeActionButton(
+      compareGroup,
+      "BEGIN WORKSHOP CHALLENGE",
+      "stage:5",
+      0,
+      0.35,
+      2.25,
+      "#fbbf24",
+    );
     compareGroup.visible = false;
     scene.add(compareGroup);
 
@@ -946,6 +1151,53 @@ export default function PlasticMouldingViewer() {
       trayLabelB,
       challengePipe,
       bakelite,
+    );
+    const sortButtons = {
+      pvcThermoplastic: makeActionButton(
+        sortGroup,
+        "PVC → THERMOPLASTIC",
+        "sort:pvc:thermoplastic",
+        -1.25,
+        0.65,
+        1.55,
+        "#fb923c",
+      ),
+      pvcThermoset: makeActionButton(
+        sortGroup,
+        "PVC → THERMOSETTING",
+        "sort:pvc:thermoset",
+        -1.25,
+        0.3,
+        1.55,
+        "#c084fc",
+      ),
+      bakeliteThermoplastic: makeActionButton(
+        sortGroup,
+        "BAKELITE → THERMOPLASTIC",
+        "sort:bakelite:thermoplastic",
+        1.25,
+        0.65,
+        1.8,
+        "#fb923c",
+      ),
+      bakeliteThermoset: makeActionButton(
+        sortGroup,
+        "BAKELITE → THERMOSETTING",
+        "sort:bakelite:thermoset",
+        1.25,
+        0.3,
+        1.75,
+        "#c084fc",
+      ),
+    };
+    const sortContinueButton = makeActionButton(
+      sortGroup,
+      "MAKE THE MISSING BADGE",
+      "stage:6",
+      0,
+      0.35,
+      2.15,
+      "#fbbf24",
     );
     sortGroup.visible = false;
     scene.add(sortGroup);
@@ -990,13 +1242,59 @@ export default function PlasticMouldingViewer() {
     );
     finalLabel.position.set(0, 4.05, -1.45);
     finalGroup.add(finalDiscA, finalDiscB, finalStar, badgeSlot, finalLabel);
+    const heatBothButton = makeActionButton(
+      finalGroup,
+      "HEAT BOTH SAMPLES",
+      "final:heat",
+      0,
+      0.65,
+      1.85,
+      "#ef4444",
+    );
+    const chooseSampleAButton = makeActionButton(
+      finalGroup,
+      "CHOOSE A — SOFTENED",
+      "final:a",
+      -1.15,
+      0.4,
+      1.6,
+      "#fbbf24",
+    );
+    const chooseSampleBButton = makeActionButton(
+      finalGroup,
+      "CHOOSE B — STAYED SET",
+      "final:b",
+      1.15,
+      0.4,
+      1.65,
+      "#c084fc",
+    );
+    const restartButton = makeActionButton(
+      finalGroup,
+      "RUN THE MISSION AGAIN",
+      "restart",
+      0,
+      0.45,
+      2,
+      "#fbbf24",
+    );
     finalGroup.visible = false;
     scene.add(finalGroup);
+
+    makeActionButton(
+      scene,
+      "REPLAY NARRATION",
+      "narration:replay",
+      -2.45,
+      3.55,
+      1.55,
+      "#22d3ee",
+    );
 
     const boardCanvas = document.createElement("canvas");
     boardCanvas.width = 940;
     boardCanvas.height = 330;
-    drawMissionBoard(boardCanvas, 0, 0);
+    drawMissionBoard(boardCanvas, 0, 0, SIMULATION_DURATION_SECONDS);
     const boardTexture = new THREE.CanvasTexture(boardCanvas);
     boardTexture.colorSpace = THREE.SRGBColorSpace;
     const board = new THREE.Mesh(
@@ -1006,7 +1304,12 @@ export default function PlasticMouldingViewer() {
     board.position.set(0, 4.65, -3.55);
     scene.add(board);
     boardUpdateRef.current = () => {
-      drawMissionBoard(boardCanvas, stageRef.current, pointsRef.current);
+      drawMissionBoard(
+        boardCanvas,
+        stageRef.current,
+        pointsRef.current,
+        secondsRemainingRef.current,
+      );
       boardTexture.needsUpdate = true;
     };
 
@@ -1026,6 +1329,92 @@ export default function PlasticMouldingViewer() {
     const handleAction = (action: string) => {
       if (stageRef.current === 0 && action.startsWith("scan:")) {
         scanItem(action.slice(5) as ScanKey);
+        return;
+      }
+      if (action === "narration:replay") {
+        narrate(NARRATIONS[stageRef.current]);
+        return;
+      }
+      if (
+        action === "stage:1" &&
+        Boolean(scannedRef.current.pet) &&
+        Boolean(scannedRef.current["disc-a"]) &&
+        Boolean(scannedRef.current["disc-b"])
+      ) {
+        goToStage(1);
+        return;
+      }
+      if (stageRef.current === 1 && action.startsWith("mould:")) {
+        advanceMould(Number(action.slice(6)));
+        return;
+      }
+      if (action === "stage:2" && mouldRef.current >= 4) {
+        goToStage(2);
+        return;
+      }
+      if (stageRef.current === 2 && action.startsWith("reshape:")) {
+        advanceReshape(Number(action.slice(8)));
+        return;
+      }
+      if (action === "stage:3" && reshapeRef.current >= 4) {
+        goToStage(3);
+        return;
+      }
+      if (stageRef.current === 3 && action === "cross:1") {
+        revealCrosslinks();
+        return;
+      }
+      if (stageRef.current === 3 && action.startsWith("cross:")) {
+        advanceCrosslink(Number(action.slice(6)));
+        return;
+      }
+      if (action === "stage:4" && crosslinkRef.current >= 4) {
+        goToStage(4);
+        return;
+      }
+      if (stageRef.current === 4 && action === "compare:replay") {
+        replayComparison();
+        return;
+      }
+      if (stageRef.current === 4 && action.startsWith("compare:")) {
+        inspectExample(action.slice(8) as ExampleKey);
+        return;
+      }
+      if (
+        action === "stage:5" &&
+        replayRef.current &&
+        EXAMPLE_KEYS.every((key) => comparisonRef.current[key])
+      ) {
+        goToStage(5);
+        return;
+      }
+      if (stageRef.current === 5 && action.startsWith("sort:")) {
+        const [, key, kind] = action.split(":") as [
+          string,
+          SortKey,
+          PlasticKind,
+        ];
+        sortObject(key, kind);
+        return;
+      }
+      if (
+        action === "stage:6" &&
+        Boolean(sortedRef.current.pvc) &&
+        Boolean(sortedRef.current.bakelite)
+      ) {
+        goToStage(6);
+        return;
+      }
+      if (stageRef.current === 6 && action === "final:heat") {
+        heatFinalDiscs();
+        return;
+      }
+      if (stageRef.current === 6 && action.startsWith("final:")) {
+        chooseBadgeDisc(action.slice(6) as "a" | "b");
+        return;
+      }
+      if (action === "restart") {
+        window.location.reload();
       }
     };
     const onPointerDown = (event: PointerEvent) => {
@@ -1079,32 +1468,35 @@ export default function PlasticMouldingViewer() {
     }
 
     const clock = new THREE.Clock();
+    const targetScale = new THREE.Vector3();
     renderer.setAnimationLoop(() => {
       const elapsed = clock.getElapsedTime();
+      const reduceMotion = reducedMotionRef.current;
       controls.update();
       petChains.visible = Boolean(scannedRef.current.pet);
       pellets.forEach((pellet, index) => {
         pellet.visible = mouldRef.current < 2;
-        pellet.position.y += Math.sin(elapsed * 2.4 + index) * 0.0007;
+        pellet.position.y =
+          Number(pellet.userData.baseY) +
+          (reduceMotion ? 0 : Math.sin(elapsed * 2.4 + index) * 0.015);
       });
       const mouldTarget = mouldRef.current >= 2 ? 1 : 0.05;
-      mouldedDisc.scale.lerp(
-        new THREE.Vector3(mouldTarget, mouldTarget, mouldTarget),
-        0.08,
-      );
+      if (reduceMotion) mouldedDisc.scale.setScalar(mouldTarget);
+      else mouldedDisc.scale.lerp(targetScale.setScalar(mouldTarget), 0.08);
       heatHalo.visible = reshapeRef.current >= 2 && reshapeRef.current < 4;
-      heatHalo.rotation.z = elapsed * 0.7;
+      heatHalo.rotation.z = reduceMotion ? 0 : elapsed * 0.7;
       reshapeRound.visible = reshapeRef.current < 3;
       reshapeStar.visible = reshapeRef.current >= 3;
       if (reshapeStar.visible) {
-        reshapeStar.scale.lerp(new THREE.Vector3(1, 1, 1), 0.07);
+        if (reduceMotion) reshapeStar.scale.setScalar(1);
+        else reshapeStar.scale.lerp(targetScale.setScalar(1), 0.07);
       }
       chainBeads.forEach((bead) => {
         const mobile = reshapeRef.current >= 2 && reshapeRef.current < 4;
         bead.position.x =
           -0.55 +
           Number(bead.userData.column) * 0.16 +
-          (mobile
+          (mobile && !reduceMotion
             ? Math.sin(elapsed * 3 + Number(bead.userData.row)) * 0.07
             : 0);
       });
@@ -1112,16 +1504,64 @@ export default function PlasticMouldingViewer() {
         link.visible = crosslinkRef.current >= 1;
       });
       crossDisc.rotation.z =
-        crosslinkRef.current >= 2 ? Math.sin(elapsed * 5) * 0.025 : 0;
+        crosslinkRef.current >= 2 && !reduceMotion
+          ? Math.sin(elapsed * 5) * 0.025
+          : 0;
       finalDiscA.scale.setScalar(
-        finalHeatedRef.current ? 1 + Math.sin(elapsed * 3) * 0.045 : 1,
+        finalHeatedRef.current && !reduceMotion
+          ? 1 + Math.sin(elapsed * 3) * 0.045
+          : 1,
       );
       finalDiscB.scale.setScalar(1);
       finalStar.visible = badgeCompleteRef.current;
       if (finalStar.visible) {
-        finalStar.scale.lerp(new THREE.Vector3(1, 1, 1), 0.06);
-        finalStar.rotation.z = Math.sin(elapsed * 1.4) * 0.08;
+        if (reduceMotion) finalStar.scale.setScalar(1);
+        else finalStar.scale.lerp(targetScale.setScalar(1), 0.06);
+        finalStar.rotation.z = reduceMotion
+          ? 0
+          : Math.sin(elapsed * 1.4) * 0.08;
       }
+
+      scanContinueButton.visible =
+        Boolean(scannedRef.current.pet) &&
+        Boolean(scannedRef.current["disc-a"]) &&
+        Boolean(scannedRef.current["disc-b"]);
+      mouldActionButtons.forEach((button, index) => {
+        button.visible = mouldRef.current === index;
+      });
+      mouldContinueButton.visible = mouldRef.current >= 4;
+      reshapeActionButtons.forEach((button, index) => {
+        button.visible = reshapeRef.current === index;
+      });
+      reshapeContinueButton.visible = reshapeRef.current >= 4;
+      crossActionButtons.forEach((button, index) => {
+        button.visible = crosslinkRef.current === index;
+      });
+      crossContinueButton.visible = crosslinkRef.current >= 4;
+      replayButton.visible = !replayRef.current;
+      exampleButtons.forEach((button, index) => {
+        button.visible =
+          replayRef.current && !comparisonRef.current[EXAMPLE_KEYS[index]];
+      });
+      compareContinueButton.visible =
+        replayRef.current &&
+        EXAMPLE_KEYS.every((key) => comparisonRef.current[key]);
+      const pvcSorted = Boolean(sortedRef.current.pvc);
+      const bakeliteSorted = Boolean(sortedRef.current.bakelite);
+      sortButtons.pvcThermoplastic.visible = !pvcSorted;
+      sortButtons.pvcThermoset.visible = !pvcSorted;
+      sortButtons.bakeliteThermoplastic.visible = !bakeliteSorted;
+      sortButtons.bakeliteThermoset.visible = !bakeliteSorted;
+      sortContinueButton.visible = pvcSorted && bakeliteSorted;
+      heatBothButton.visible =
+        !finalHeatedRef.current && !badgeCompleteRef.current;
+      chooseSampleAButton.visible =
+        finalHeatedRef.current && !badgeCompleteRef.current;
+      chooseSampleBButton.visible =
+        finalHeatedRef.current &&
+        !badgeCompleteRef.current &&
+        retryCountRef.current === 0;
+      restartButton.visible = badgeCompleteRef.current;
       renderer.render(scene, camera);
     });
 
@@ -1167,7 +1607,20 @@ export default function PlasticMouldingViewer() {
       boardUpdateRef.current = () => undefined;
       window.speechSynthesis?.cancel();
     };
-  }, [scanItem]);
+  }, [
+    advanceCrosslink,
+    advanceMould,
+    advanceReshape,
+    chooseBadgeDisc,
+    goToStage,
+    heatFinalDiscs,
+    inspectExample,
+    narrate,
+    replayComparison,
+    revealCrosslinks,
+    scanItem,
+    sortObject,
+  ]);
 
   const enterVR = useCallback(async () => {
     const renderer = rendererRef.current;
@@ -1205,6 +1658,8 @@ export default function PlasticMouldingViewer() {
   const comparisonComplete =
     replayed && EXAMPLE_KEYS.every((key) => examples[key]);
   const sortingComplete = Boolean(sorted.pvc) && Boolean(sorted.bakelite);
+  const timerMinutes = Math.floor(secondsRemaining / 60);
+  const timerSeconds = String(secondsRemaining % 60).padStart(2, "0");
 
   return (
     <div
@@ -1218,7 +1673,12 @@ export default function PlasticMouldingViewer() {
         fontFamily: "system-ui, sans-serif",
       }}
     >
-      <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
+      <div
+        ref={mountRef}
+        role="img"
+        aria-label={`Interactive 3D moulding workshop. ${STAGES[stage].title}. ${feedback}`}
+        style={{ position: "absolute", inset: 0 }}
+      />
 
       {!started ? (
         <div
@@ -1266,7 +1726,7 @@ export default function PlasticMouldingViewer() {
             <button
               onClick={() => {
                 setStarted(true);
-                speak(NARRATIONS[0]);
+                narrate(NARRATIONS[0]);
               }}
               style={{
                 padding: "13px 26px",
@@ -1311,6 +1771,9 @@ export default function PlasticMouldingViewer() {
             {stage >= 5
               ? ` · ${points}/3 challenge points`
               : " · Guided learning"}
+            <span role="timer" aria-label={`${secondsRemaining} seconds left`}>
+              {` · ${timerMinutes}:${timerSeconds}`}
+            </span>
           </div>
 
           {vrSupported ? (
@@ -1364,6 +1827,35 @@ export default function PlasticMouldingViewer() {
             >
               {STAGES[stage].cue}
             </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                gap: 6,
+                marginBottom: 10,
+              }}
+            >
+              <button
+                onClick={() => narrate(NARRATIONS[stage])}
+                style={choiceStyle(false, "#22d3ee")}
+              >
+                🔊 Replay
+              </button>
+              <button
+                aria-pressed={muted}
+                onClick={toggleMuted}
+                style={choiceStyle(muted, "#22d3ee")}
+              >
+                {muted ? "🔇 Muted" : "🔉 Sound"}
+              </button>
+              <button
+                aria-pressed={reducedMotion}
+                onClick={toggleReducedMotion}
+                style={choiceStyle(reducedMotion, "#22d3ee")}
+              >
+                {reducedMotion ? "Motion: low" : "Motion: full"}
+              </button>
+            </div>
             <div
               aria-live="polite"
               style={{
@@ -1667,7 +2159,7 @@ export default function PlasticMouldingViewer() {
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
+                      gridTemplateColumns: retryCount === 0 ? "1fr 1fr" : "1fr",
                       gap: 8,
                     }}
                   >
@@ -1677,18 +2169,20 @@ export default function PlasticMouldingViewer() {
                     >
                       Choose Sample A — softened
                     </button>
-                    <button
-                      onClick={() => chooseBadgeDisc("b")}
-                      style={choiceStyle(false, "#c084fc")}
-                    >
-                      Choose Sample B — stayed set
-                    </button>
+                    {retryCount === 0 ? (
+                      <button
+                        onClick={() => chooseBadgeDisc("b")}
+                        style={choiceStyle(false, "#c084fc")}
+                      >
+                        Choose Sample B — stayed set
+                      </button>
+                    ) : null}
                   </div>
                 ) : null}
                 {retryCount > 0 ? (
                   <div role="alert" style={{ color: "#fecaca", fontSize: 12 }}>
-                    Retry available: choose the sample that softened during the
-                    test.
+                    One retry available: choose the sample that softened during
+                    the test. The incorrect sample is now unavailable.
                   </div>
                 ) : null}
               </div>
@@ -1706,7 +2200,11 @@ export default function PlasticMouldingViewer() {
                 }}
               >
                 <div style={{ fontSize: 42 }}>⭐🏅</div>
-                <h3 style={{ margin: "4px 0 8px" }}>Star Badge Completed!</h3>
+                <h3 style={{ margin: "4px 0 8px" }}>
+                  {guidedCompletion
+                    ? "Guided Result Completed"
+                    : "Star Badge Completed!"}
+                </h3>
                 <p
                   style={{
                     margin: "0 0 12px",
@@ -1715,9 +2213,9 @@ export default function PlasticMouldingViewer() {
                     lineHeight: 1.55,
                   }}
                 >
-                  Both samples started round. Only the thermoplastic softened
-                  and could be remoulded. Permanent cross-links kept the
-                  thermosetting sample round.
+                  {guidedCompletion
+                    ? "The five-minute learning slot is complete. Sample A softened and filled the star mould; permanent cross-links kept Sample B round. Guided completion does not add challenge points."
+                    : "Both samples started round. Only the thermoplastic softened and could be remoulded. Permanent cross-links kept the thermosetting sample round."}
                 </p>
                 <button
                   onClick={() => window.location.reload()}
