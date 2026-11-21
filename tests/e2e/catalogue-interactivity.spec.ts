@@ -72,3 +72,59 @@ test("solubility predictions are selectable and narrated", async ({ page }) => {
     page.getByRole("button", { name: "Replay narration" }),
   ).toBeVisible();
 });
+
+test("traffic safety completes the full Smart Road mission", async ({
+  page,
+}) => {
+  await page.goto("/simulations/traffic-signs-road-safety");
+  await page.getByRole("button", { name: "Enter Smart City" }).click();
+  await page.getByRole("button", { name: /At a zebra crossing/ }).click();
+  await page.getByRole("button", { name: /Begin the safety mission/ }).click();
+
+  for (const sign of ["STOP", "NO ENTRY", "SPEED LIMIT 40", "SCHOOL AHEAD"]) {
+    await page
+      .getByRole("button", { name: new RegExp(`Restore ${sign}`) })
+      .click();
+  }
+  await page
+    .getByRole("button", { name: /Continue to the traffic lights/ })
+    .click();
+
+  await page.getByRole("button", { name: /RED$/ }).click();
+  await page.getByRole("button", { name: /YELLOW$/ }).click();
+  await page.getByRole("button", { name: /GREEN$/ }).click();
+  await page
+    .getByRole("button", { name: /Continue to the zebra crossing/ })
+    .click();
+
+  await page.getByRole("button", { name: /Use the zebra crossing/ }).click();
+  for (const step of [
+    "Stop at the footpath edge",
+    "Look right",
+    "Look left",
+    "Look right again",
+    "Listen for vehicles",
+    "Check that vehicles have stopped",
+    "Walk straight across—do not run",
+  ]) {
+    await page.getByRole("button", { name: `→ ${step}`, exact: true }).click();
+  }
+  await page
+    .getByRole("button", { name: /Take Robo's final safety test/ })
+    .click();
+
+  for (const answer of [
+    "Stop completely",
+    "Vehicles cannot enter",
+    "Stop",
+    "At a zebra crossing",
+    "Slow down and watch",
+  ]) {
+    await page.getByRole("button", { name: new RegExp(answer) }).click();
+  }
+
+  await expect(
+    page.getByRole("heading", { name: "Traffic Safety Hero!" }),
+  ).toBeVisible();
+  await expect(page.getByText(/Follow signs · Obey signals/)).toBeVisible();
+});

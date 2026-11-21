@@ -188,6 +188,25 @@ const SIMULATIONS = [
     stages: 7,
     status: "approved",
   },
+  {
+    id: "sim-traffic-signs-road-safety-001",
+    slug: "traffic-signs-road-safety",
+    title: "The Smart Road Adventure",
+    gradeBands: ["class3To5"],
+    subjects: ["science", "environmentalScience"],
+    applicableBoards: ["cbse", "icse", "stateBoard"],
+    simulationFormat: "immersiveVr",
+    xrFitType: "strongVrFit",
+    xrFitJustification:
+      "Learners repeatedly practise road-sign, traffic-light, and zebra-crossing decisions inside a responsive junction without exposure to real traffic.",
+    learningObjective:
+      "Students will identify important signs, interpret traffic lights, and perform the complete safe zebra-crossing sequence.",
+    evidenceConfidenceLevel: "expertDesigned",
+    comfortRiskLevel: "low",
+    expectedDurationMinutes: 5,
+    stages: 6,
+    status: "approved",
+  },
 ];
 
 describe("Simulation module contracts", () => {

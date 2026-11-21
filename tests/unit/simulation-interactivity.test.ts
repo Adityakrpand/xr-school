@@ -59,6 +59,45 @@ describe("catalogue simulation interactivity", () => {
     }
   });
 
+  it("keeps the complete traffic-safety mission available in headset controls", () => {
+    const source = viewerSource("TrafficSafetyViewer.tsx");
+    for (const action of [
+      "precheck:zebra",
+      "precheck:cars",
+      "mission:start",
+      "crossing:zebra",
+      "crossing:cars",
+      "stage:crossing-next",
+      "quiz:0",
+      "quiz:1",
+      "quiz:2",
+      "narration:replay",
+      "restart",
+    ]) {
+      expect(source, `missing Traffic Safety XR action ${action}`).toContain(
+        `"${action}"`,
+      );
+    }
+    expect(source).toContain(
+      'type SignKey = "stop" | "no-entry" | "speed" | "school"',
+    );
+    expect(source).toContain('type LightColor = "red" | "yellow" | "green"');
+    expect(source).toContain("`sign:${sign.key}`");
+    expect(source).toContain("`light:${light.key}`");
+    expect(source).toContain("`crossing:step:${step.id}`");
+    for (const step of [
+      "stop",
+      "right",
+      "left",
+      "right-again",
+      "listen",
+      "check",
+      "walk",
+    ]) {
+      expect(source).toContain(`id: "${step}"`);
+    }
+  });
+
   it("keeps narration replay available in every catalogue viewer", () => {
     for (const viewer of [
       "PollinationViewer.tsx",
@@ -68,6 +107,7 @@ describe("catalogue simulation interactivity", () => {
       "SolubleInsolubleViewer.tsx",
       "SyntheticFibresViewer.tsx",
       "PlasticMouldingViewer.tsx",
+      "TrafficSafetyViewer.tsx",
     ]) {
       const source = viewerSource(viewer);
       expect(source, `${viewer} is missing narration replay`).toMatch(

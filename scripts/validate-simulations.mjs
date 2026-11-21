@@ -75,6 +75,7 @@ const viewerNameMap = {
   "soluble-insoluble-substances": "SolubleInsolubleViewer",
   "synthetic-fibres-types": "SyntheticFibresViewer",
   "thermoplastics-thermosetting": "PlasticMouldingViewer",
+  "traffic-signs-road-safety": "TrafficSafetyViewer",
 };
 
 for (const slug of slugs) {

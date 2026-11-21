@@ -156,6 +156,27 @@ const SIMULATIONS = [
     stages: 7,
     status: "approved",
   },
+  {
+    id: "sim-traffic-signs-road-safety-001",
+    slug: "traffic-signs-road-safety",
+    title: "The Smart Road Adventure",
+    summary:
+      "Restore four important traffic signs, control a busy junction, complete the right-left-right zebra-crossing sequence, and pass Robo's road-safety challenge.",
+    gradeBands: ["class3To5"],
+    subjects: ["science", "environmentalScience"],
+    applicableBoards: ["cbse", "icse", "stateBoard"],
+    simulationFormat: "immersiveVr",
+    xrFitType: "strongVrFit",
+    xrFitJustification:
+      "A stationary virtual junction lets every learner practise high-consequence road decisions repeatedly without exposure to real traffic. The city responds immediately to signs, lights, and crossing choices, making cause, consequence, visibility, and safe sequencing spatial in a way a worksheet cannot provide.",
+    learningObjective:
+      "Students will identify four important traffic signs, interpret red-yellow-green signals, and independently perform the complete safe zebra-crossing sequence.",
+    evidenceConfidenceLevel: "expertDesigned",
+    comfortRiskLevel: "low",
+    expectedDurationMinutes: 5,
+    stages: 6,
+    status: "approved",
+  },
 ];
 
 app.get("/v1/simulation-modules", async () => ({

@@ -78,6 +78,17 @@ const SIMS = [
     stages: 7,
     minutes: 5,
   },
+  {
+    slug: "traffic-signs-road-safety",
+    emoji: "🚦",
+    color: "#22d3ee",
+    subject: "Environmental Science",
+    grade: "Class 5",
+    title: "The Smart Road Adventure",
+    xrFit: "Strong VR Fit",
+    stages: 6,
+    minutes: 5,
+  },
 ];
 
 export default function SimulationsPage() {
