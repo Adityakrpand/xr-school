@@ -105,11 +105,11 @@ export default function Home() {
           />
           <SimCard
             href="/simulations/thermoplastics-thermosetting"
-            emoji="⭐"
+            emoji="🟠"
             color="#fb923c"
             subject="Science · Class 8"
-            title="Thermoplastics & Thermosetting Plastics"
-            desc="Mould two identical plastic discs, reheat them, reveal permanent cross-links, and choose the material that can become a star badge."
+            title="The Plastics Workshop: Mystery of Two Discs"
+            desc="Investigate two plastic discs, reveal their polymer structures, remould a display tag, and choose a saucepan handle by its properties."
             tags={["CBSE", "Class 8", "VR Ready"]}
           />
         </div>

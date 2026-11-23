@@ -69,14 +69,14 @@ const SIMS = [
   },
   {
     slug: "thermoplastics-thermosetting",
-    emoji: "⭐",
+    emoji: "🟠",
     color: "#fb923c",
     subject: "Science",
     grade: "Class 8",
-    title: "Thermoplastics & Thermosetting Plastics",
+    title: "The Plastics Workshop: Mystery of Two Discs",
     xrFit: "Strong VR Fit",
-    stages: 7,
-    minutes: 5,
+    stages: 9,
+    minutes: 6,
   },
   {
     slug: "traffic-signs-road-safety",

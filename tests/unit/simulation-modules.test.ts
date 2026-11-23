@@ -172,7 +172,7 @@ const SIMULATIONS = [
   {
     id: "sim-thermoplastics-thermosetting-001",
     slug: "thermoplastics-thermosetting",
-    title: "Thermoplastics & Thermosetting Plastics",
+    title: "The Plastics Workshop: The Mystery of Two Discs",
     gradeBands: ["class6To8"],
     subjects: ["science", "chemistry"],
     applicableBoards: ["cbse", "icse", "stateBoard"],
@@ -181,11 +181,11 @@ const SIMULATIONS = [
     xrFitJustification:
       "Learners safely repeat virtual heating and remoulding tests while observing chain movement and permanent cross-links inside identical samples.",
     learningObjective:
-      "Students will distinguish thermoplastics from thermosetting plastics, explain cross-links, and classify common plastic objects.",
+      "Students will distinguish thermoplastics from thermosetting plastics, explain cross-links, classify common plastic objects, and choose materials using their properties.",
     evidenceConfidenceLevel: "expertDesigned",
     comfortRiskLevel: "low",
-    expectedDurationMinutes: 5,
-    stages: 7,
+    expectedDurationMinutes: 6,
+    stages: 9,
     status: "approved",
   },
   {

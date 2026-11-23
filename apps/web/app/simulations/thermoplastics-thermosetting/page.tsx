@@ -12,15 +12,15 @@ const PlasticMouldingViewer = dynamic(
         style={{
           width: "100vw",
           height: "100vh",
-          background: "#15101f",
+          background: "#c8e6f5",
           display: "grid",
           placeItems: "center",
-          color: "#ffedd5",
+          color: "#0f172a",
         }}
       >
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 56 }}>⭐🏭🔬</div>
-          <p>Starting the virtual moulding workshop…</p>
+          <div style={{ fontSize: 56 }}>🟠🟣🏭🍳</div>
+          <p>Opening the Plastics Workshop…</p>
         </div>
       </div>
     ),
@@ -35,7 +35,7 @@ export default function ThermoplasticsThermosettingPage() {
         width: "100vw",
         height: "100vh",
         overflow: "hidden",
-        background: "#15101f",
+        background: "#c8e6f5",
       }}
     >
       <Link

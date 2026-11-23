@@ -1,50 +1,99 @@
-# Thermoplastics and Thermosetting Plastics — Simulation Design
+# The Plastics Workshop: The Mystery of Two Discs
 
 ## Module definition
 
 - **Slug:** `thermoplastics-thermosetting`
 - **Curriculum:** Class 8 Science, Chapter 3: Synthetic Fibres and Plastics, Activity 3
-- **Boards:** CBSE, ICSE, and state boards using the supplied activity
+- **Boards:** CBSE, ICSE, and applicable state boards
 - **Format:** `immersiveVr`
 - **Status:** `approved` pending internal and school pilots
 - **Evidence confidence:** `expertDesigned`
-- **Duration:** 5 minutes; guided completion remains available if a learner needs longer
+- **Duration:** 5 minutes 45 seconds; non-scoring guided completion appears when the timer expires
 - **Comfort risk:** `low` — stationary viewpoint with optional desktop orbit
 - **Performance target:** 72 FPS on Meta Quest using procedural geometry and no external assets
-- **Timing:** A visible five-minute timer provides a non-scoring guided result when the learning slot expires.
+- **Estimated package size:** below 25 MB for the browser module
 
 ## XR fit justification
 
-The learner safely operates a virtual moulding workshop and compares two identical-looking plastic discs. A cutaway reveals polymer chains sliding when a thermoplastic is warmed and permanent cross-links holding a thermosetting plastic in shape. VR makes the invisible structural difference spatial and repeatable without hot equipment, fumes, damaged materials, or burn risk.
+The stationary workshop lets every learner safely repeat a moulding cycle, compare two identical-looking samples, and see a clearly labelled molecular model beside the real-scale experiment. VR makes chain movement and permanent cross-links spatially visible without hot machinery, fumes, damaged plastics, or burn risk; the same evidence can be replayed for each headset batch.
 
 ## Learning objective
 
-Students will distinguish thermoplastics from thermosetting plastics by their response to reheating, explain why permanent cross-links prevent remoulding, and classify common plastic objects using evidence rather than appearance or rigidity.
+Students will distinguish thermoplastics from thermosetting plastics by reheating behaviour, explain how chain mobility and permanent cross-links cause the difference, classify familiar objects, and select materials using properties rather than appearance.
 
-## Seven-stage flow
+## Misconceptions confronted
 
-1. **Scan the workshop:** Inspect PET, PVC, melamine, and two identical-looking discs; reveal a magnified polymer model.
-2. **Make Disc A:** Load polythene pellets, mould, cool, open, and trace the round edge.
-3. **Reshape Disc A:** Press it cold, apply simulated heat, press it into a star mould, and cool the new shape.
-4. **Test Disc B:** Move from before setting to after setting, reveal cross-links, reheat, press, and inspect why it stays round.
-5. **Compare everyday plastics:** Replay both results and scan polythene, PVC, Bakelite, and melamine examples.
-6. **Sort rigid objects:** Classify PVC and Bakelite in the scored Workshop Challenge with corrective hints.
-7. **Make the missing badge:** Heat two unlabelled discs, choose the one that softened, mould the star badge, and review the evidence.
+- A rigid object must be a thermosetting plastic.
+- More heat will eventually remould already-set Bakelite.
+- Remoulding a thermoplastic breaks it into separate monomers.
+- Similar-looking plastics must have the same properties.
+
+## Nine-stage flow
+
+1. **Unfinished display:** Inspect Disc A, Disc B, and the task card: Investigate → Compare → Choose.
+2. **What is plastic?:** Compare a flexible polythene bag with a rigid PVC pipe, focus an enlarged polymer model, and observe that a mould gives shape.
+3. **Disc A:** Load polythene with tongs, lock the cover, test while cool, heat and mould a star, cool, and open only when safe.
+4. **Disc B:** Repeat the approved cycle with already-set Bakelite and trigger the high-temperature safety limit; the disc remains round.
+5. **Hidden difference:** Move the Cool → Heated molecular slider, compare mobile thermoplastic chains with the fixed cross-linked network, and inspect four labelled examples.
+6. **Learning summary:** Review “Heat → Reshape → Cool” versus “Once Set → Cannot Be Remoulded by Reheating.”
+7. **Challenge 1:** Independently sort polythene, PVC, Bakelite, and melamine resin.
+8. **Challenge 2:** Reuse the polythene star in a rectangular mould and install the cooled tag on the display.
+9. **Challenge 3:** Choose a ready-made Bakelite saucepan handle to complete the display.
+
+## Cue cards
+
+1. “These discs look alike. Test their behaviour before choosing.” — inspect both samples.
+2. “Flexible and rigid objects can belong to the same plastic type.” — compare bag and pipe.
+3. “Test the polythene while cool before adding controlled heat.” — run the Disc A sequence.
+4. “More heat is not the solution for an already-set thermosetting plastic.” — trigger the safety limit.
+5. “The molecular view is a scientific model, not something visible to the unaided eye.” — move the model slider.
+6. “Sort by material behaviour, not by appearance or stiffness.” — begin the independent challenge.
+7. “The handle is already manufactured; choose it for its useful properties.” — complete the transfer task.
 
 ## Assessment hooks
 
-- Ordered moulding and remoulding actions during guided practice.
-- Observation that cold pressing does not reshape Disc A.
-- Observation of chain mobility in warmed thermoplastic and cross-links in set thermoset.
-- Classification of two rigid everyday objects, preventing texture-based guessing.
-- Final transfer task requiring the learner to test, choose, and mould an unlabelled sample.
+- **Pre-check:** The two discs appear identical; the learner must investigate instead of guessing.
+- **Guided evidence:** Ordered cool-test, heat, mould, cooling, and safe-opening actions for both samples.
+- **Misconception check:** An excessive-heat attempt is blocked with corrective feedback.
+- **Post-check:** Four-object classification without guided labels.
+- **Transfer check:** Select a remouldable tag material and a suitable ready-made saucepan handle.
+- **Scoring:** Four sorting points, one tag point, and one handle point. Guided timeout completion adds no points.
 
-## Safety and accessibility
+## Instructor script
 
-- All heat is simulated; no flames, fumes, burn hazards, or destructive testing.
-- Stationary VR camera with no artificial locomotion or sudden camera movement.
-- Spoken narration is duplicated in the in-world mission board and browser control panel.
-- Point-and-select controls duplicate every grab or machine action.
-- In-world ray controls cover every guided action, classification choice, sample test, stage transition, narration replay, and restart inside immersive VR.
-- High contrast, visible progress, one corrective retry, and `aria-live` feedback.
-- Narration replay/mute controls and an explicit reduced-motion mode are available in the browser panel; the operating-system reduced-motion preference is respected automatically.
+### Setup
+
+Tell the class: “Two plastics can look or feel similar but behave differently because of their structure.” Ask: “How could we choose a material without guessing from appearance?” Non-headset students predict what will happen to each disc and record one reason.
+
+### During the headset batch
+
+At the cool test, ask learners to name the evidence before heating. At the Bakelite safety limit, reinforce that the simulation does not recommend heating unknown plastics in real life. At the molecular model, confirm that chains remain polymers during remoulding; they are not shown breaking into monomers. Watch for learners skipping the Safe to Open state.
+
+### Debrief
+
+Compare the remoulded polythene tag with the unchanged Bakelite disc. Ask why rigid PVC is still a thermoplastic and why the ready-made Bakelite handle is chosen for the saucepan. Connect the observations to the chapter table of thermoplastic and thermosetting examples.
+
+### Revision trigger
+
+After one week, show the four objects without labels and ask pairs to classify them with evidence. After one month, ask learners to explain the result using “chain movement” and “cross-links.”
+
+## Companion activity
+
+Non-headset students complete a three-column observation log: **Prediction**, **Observed evidence**, and **Property-based choice**. They must include the PVC rigidity misconception, the Bakelite heat-limit result, the rectangular tag material, and the saucepan-handle reason.
+
+## Revision card
+
+**Front:** A rigid PVC pipe and rigid Bakelite handle look similar. How can their plastic types differ?
+
+**Back:** PVC is a thermoplastic that can soften under suitable processing conditions. Set Bakelite contains permanent cross-links and cannot be remoulded by reheating. Classify using behaviour and structure, not stiffness alone.
+
+## Safety, comfort, performance, and accessibility
+
+- All heating is virtual and enclosed; there are no flames, fumes, hot surfaces, or simulated hand heat.
+- The safety cover locks during heating and opens only after cooling.
+- The temperature control stops at the approved range and explains why excess heat is unsafe.
+- The camera is stationary, with no artificial locomotion, flashes, or sudden viewpoint changes.
+- Browser buttons duplicate every in-headset ray action; all critical targets are at least 44 px.
+- Narration is duplicated as text and can be replayed or muted.
+- Reduced-motion mode is available and respects the operating-system preference.
+- Procedural low-poly geometry avoids external downloads and targets 72 FPS on Quest.

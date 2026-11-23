@@ -10,50 +10,60 @@ import {
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-type ScanKey = "pet" | "disc-a" | "disc-b";
+type ScanKey = "task-card" | "disc-a" | "disc-b";
 type ExampleKey = "polythene" | "pvc" | "bakelite" | "melamine";
-type SortKey = "pvc" | "bakelite";
+type SortKey = ExampleKey;
 type PlasticKind = "thermoplastic" | "thermoset";
 
 const STAGES = [
   {
-    title: "Scan the moulding workshop",
-    cue: "Scan PET and both identical-looking discs. Appearance alone cannot reveal which disc can be remoulded.",
+    title: "The unfinished materials display",
+    cue: "Inspect both identical-looking discs, then open the task card: investigate, compare, and choose.",
   },
   {
-    title: "Make a round plastic disc",
-    cue: "Load polythene pellets, mould them, cool the plastic, and trace the matching round edge.",
+    title: "What is plastic?",
+    cue: "Compare a flexible polythene bag with rigid PVC, magnify their polymer model, and observe how a mould gives shape.",
   },
   {
-    title: "Reshape Disc A",
-    cue: "Try the press cold, then add simulated heat and watch the same plastic become a star.",
+    title: "Disc A — can its shape change?",
+    cue: "Use tongs and the enclosed machine. Test the polythene while cool, then heat, mould, cool, and open safely.",
   },
   {
-    title: "Find out why Disc B stays round",
-    cue: "Reveal the cross-links formed during setting, then repeat the same heating and pressing test.",
+    title: "Disc B — why does it stay round?",
+    cue: "Repeat the approved cycle with already-set Bakelite. More heat is not the solution.",
   },
   {
-    title: "Compare everyday plastics",
-    cue: "Replay both results and inspect examples. Rigidity alone does not identify the plastic type.",
+    title: "Reveal the hidden difference",
+    cue: "Compare chain movement with a cross-linked network, then inspect four everyday examples.",
   },
   {
-    title: "Workshop Challenge: sort the objects",
-    cue: "Classify a rigid PVC pipe and a rigid Bakelite casing using what happens on reheating.",
+    title: "Learning summary",
+    cue: "Thermoplastics can soften and be reshaped; thermosetting plastics keep permanent links once set.",
   },
   {
-    title: "Make the missing star badge",
-    cue: "Heat two unlabelled discs, choose the one that softened, and complete the badge.",
+    title: "Challenge 1 — sort the materials",
+    cue: "Sort the bag, pipe, handle, and plate by material behaviour—not by whether each object feels hard or soft.",
+  },
+  {
+    title: "Challenge 2 — reshape the display tag",
+    cue: "Reuse the polythene star in the rectangular mould, then cool it before opening the safety cover.",
+  },
+  {
+    title: "Challenge 3 — choose the saucepan handle",
+    cue: "Choose between two ready-made handles using the properties required for the demonstration saucepan.",
   },
 ];
 
 const NARRATIONS = [
-  "Welcome to the moulding workshop. Plastics are made mainly from polymers. Scan PET and the two round discs, then investigate which disc can become a star.",
-  "A mould gives material its shape. Polythene pellets soften with suitable heat, fill the round mould, and firm up as they cool.",
-  "Disc A stays firm when pressed cold. With suitable heat its chains move past one another more easily, so it can be remoulded. This is a thermoplastic.",
-  "Disc B formed permanent links called cross-links as it set. Reheating does not let its chains flow into a new mould. This is a thermosetting plastic.",
-  "Polythene and PVC are thermoplastics. Bakelite and melamine resin are thermosetting plastics. Test reheating behavior instead of judging by flexibility or rigidity.",
-  "The Workshop Challenge begins now. Sort the PVC pipe and Bakelite casing using the reheating evidence.",
-  "Test both unlabelled discs, choose the sample that softened, and mould the missing star badge.",
+  "The materials display needs your help. Two plastic discs look similar, but appearance alone cannot tell us how they behave. Inspect them and open the task card.",
+  "Plastics are made mainly from polymers, which are large molecules with repeating units. A flexible bag and a rigid PVC pipe can both be thermoplastics.",
+  "Disc A is polythene. It stays firm while cool, softens with suitable heating, fills the star mould, and hardens again as it cools.",
+  "Disc B is already-set Bakelite. Reheating does not let it flow into a new mould. Excess heat can damage material, so the enclosed machine blocks it.",
+  "Heated thermoplastic chains can move past one another more easily. Permanent cross-links hold a thermosetting network together. Inspect the everyday examples.",
+  "Plastics are mainly polymers. Thermoplastics can soften and be reshaped with suitable heating. Once set, thermosetting plastics cannot be remoulded by reheating.",
+  "The guided labels are gone. Sort all four labelled objects using their material behaviour, not appearance or stiffness.",
+  "The display design changed. Reuse the polythene star in a rectangular mould, then cool it before opening the safety cover.",
+  "Choose the ready-made handle that is heat-resistant and a poor conductor of heat to complete the materials display.",
 ];
 
 const EXAMPLES: Record<
@@ -73,10 +83,10 @@ const EXAMPLES: Record<
     note: "Rigid yet still a thermoplastic: rigidity is not the deciding test.",
   },
   bakelite: {
-    label: "Bakelite casing",
-    emoji: "🔌",
+    label: "Bakelite handle",
+    emoji: "🍳",
     kind: "thermoset",
-    note: "Permanent cross-links help it keep its set shape around electrical parts.",
+    note: "Already set, heat-resistant, and a poor conductor of heat for its intended use.",
   },
   melamine: {
     label: "Melamine plate",
@@ -87,7 +97,7 @@ const EXAMPLES: Record<
 };
 
 const EXAMPLE_KEYS = Object.keys(EXAMPLES) as ExampleKey[];
-const SIMULATION_DURATION_SECONDS = 5 * 60;
+const SIMULATION_DURATION_SECONDS = 5 * 60 + 45;
 
 function speak(text: string) {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
@@ -165,7 +175,11 @@ function drawMissionBoard(
   context.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
   context.fillStyle = "#fdba74";
   context.font = "700 27px sans-serif";
-  context.fillText(`MOULDING LAB  •  ${stage + 1}/7`, 34, 46);
+  context.fillText(
+    `PLASTICS WORKSHOP  •  ${stage + 1}/${STAGES.length}`,
+    34,
+    46,
+  );
   const minutes = Math.floor(secondsRemaining / 60);
   const seconds = String(secondsRemaining % 60).padStart(2, "0");
   context.textAlign = "right";
@@ -190,10 +204,10 @@ function drawMissionBoard(
     }
   }
   context.fillText(line.trim(), 34, y);
-  if (stage >= 5) {
+  if (stage >= 6) {
     context.fillStyle = "#fde68a";
     context.font = "700 24px sans-serif";
-    context.fillText(`Challenge points: ${points}/3`, 34, 302);
+    context.fillText(`Challenge points: ${points}/6`, 34, 302);
   }
 }
 
@@ -255,12 +269,15 @@ export default function PlasticMouldingViewer() {
   const mouldRef = useRef(0);
   const reshapeRef = useRef(0);
   const crosslinkRef = useRef(0);
+  const moleculeRevealedRef = useRef(false);
   const comparisonRef = useRef<Partial<Record<ExampleKey, boolean>>>({});
   const replayRef = useRef(false);
   const sortedRef = useRef<Partial<Record<SortKey, PlasticKind>>>({});
-  const finalHeatedRef = useRef(false);
-  const badgeCompleteRef = useRef(false);
-  const retryCountRef = useRef(0);
+  const tagStepRef = useRef(0);
+  const tagCompleteRef = useRef(false);
+  const tagRetryRef = useRef(0);
+  const displayCompleteRef = useRef(false);
+  const handleRetryRef = useRef(0);
   const mutedRef = useRef(false);
   const reducedMotionRef = useRef(false);
   const deadlineRef = useRef<number | null>(null);
@@ -284,9 +301,11 @@ export default function PlasticMouldingViewer() {
   const [sorted, setSorted] = useState<Partial<Record<SortKey, PlasticKind>>>(
     {},
   );
-  const [finalHeated, setFinalHeated] = useState(false);
-  const [badgeComplete, setBadgeComplete] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
+  const [tagStep, setTagStep] = useState(0);
+  const [tagComplete, setTagComplete] = useState(false);
+  const [tagRetry, setTagRetry] = useState(0);
+  const [displayComplete, setDisplayComplete] = useState(false);
+  const [handleRetry, setHandleRetry] = useState(0);
   const [muted, setMuted] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState(
@@ -294,7 +313,7 @@ export default function PlasticMouldingViewer() {
   );
   const [guidedCompletion, setGuidedCompletion] = useState(false);
   const [feedback, setFeedback] = useState(
-    "Start with the PET bottle, then inspect both round discs.",
+    "Inspect Disc A, Disc B, and the task card on the workbench.",
   );
 
   const awardPoint = useCallback(() => {
@@ -359,7 +378,8 @@ export default function PlasticMouldingViewer() {
 
   const scanItem = useCallback((key: ScanKey) => {
     const messages: Record<ScanKey, string> = {
-      pet: "PET is a polyester. Magnified polymer chains are now visible inside the bottle.",
+      "task-card":
+        "Task card opened: Investigate → Compare → Choose. No answer is required yet.",
       "disc-a":
         "Disc A looks round, smooth, and firm. Its appearance does not reveal whether it can be remoulded.",
       "disc-b":
@@ -377,10 +397,10 @@ export default function PlasticMouldingViewer() {
     setMouldStep(next);
     const messages = [
       "",
-      "Polythene pellets loaded into the hopper.",
-      "The pellets softened and filled the round mould.",
-      "Cooling made the plastic firm. Disc A released with a round shape.",
-      "The disc edge matches the mould: a mould gives material its shape.",
+      "The polythene bag folds easily, but flexibility alone does not define its plastic type.",
+      "The rigid PVC pipe keeps its shape, yet it is also a thermoplastic.",
+      "Enlarged scientific model: plastics contain long polymer chains made from repeating units.",
+      "The mould cavity controls the product's shape during manufacturing.",
     ];
     setFeedback(messages[next]);
   }, []);
@@ -391,21 +411,22 @@ export default function PlasticMouldingViewer() {
     setReshapeStep(next);
     const messages = [
       "",
-      "With heat off, Disc A stays round and firm at room temperature.",
-      "Simulated heat lets the polymer chains slide past one another more easily.",
-      "The softened disc flowed into the star mould.",
-      "Heat off: the plastic firmed up and kept its new star shape. Disc A is a thermoplastic.",
+      "Disc A, labelled polythene, is loaded with virtual tongs.",
+      "The transparent safety cover clicked shut and locked.",
+      "Cool test: Disc A remains firm and does not fill the star cavity.",
+      "Controlled heat lets the chains move more easily, and the press fills the star mould.",
+      "Cooling makes the polythene firm again. The Safe to Open light is now on.",
+      "The cover opens safely. Disc A is now a star: it is a thermoplastic.",
     ];
     setFeedback(messages[next]);
   }, []);
 
   const revealCrosslinks = useCallback(() => {
-    if (crosslinkRef.current >= 1) return;
-    crosslinkRef.current = 1;
+    if (moleculeRevealedRef.current) return;
+    moleculeRevealedRef.current = true;
     setAfterSetting(true);
-    setCrosslinkStep(1);
     setFeedback(
-      "After setting, permanent cross-links bridge the polymer chains inside Disc B.",
+      "Heated model: thermoplastic chains can move past one another, while permanent cross-links keep the Bakelite network from flowing.",
     );
   }, []);
 
@@ -415,10 +436,12 @@ export default function PlasticMouldingViewer() {
     setCrosslinkStep(next);
     const messages = [
       "",
-      "",
-      "Simulated heat applied. The cross-linked structure remains locked together.",
-      "The press cannot make Disc B flow into the star mould. It stays round.",
-      "Magnifier evidence: permanent cross-links prevent remoulding. Disc B is thermosetting.",
+      "Disc B, labelled already-set Bakelite, is loaded with virtual tongs.",
+      "The transparent safety cover clicked shut and locked.",
+      "The approved heating and moulding cycle runs, but Disc B does not flow.",
+      "Safety limit reached: more heat is not the solution and could damage the material.",
+      "Comparison: the star cavity is empty and the Bakelite sample remains round.",
+      "The sample is cool and safe to remove. Disc B is a thermosetting plastic.",
     ];
     setFeedback(messages[next]);
   }, []);
@@ -447,12 +470,14 @@ export default function PlasticMouldingViewer() {
   const sortObject = useCallback(
     (key: SortKey, kind: PlasticKind) => {
       const correct: Record<SortKey, PlasticKind> = {
+        polythene: "thermoplastic",
         pvc: "thermoplastic",
         bakelite: "thermoset",
+        melamine: "thermoset",
       };
       if (kind !== correct[key]) {
         setFeedback(
-          "Both objects feel rigid. Think about which material can soften and be reshaped when reheated.",
+          "Think about the material—not appearance or stiffness. Which one can soften and be reshaped when reheated?",
         );
         return;
       }
@@ -462,76 +487,103 @@ export default function PlasticMouldingViewer() {
         awardPoint();
       }
       setFeedback(
-        key === "pvc"
-          ? "Correct: rigid PVC is still a thermoplastic."
-          : "Correct: Bakelite is a cross-linked thermosetting plastic.",
+        key === "polythene"
+          ? "Correct: polythene is a thermoplastic."
+          : key === "pvc"
+            ? "Correct: rigid PVC is still a thermoplastic."
+            : key === "bakelite"
+              ? "Correct: Bakelite is a cross-linked thermosetting plastic."
+              : "Correct: melamine resin is a thermosetting plastic.",
       );
     },
     [awardPoint],
   );
 
-  const heatFinalDiscs = useCallback(() => {
-    if (!finalHeatedRef.current) {
-      finalHeatedRef.current = true;
-      setFinalHeated(true);
+  const chooseTagMaterial = useCallback((sample: "a" | "b") => {
+    if (sample === "b") {
+      tagRetryRef.current += 1;
+      setTagRetry(tagRetryRef.current);
+      setFeedback(
+        "Bakelite has already set and cannot be remoulded. Choose the polythene star that softened earlier.",
+      );
+      return;
     }
+    if (tagStepRef.current > 0) return;
+    tagStepRef.current = 1;
+    setTagStep(1);
     setFeedback(
-      "Test result: Sample A softened; Sample B stayed set. Choose the sample that can flow into the star mould.",
+      "Correct material selected: the polythene star can be remoulded into the new rectangular tag.",
     );
   }, []);
 
-  const chooseBadgeDisc = useCallback(
-    (sample: "a" | "b") => {
-      if (!finalHeatedRef.current) {
-        setFeedback("Heat both samples before choosing.");
-        return;
+  const advanceTag = useCallback(
+    (next: number) => {
+      if (next !== tagStepRef.current + 1) return;
+      tagStepRef.current = next;
+      setTagStep(next);
+      const messages = [
+        "",
+        "",
+        "The polythene star is loaded into the rectangular mould with virtual tongs.",
+        "The safety cover is closed and locked.",
+        "The controlled heat-and-mould cycle reshapes the same material into a rectangle.",
+        "Cooling is complete. The Safe to Open indicator is on.",
+        "The rectangular tag fits the display board. The thermoplastic has been reused.",
+      ];
+      setFeedback(messages[next]);
+      if (next === 6 && !tagCompleteRef.current) {
+        tagCompleteRef.current = true;
+        setTagComplete(true);
+        awardPoint();
       }
-      if (sample === "b") {
-        if (retryCountRef.current >= 1) {
-          setFeedback(
-            "The retry has already been used. Choose the sample that softened during the test.",
-          );
-          return;
-        }
-        retryCountRef.current = 1;
-        setRetryCount(1);
+    },
+    [awardPoint],
+  );
+
+  const chooseHandle = useCallback(
+    (kind: "polythene" | "bakelite") => {
+      if (kind === "polythene") {
+        handleRetryRef.current += 1;
+        setHandleRetry(handleRetryRef.current);
         setFeedback(
-          "The mould remains empty. Which sample softened during the test? Try once more.",
+          "Polythene is not the suitable choice here. Select the ready-made handle that is heat-resistant and a poor conductor of heat.",
         );
         return;
       }
-      if (!badgeCompleteRef.current) {
-        badgeCompleteRef.current = true;
-        setBadgeComplete(true);
+      if (!displayCompleteRef.current) {
+        displayCompleteRef.current = true;
+        setDisplayComplete(true);
         awardPoint();
       }
       setFeedback(
-        "Sample A filled the mould, cooled, and snapped into the badge slot. Mission complete!",
+        "Bakelite handle attached. The materials display is complete—choose by properties, not appearance.",
       );
     },
     [awardPoint],
   );
 
   const showGuidedResult = useCallback(() => {
-    if (badgeCompleteRef.current) return;
-    stageRef.current = 6;
-    finalHeatedRef.current = true;
-    badgeCompleteRef.current = true;
-    setStage(6);
-    setFinalHeated(true);
-    setBadgeComplete(true);
+    if (displayCompleteRef.current) return;
+    stageRef.current = 8;
+    tagStepRef.current = 6;
+    tagCompleteRef.current = true;
+    displayCompleteRef.current = true;
+    setStage(8);
+    setTagStep(6);
+    setTagComplete(true);
+    setDisplayComplete(true);
     setGuidedCompletion(true);
     setFeedback(
-      "Five-minute guided result: Sample A softened, filled the star mould, and cooled into the missing badge.",
+      "Guided result: polythene was remoulded into the rectangular tag, and the ready-made Bakelite handle completed the saucepan.",
     );
-    stageVisualRef.current(6);
+    stageVisualRef.current(8);
     narrate(
-      "Time is complete, so here is the guided result. Both samples started round. Only the thermoplastic softened and could be reshaped into the star badge.",
+      "Time is complete, so here is the guided result. The thermoplastic was reused as a rectangular tag, and the ready-made Bakelite handle was chosen for its suitable properties.",
     );
   }, [narrate]);
 
   useEffect(() => {
-    if (!started || badgeComplete) return;
+    if (!started || displayComplete) return;
     deadlineRef.current ??= Date.now() + SIMULATION_DURATION_SECONDS * 1000;
     const updateTimer = () => {
       const remaining = Math.max(
@@ -546,15 +598,15 @@ export default function PlasticMouldingViewer() {
     updateTimer();
     const timer = window.setInterval(updateTimer, 1000);
     return () => window.clearInterval(timer);
-  }, [badgeComplete, showGuidedResult, started]);
+  }, [displayComplete, showGuidedResult, started]);
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x15101f);
-    scene.fog = new THREE.Fog(0x15101f, 9, 25);
+    scene.background = new THREE.Color(0xc8e6f5);
+    scene.fog = new THREE.Fog(0xc8e6f5, 12, 30);
 
     const camera = new THREE.PerspectiveCamera(
       54,
@@ -583,22 +635,22 @@ export default function PlasticMouldingViewer() {
     controls.maxDistance = 9;
     controls.maxPolarAngle = Math.PI * 0.56;
 
-    scene.add(new THREE.HemisphereLight(0xffedd5, 0x150c22, 2.25));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x7c6652, 2.45));
     const keyLight = new THREE.DirectionalLight(0xffffff, 2.6);
     keyLight.position.set(4, 7, 5);
     keyLight.castShadow = true;
     scene.add(keyLight);
-    const orangeLight = new THREE.PointLight(0xfb923c, 19, 11);
+    const orangeLight = new THREE.PointLight(0xffd7a3, 13, 11);
     orangeLight.position.set(-4, 3, 0);
     scene.add(orangeLight);
-    const cyanLight = new THREE.PointLight(0x22d3ee, 14, 10);
+    const cyanLight = new THREE.PointLight(0xd9f4ff, 10, 10);
     cyanLight.position.set(4, 2.5, -2);
     scene.add(cyanLight);
 
     const floor = new THREE.Mesh(
       new THREE.CircleGeometry(12, 64),
       new THREE.MeshStandardMaterial({
-        color: 0x21152d,
+        color: 0x8b735b,
         roughness: 0.64,
         metalness: 0.2,
       }),
@@ -611,7 +663,7 @@ export default function PlasticMouldingViewer() {
       const ring = new THREE.Mesh(
         new THREE.TorusGeometry(1.7 + ringIndex * 1.75, 0.018, 8, 96),
         new THREE.MeshBasicMaterial({
-          color: ringIndex % 2 ? 0x9a3412 : 0x155e75,
+          color: ringIndex % 2 ? 0xb45309 : 0x0e7490,
         }),
       );
       ring.rotation.x = Math.PI / 2;
@@ -679,7 +731,7 @@ export default function PlasticMouldingViewer() {
     bottleNeck.position.y = 1.46;
     petBottle.add(bottleBody, bottleNeck);
     petBottle.position.set(-2.15, 1.05, -1.05);
-    setAction(petBottle, "scan:pet");
+    setAction(petBottle, "scan:task-card");
     interactive.push(petBottle);
     scanGroup.add(petBottle);
 
@@ -761,7 +813,7 @@ export default function PlasticMouldingViewer() {
     petChains.visible = false;
     scanGroup.add(petChains);
     const scanLabel = labelSprite(
-      "SCAN: PET → POLYMER CHAINS",
+      "TASK CARD: INVESTIGATE → COMPARE → CHOOSE",
       "#22d3ee",
       2.25,
     );
@@ -841,23 +893,23 @@ export default function PlasticMouldingViewer() {
     mouldedDisc.scale.setScalar(0.05);
     mouldGroup.add(mouldedDisc);
     const mouldLabel = labelSprite(
-      "POLYTHENE → ROUND MOULD → DISC A",
+      "POLYMERS → MOULDS → USEFUL SHAPES",
       "#fbbf24",
       2.55,
     );
     mouldLabel.position.set(0, 4.05, -1.55);
     mouldGroup.add(mouldLabel);
     const mouldActionButtons = [
-      ["LOAD POLYTHENE PELLETS", "mould:1"],
-      ["PULL THE MOULD LEVER", "mould:2"],
-      ["COOL AND OPEN", "mould:3"],
-      ["TRACE THE ROUND EDGE", "mould:4"],
+      ["SQUEEZE POLYTHENE BAG", "mould:1"],
+      ["ROTATE RIGID PVC PIPE", "mould:2"],
+      ["MAGNIFY POLYMER MODEL", "mould:3"],
+      ["OBSERVE THE MOULD", "mould:4"],
     ].map(([label, action]) =>
       makeActionButton(mouldGroup, label, action, 0, 0.55, 2.15, "#fbbf24"),
     );
     const mouldContinueButton = makeActionButton(
       mouldGroup,
-      "RESHAPE DISC A",
+      "TEST DISC A",
       "stage:2",
       0,
       0.55,
@@ -945,10 +997,12 @@ export default function PlasticMouldingViewer() {
     reshapeLabel.position.set(0, 4.25, -1.65);
     reshapeGroup.add(reshapeLabel);
     const reshapeActionButtons = [
-      ["PRESS WITH HEAT OFF", "reshape:1"],
-      ["TURN ON SIMULATED HEAT", "reshape:2"],
-      ["PRESS INTO STAR MOULD", "reshape:3"],
-      ["SWITCH HEAT OFF AND COOL", "reshape:4"],
+      ["LOAD DISC A WITH TONGS", "reshape:1"],
+      ["CLOSE SAFETY COVER", "reshape:2"],
+      ["TEST WHILE COOL", "reshape:3"],
+      ["HEAT AND MOULD", "reshape:4"],
+      ["COOL TO SAFE", "reshape:5"],
+      ["OPEN AND REMOVE STAR", "reshape:6"],
     ].map(([label, action]) =>
       makeActionButton(reshapeGroup, label, action, 0, 0.55, 2.25, "#fb923c"),
     );
@@ -1032,16 +1086,18 @@ export default function PlasticMouldingViewer() {
     crossLabel.position.set(0, 4.15, -1.6);
     crossGroup.add(crossLabel);
     const crossActionButtons = [
-      ["MOVE SLIDER: AFTER SETTING", "cross:1"],
-      ["TURN ON SIMULATED HEAT", "cross:2"],
-      ["PRESS INTO STAR MOULD", "cross:3"],
-      ["MAGNIFY THE CROSS-LINKS", "cross:4"],
+      ["LOAD DISC B WITH TONGS", "cross:1"],
+      ["CLOSE SAFETY COVER", "cross:2"],
+      ["RUN APPROVED CYCLE", "cross:3"],
+      ["TRY HIGHER HEAT LIMIT", "cross:4"],
+      ["COMPARE WITH STAR MOULD", "cross:5"],
+      ["COOL AND OPEN SAFELY", "cross:6"],
     ].map(([label, action]) =>
       makeActionButton(crossGroup, label, action, 0, 0.55, 2.35, "#c084fc"),
     );
     const crossContinueButton = makeActionButton(
       crossGroup,
-      "COMPARE PLASTICS",
+      "REVEAL THE HIDDEN DIFFERENCE",
       "stage:4",
       0,
       0.55,
@@ -1087,6 +1143,15 @@ export default function PlasticMouldingViewer() {
       label.position.set(sample.position.x, 0.62, -0.15);
       compareGroup.add(sample, label);
     });
+    const moleculeHeatButton = makeActionButton(
+      compareGroup,
+      "SLIDE MODEL TO HEATED",
+      "molecule:heat",
+      0,
+      0.75,
+      2.1,
+      "#c084fc",
+    );
     const replayButton = makeActionButton(
       compareGroup,
       "REPLAY BOTH TESTS",
@@ -1118,6 +1183,47 @@ export default function PlasticMouldingViewer() {
     );
     compareGroup.visible = false;
     scene.add(compareGroup);
+
+    const summaryGroup = new THREE.Group();
+    makeBench(summaryGroup, 6.2);
+    const summaryStar = new THREE.Mesh(
+      starGeometry(),
+      new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.3 }),
+    );
+    summaryStar.position.set(-1.65, 1.55, -0.9);
+    const summaryDisc = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.58, 0.58, 0.2, 32),
+      new THREE.MeshStandardMaterial({ color: 0x8b5cf6, roughness: 0.32 }),
+    );
+    summaryDisc.rotation.x = Math.PI / 2;
+    summaryDisc.position.set(0, 1.55, -0.9);
+    const summaryOutline = new THREE.LineSegments(
+      new THREE.EdgesGeometry(
+        new THREE.CylinderGeometry(0.58, 0.58, 0.2, 32),
+      ),
+      new THREE.LineBasicMaterial({ color: 0xfbbf24 }),
+    );
+    summaryOutline.rotation.x = Math.PI / 2;
+    summaryOutline.position.set(1.65, 1.55, -0.9);
+    summaryGroup.add(summaryStar, summaryDisc, summaryOutline);
+    const summaryLabel = labelSprite(
+      "HEAT → RESHAPE → COOL   |   ONCE SET → NO REMOULD",
+      "#fbbf24",
+      3.5,
+    );
+    summaryLabel.position.set(0, 3.7, -1.35);
+    summaryGroup.add(summaryLabel);
+    makeActionButton(
+      summaryGroup,
+      "COMPLETE THE MATERIALS DISPLAY",
+      "stage:6",
+      0,
+      0.5,
+      2.75,
+      "#fbbf24",
+    );
+    summaryGroup.visible = false;
+    scene.add(summaryGroup);
 
     const sortGroup = new THREE.Group();
     makeBench(sortGroup, 6.4);
@@ -1153,12 +1259,30 @@ export default function PlasticMouldingViewer() {
       bakelite,
     );
     const sortButtons = {
+      polytheneThermoplastic: makeActionButton(
+        sortGroup,
+        "BAG → THERMOPLASTIC",
+        "sort:polythene:thermoplastic",
+        -1.25,
+        1.0,
+        1.65,
+        "#fb923c",
+      ),
+      polytheneThermoset: makeActionButton(
+        sortGroup,
+        "BAG → THERMOSETTING",
+        "sort:polythene:thermoset",
+        -1.25,
+        0.7,
+        1.65,
+        "#c084fc",
+      ),
       pvcThermoplastic: makeActionButton(
         sortGroup,
         "PVC → THERMOPLASTIC",
         "sort:pvc:thermoplastic",
         -1.25,
-        0.65,
+        0.4,
         1.55,
         "#fb923c",
       ),
@@ -1167,7 +1291,7 @@ export default function PlasticMouldingViewer() {
         "PVC → THERMOSETTING",
         "sort:pvc:thermoset",
         -1.25,
-        0.3,
+        0.1,
         1.55,
         "#c084fc",
       ),
@@ -1176,7 +1300,7 @@ export default function PlasticMouldingViewer() {
         "BAKELITE → THERMOPLASTIC",
         "sort:bakelite:thermoplastic",
         1.25,
-        0.65,
+        1.0,
         1.8,
         "#fb923c",
       ),
@@ -1185,15 +1309,33 @@ export default function PlasticMouldingViewer() {
         "BAKELITE → THERMOSETTING",
         "sort:bakelite:thermoset",
         1.25,
-        0.3,
+        0.7,
         1.75,
+        "#c084fc",
+      ),
+      melamineThermoplastic: makeActionButton(
+        sortGroup,
+        "MELAMINE → THERMOPLASTIC",
+        "sort:melamine:thermoplastic",
+        1.25,
+        0.4,
+        1.95,
+        "#fb923c",
+      ),
+      melamineThermoset: makeActionButton(
+        sortGroup,
+        "MELAMINE → THERMOSETTING",
+        "sort:melamine:thermoset",
+        1.25,
+        0.1,
+        1.95,
         "#c084fc",
       ),
     };
     const sortContinueButton = makeActionButton(
       sortGroup,
-      "MAKE THE MISSING BADGE",
-      "stage:6",
+      "RESHAPE THE DISPLAY TAG",
+      "stage:7",
       0,
       0.35,
       2.15,
@@ -1217,8 +1359,8 @@ export default function PlasticMouldingViewer() {
         roughness: 0.3,
       });
     finalDiscB.position.x = 0;
-    const finalStar = new THREE.Mesh(
-      starGeometry(0.78, 0.36, 0.22),
+    const finalTag = new THREE.Mesh(
+      new THREE.BoxGeometry(1.7, 0.82, 0.2),
       new THREE.MeshStandardMaterial({
         color: 0xfbbf24,
         emissive: 0xea580c,
@@ -1227,50 +1369,109 @@ export default function PlasticMouldingViewer() {
         roughness: 0.24,
       }),
     );
-    finalStar.position.set(1.65, 1.65, -0.65);
-    finalStar.scale.setScalar(0.01);
-    finalStar.visible = false;
-    const badgeSlot = new THREE.LineSegments(
-      new THREE.EdgesGeometry(starGeometry(0.9, 0.42, 0.18)),
+    finalTag.position.set(1.65, 1.65, -0.65);
+    finalTag.scale.setScalar(0.01);
+    finalTag.visible = false;
+    const tagSlot = new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(1.9, 1, 0.18)),
       new THREE.LineBasicMaterial({ color: 0xfde68a }),
     );
-    badgeSlot.position.set(1.65, 1.65, -0.94);
+    tagSlot.position.set(1.65, 1.65, -0.94);
     const finalLabel = labelSprite(
-      "TEST → CHOOSE → MOULD THE BADGE",
+      "REUSE → RECTANGULAR MOULD → COOL → DISPLAY",
       "#fbbf24",
-      2.6,
+      3.1,
     );
     finalLabel.position.set(0, 4.05, -1.45);
-    finalGroup.add(finalDiscA, finalDiscB, finalStar, badgeSlot, finalLabel);
-    const heatBothButton = makeActionButton(
-      finalGroup,
-      "HEAT BOTH SAMPLES",
-      "final:heat",
-      0,
-      0.65,
-      1.85,
-      "#ef4444",
-    );
+    finalGroup.add(finalDiscA, finalDiscB, finalTag, tagSlot, finalLabel);
     const chooseSampleAButton = makeActionButton(
       finalGroup,
-      "CHOOSE A — SOFTENED",
-      "final:a",
+      "CHOOSE POLYTHENE STAR",
+      "tag:a",
       -1.15,
-      0.4,
-      1.6,
+      0.65,
+      1.9,
       "#fbbf24",
     );
     const chooseSampleBButton = makeActionButton(
       finalGroup,
-      "CHOOSE B — STAYED SET",
-      "final:b",
+      "CHOOSE SET BAKELITE",
+      "tag:b",
       1.15,
-      0.4,
-      1.65,
+      0.65,
+      1.85,
+      "#c084fc",
+    );
+    const tagActionButtons = [
+      ["LOAD WITH TONGS", "tag:2"],
+      ["CLOSE SAFETY COVER", "tag:3"],
+      ["HEAT AND MOULD RECTANGLE", "tag:4"],
+      ["COOL TO SAFE", "tag:5"],
+      ["OPEN AND INSTALL TAG", "tag:6"],
+    ].map(([label, action]) =>
+      makeActionButton(finalGroup, label, action, 0, 0.5, 2.25, "#fbbf24"),
+    );
+    const tagContinueButton = makeActionButton(
+      finalGroup,
+      "CHOOSE THE SAUCEPAN HANDLE",
+      "stage:8",
+      0,
+      0.45,
+      2.45,
+      "#fbbf24",
+    );
+    finalGroup.visible = false;
+    scene.add(finalGroup);
+
+    const handleGroup = new THREE.Group();
+    makeBench(handleGroup, 6.2);
+    const pan = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.05, 1.05, 0.42, 40),
+      new THREE.MeshStandardMaterial({
+        color: 0x94a3b8,
+        metalness: 0.72,
+        roughness: 0.25,
+      }),
+    );
+    pan.position.set(0, 1.45, -1.0);
+    const handleSlot = new THREE.Mesh(
+      new THREE.BoxGeometry(1.6, 0.28, 0.34),
+      new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.35 }),
+    );
+    handleSlot.position.set(1.55, 1.45, -1.0);
+    const fittedHandle = new THREE.Mesh(
+      new THREE.BoxGeometry(1.8, 0.34, 0.38),
+      new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.48 }),
+    );
+    fittedHandle.position.set(1.65, 1.45, -0.98);
+    fittedHandle.visible = false;
+    const handleLabel = labelSprite(
+      "READY-MADE HANDLE: CHOOSE BY PROPERTIES",
+      "#22d3ee",
+      3.1,
+    );
+    handleLabel.position.set(0, 4.05, -1.45);
+    handleGroup.add(pan, handleSlot, fittedHandle, handleLabel);
+    const polytheneHandleButton = makeActionButton(
+      handleGroup,
+      "CHOOSE POLYTHENE HANDLE",
+      "handle:polythene",
+      -1.2,
+      0.55,
+      2.05,
+      "#fb923c",
+    );
+    const bakeliteHandleButton = makeActionButton(
+      handleGroup,
+      "CHOOSE BAKELITE HANDLE",
+      "handle:bakelite",
+      1.2,
+      0.55,
+      2.05,
       "#c084fc",
     );
     const restartButton = makeActionButton(
-      finalGroup,
+      handleGroup,
       "RUN THE MISSION AGAIN",
       "restart",
       0,
@@ -1278,8 +1479,8 @@ export default function PlasticMouldingViewer() {
       2,
       "#fbbf24",
     );
-    finalGroup.visible = false;
-    scene.add(finalGroup);
+    handleGroup.visible = false;
+    scene.add(handleGroup);
 
     makeActionButton(
       scene,
@@ -1319,8 +1520,10 @@ export default function PlasticMouldingViewer() {
       reshapeGroup.visible = next === 2;
       crossGroup.visible = next === 3;
       compareGroup.visible = next === 4;
-      sortGroup.visible = next === 5;
-      finalGroup.visible = next === 6;
+      summaryGroup.visible = next === 5;
+      sortGroup.visible = next === 6;
+      finalGroup.visible = next === 7;
+      handleGroup.visible = next === 8;
       boardUpdateRef.current();
     };
 
@@ -1337,7 +1540,7 @@ export default function PlasticMouldingViewer() {
       }
       if (
         action === "stage:1" &&
-        Boolean(scannedRef.current.pet) &&
+        Boolean(scannedRef.current["task-card"]) &&
         Boolean(scannedRef.current["disc-a"]) &&
         Boolean(scannedRef.current["disc-b"])
       ) {
@@ -1356,20 +1559,20 @@ export default function PlasticMouldingViewer() {
         advanceReshape(Number(action.slice(8)));
         return;
       }
-      if (action === "stage:3" && reshapeRef.current >= 4) {
+      if (action === "stage:3" && reshapeRef.current >= 6) {
         goToStage(3);
-        return;
-      }
-      if (stageRef.current === 3 && action === "cross:1") {
-        revealCrosslinks();
         return;
       }
       if (stageRef.current === 3 && action.startsWith("cross:")) {
         advanceCrosslink(Number(action.slice(6)));
         return;
       }
-      if (action === "stage:4" && crosslinkRef.current >= 4) {
+      if (action === "stage:4" && crosslinkRef.current >= 6) {
         goToStage(4);
+        return;
+      }
+      if (stageRef.current === 4 && action === "molecule:heat") {
+        revealCrosslinks();
         return;
       }
       if (stageRef.current === 4 && action === "compare:replay") {
@@ -1382,13 +1585,18 @@ export default function PlasticMouldingViewer() {
       }
       if (
         action === "stage:5" &&
+        moleculeRevealedRef.current &&
         replayRef.current &&
         EXAMPLE_KEYS.every((key) => comparisonRef.current[key])
       ) {
         goToStage(5);
         return;
       }
-      if (stageRef.current === 5 && action.startsWith("sort:")) {
+      if (stageRef.current === 5 && action === "stage:6") {
+        goToStage(6);
+        return;
+      }
+      if (stageRef.current === 6 && action.startsWith("sort:")) {
         const [, key, kind] = action.split(":") as [
           string,
           SortKey,
@@ -1398,19 +1606,37 @@ export default function PlasticMouldingViewer() {
         return;
       }
       if (
-        action === "stage:6" &&
+        action === "stage:7" &&
+        Boolean(sortedRef.current.polythene) &&
         Boolean(sortedRef.current.pvc) &&
-        Boolean(sortedRef.current.bakelite)
+        Boolean(sortedRef.current.bakelite) &&
+        Boolean(sortedRef.current.melamine)
       ) {
-        goToStage(6);
+        goToStage(7);
         return;
       }
-      if (stageRef.current === 6 && action === "final:heat") {
-        heatFinalDiscs();
+      if (stageRef.current === 7 && action === "tag:a") {
+        chooseTagMaterial("a");
         return;
       }
-      if (stageRef.current === 6 && action.startsWith("final:")) {
-        chooseBadgeDisc(action.slice(6) as "a" | "b");
+      if (stageRef.current === 7 && action === "tag:b") {
+        chooseTagMaterial("b");
+        return;
+      }
+      if (stageRef.current === 7 && action.startsWith("tag:")) {
+        advanceTag(Number(action.slice(4)));
+        return;
+      }
+      if (stageRef.current === 7 && action === "stage:8" && tagCompleteRef.current) {
+        goToStage(8);
+        return;
+      }
+      if (stageRef.current === 8 && action === "handle:polythene") {
+        chooseHandle("polythene");
+        return;
+      }
+      if (stageRef.current === 8 && action === "handle:bakelite") {
+        chooseHandle("bakelite");
         return;
       }
       if (action === "restart") {
@@ -1473,7 +1699,7 @@ export default function PlasticMouldingViewer() {
       const elapsed = clock.getElapsedTime();
       const reduceMotion = reducedMotionRef.current;
       controls.update();
-      petChains.visible = Boolean(scannedRef.current.pet);
+      petChains.visible = mouldRef.current >= 3;
       pellets.forEach((pellet, index) => {
         pellet.visible = mouldRef.current < 2;
         pellet.position.y =
@@ -1483,16 +1709,16 @@ export default function PlasticMouldingViewer() {
       const mouldTarget = mouldRef.current >= 2 ? 1 : 0.05;
       if (reduceMotion) mouldedDisc.scale.setScalar(mouldTarget);
       else mouldedDisc.scale.lerp(targetScale.setScalar(mouldTarget), 0.08);
-      heatHalo.visible = reshapeRef.current >= 2 && reshapeRef.current < 4;
+      heatHalo.visible = reshapeRef.current >= 4 && reshapeRef.current < 5;
       heatHalo.rotation.z = reduceMotion ? 0 : elapsed * 0.7;
-      reshapeRound.visible = reshapeRef.current < 3;
-      reshapeStar.visible = reshapeRef.current >= 3;
+      reshapeRound.visible = reshapeRef.current < 4;
+      reshapeStar.visible = reshapeRef.current >= 4;
       if (reshapeStar.visible) {
         if (reduceMotion) reshapeStar.scale.setScalar(1);
         else reshapeStar.scale.lerp(targetScale.setScalar(1), 0.07);
       }
       chainBeads.forEach((bead) => {
-        const mobile = reshapeRef.current >= 2 && reshapeRef.current < 4;
+        const mobile = reshapeRef.current >= 4 && reshapeRef.current < 5;
         bead.position.x =
           -0.55 +
           Number(bead.userData.column) * 0.16 +
@@ -1501,29 +1727,27 @@ export default function PlasticMouldingViewer() {
             : 0);
       });
       crossLinks.forEach((link) => {
-        link.visible = crosslinkRef.current >= 1;
+        link.visible = moleculeRevealedRef.current;
       });
       crossDisc.rotation.z =
-        crosslinkRef.current >= 2 && !reduceMotion
+        moleculeRevealedRef.current && !reduceMotion
           ? Math.sin(elapsed * 5) * 0.025
           : 0;
       finalDiscA.scale.setScalar(
-        finalHeatedRef.current && !reduceMotion
+        tagStepRef.current >= 4 && !reduceMotion
           ? 1 + Math.sin(elapsed * 3) * 0.045
           : 1,
       );
       finalDiscB.scale.setScalar(1);
-      finalStar.visible = badgeCompleteRef.current;
-      if (finalStar.visible) {
-        if (reduceMotion) finalStar.scale.setScalar(1);
-        else finalStar.scale.lerp(targetScale.setScalar(1), 0.06);
-        finalStar.rotation.z = reduceMotion
-          ? 0
-          : Math.sin(elapsed * 1.4) * 0.08;
+      finalTag.visible = tagStepRef.current >= 4;
+      if (finalTag.visible) {
+        if (reduceMotion) finalTag.scale.setScalar(1);
+        else finalTag.scale.lerp(targetScale.setScalar(1), 0.06);
       }
+      fittedHandle.visible = displayCompleteRef.current;
 
       scanContinueButton.visible =
-        Boolean(scannedRef.current.pet) &&
+        Boolean(scannedRef.current["task-card"]) &&
         Boolean(scannedRef.current["disc-a"]) &&
         Boolean(scannedRef.current["disc-b"]);
       mouldActionButtons.forEach((button, index) => {
@@ -1533,35 +1757,46 @@ export default function PlasticMouldingViewer() {
       reshapeActionButtons.forEach((button, index) => {
         button.visible = reshapeRef.current === index;
       });
-      reshapeContinueButton.visible = reshapeRef.current >= 4;
+      reshapeContinueButton.visible = reshapeRef.current >= 6;
       crossActionButtons.forEach((button, index) => {
         button.visible = crosslinkRef.current === index;
       });
-      crossContinueButton.visible = crosslinkRef.current >= 4;
+      crossContinueButton.visible = crosslinkRef.current >= 6;
+      moleculeHeatButton.visible = !moleculeRevealedRef.current;
       replayButton.visible = !replayRef.current;
       exampleButtons.forEach((button, index) => {
         button.visible =
-          replayRef.current && !comparisonRef.current[EXAMPLE_KEYS[index]];
+          moleculeRevealedRef.current &&
+          replayRef.current &&
+          !comparisonRef.current[EXAMPLE_KEYS[index]];
       });
       compareContinueButton.visible =
+        moleculeRevealedRef.current &&
         replayRef.current &&
         EXAMPLE_KEYS.every((key) => comparisonRef.current[key]);
+      const polytheneSorted = Boolean(sortedRef.current.polythene);
       const pvcSorted = Boolean(sortedRef.current.pvc);
       const bakeliteSorted = Boolean(sortedRef.current.bakelite);
+      const melamineSorted = Boolean(sortedRef.current.melamine);
+      sortButtons.polytheneThermoplastic.visible = !polytheneSorted;
+      sortButtons.polytheneThermoset.visible = !polytheneSorted;
       sortButtons.pvcThermoplastic.visible = !pvcSorted;
       sortButtons.pvcThermoset.visible = !pvcSorted;
       sortButtons.bakeliteThermoplastic.visible = !bakeliteSorted;
       sortButtons.bakeliteThermoset.visible = !bakeliteSorted;
-      sortContinueButton.visible = pvcSorted && bakeliteSorted;
-      heatBothButton.visible =
-        !finalHeatedRef.current && !badgeCompleteRef.current;
-      chooseSampleAButton.visible =
-        finalHeatedRef.current && !badgeCompleteRef.current;
-      chooseSampleBButton.visible =
-        finalHeatedRef.current &&
-        !badgeCompleteRef.current &&
-        retryCountRef.current === 0;
-      restartButton.visible = badgeCompleteRef.current;
+      sortButtons.melamineThermoplastic.visible = !melamineSorted;
+      sortButtons.melamineThermoset.visible = !melamineSorted;
+      sortContinueButton.visible =
+        polytheneSorted && pvcSorted && bakeliteSorted && melamineSorted;
+      chooseSampleAButton.visible = tagStepRef.current === 0;
+      chooseSampleBButton.visible = tagStepRef.current === 0;
+      tagActionButtons.forEach((button, index) => {
+        button.visible = tagStepRef.current === index + 1;
+      });
+      tagContinueButton.visible = tagCompleteRef.current;
+      polytheneHandleButton.visible = !displayCompleteRef.current;
+      bakeliteHandleButton.visible = !displayCompleteRef.current;
+      restartButton.visible = displayCompleteRef.current;
       renderer.render(scene, camera);
     });
 
@@ -1611,9 +1846,10 @@ export default function PlasticMouldingViewer() {
     advanceCrosslink,
     advanceMould,
     advanceReshape,
-    chooseBadgeDisc,
+    advanceTag,
+    chooseHandle,
+    chooseTagMaterial,
     goToStage,
-    heatFinalDiscs,
     inspectExample,
     narrate,
     replayComparison,
@@ -1652,12 +1888,12 @@ export default function PlasticMouldingViewer() {
   }, []);
 
   const scannedComplete =
-    Boolean(scanned.pet) &&
+    Boolean(scanned["task-card"]) &&
     Boolean(scanned["disc-a"]) &&
     Boolean(scanned["disc-b"]);
   const comparisonComplete =
-    replayed && EXAMPLE_KEYS.every((key) => examples[key]);
-  const sortingComplete = Boolean(sorted.pvc) && Boolean(sorted.bakelite);
+    afterSetting && replayed && EXAMPLE_KEYS.every((key) => examples[key]);
+  const sortingComplete = EXAMPLE_KEYS.every((key) => sorted[key]);
   const timerMinutes = Math.floor(secondsRemaining / 60);
   const timerSeconds = String(secondsRemaining % 60).padStart(2, "0");
 
@@ -1668,7 +1904,7 @@ export default function PlasticMouldingViewer() {
         width: "100%",
         height: "100vh",
         overflow: "hidden",
-        background: "#15101f",
+        background: "#c8e6f5",
         color: "#fff7ed",
         fontFamily: "system-ui, sans-serif",
       }}
@@ -1690,11 +1926,11 @@ export default function PlasticMouldingViewer() {
             placeItems: "center",
             padding: 24,
             background:
-              "radial-gradient(circle at 50% 30%, rgba(234,88,12,.24), rgba(21,16,31,.96) 58%)",
+              "radial-gradient(circle at 50% 30%, rgba(14,116,144,.28), rgba(15,23,42,.96) 62%)",
           }}
         >
           <div style={{ maxWidth: 650, textAlign: "center" }}>
-            <div style={{ fontSize: 58, marginBottom: 12 }}>⭐🏭🔬</div>
+            <div style={{ fontSize: 58, marginBottom: 12 }}>🟠🟣🏭🍳</div>
             <div
               style={{
                 color: "#fdba74",
@@ -1709,7 +1945,7 @@ export default function PlasticMouldingViewer() {
             <h1
               style={{ fontSize: "clamp(2rem,5vw,3.3rem)", margin: "0 0 14px" }}
             >
-              Thermoplastics & Thermosetting Plastics
+              The Plastics Workshop: The Mystery of Two Discs
             </h1>
             <p
               style={{
@@ -1719,9 +1955,9 @@ export default function PlasticMouldingViewer() {
                 margin: "0 auto 24px",
               }}
             >
-              Operate a virtual moulding machine, reveal polymer chains and
-              cross-links, and discover which round disc can become the missing
-              star badge.
+              Investigate two similar-looking plastics, reveal their hidden
+              structures, reuse one as a display tag, and choose the suitable
+              saucepan handle.
             </p>
             <button
               onClick={() => {
@@ -1767,9 +2003,9 @@ export default function PlasticMouldingViewer() {
               whiteSpace: "nowrap",
             }}
           >
-            STAGE {stage + 1}/7
-            {stage >= 5
-              ? ` · ${points}/3 challenge points`
+            STAGE {stage + 1}/{STAGES.length}
+            {stage >= 6
+              ? ` · ${points}/6 challenge points`
               : " · Guided learning"}
             <span role="timer" aria-label={`${secondsRemaining} seconds left`}>
               {` · ${timerMinutes}:${timerSeconds}`}
@@ -1875,9 +2111,9 @@ export default function PlasticMouldingViewer() {
               <div style={{ display: "grid", gap: 8 }}>
                 {(
                   [
-                    ["pet", "🧴 Scan PET bottle"],
-                    ["disc-a", "🟠 Scan Disc A"],
-                    ["disc-b", "🟣 Scan Disc B"],
+                    ["disc-a", "🟠 Pick up and rotate Disc A"],
+                    ["disc-b", "🟣 Pick up and rotate Disc B"],
+                    ["task-card", "📋 Open the task card"],
                   ] as Array<[ScanKey, string]>
                 ).map(([key, label]) => (
                   <button
@@ -1897,7 +2133,7 @@ export default function PlasticMouldingViewer() {
                   onClick={() => goToStage(1)}
                   style={nextStyle(scannedComplete)}
                 >
-                  Operate the moulding machine →
+                  Explore what plastics are
                 </button>
               </div>
             ) : null}
@@ -1905,10 +2141,10 @@ export default function PlasticMouldingViewer() {
             {stage === 1 ? (
               <div style={{ display: "grid", gap: 8 }}>
                 {[
-                  "Load polythene pellets",
-                  "Pull the Mould lever",
-                  "Cool and open the mould",
-                  "Trace the round edge",
+                  "Squeeze the polythene bag",
+                  "Rotate the rigid PVC pipe",
+                  "Focus the enlarged polymer model",
+                  "Observe how the mould gives shape",
                 ].map((label, index) => {
                   const step = index + 1;
                   return (
@@ -1928,7 +2164,7 @@ export default function PlasticMouldingViewer() {
                   onClick={() => goToStage(2)}
                   style={nextStyle(mouldStep >= 4)}
                 >
-                  Try reshaping Disc A →
+                  Test Disc A in the enclosed machine
                 </button>
               </div>
             ) : null}
@@ -1936,10 +2172,12 @@ export default function PlasticMouldingViewer() {
             {stage === 2 ? (
               <div style={{ display: "grid", gap: 8 }}>
                 {[
-                  "Press with heat off",
-                  "Turn on simulated heat",
-                  "Press into star mould",
-                  "Switch heat off and cool",
+                  "Load Disc A with virtual tongs",
+                  "Close and lock the safety cover",
+                  "Test the star mould while cool",
+                  "Run Heat and Mould",
+                  "Cool until Safe to Open",
+                  "Open and remove the star",
                 ].map((label, index) => {
                   const step = index + 1;
                   return (
@@ -1954,7 +2192,7 @@ export default function PlasticMouldingViewer() {
                     </button>
                   );
                 })}
-                {reshapeStep >= 4 ? (
+                {reshapeStep >= 6 ? (
                   <div
                     style={{
                       padding: 9,
@@ -1968,9 +2206,9 @@ export default function PlasticMouldingViewer() {
                   </div>
                 ) : null}
                 <button
-                  disabled={reshapeStep < 4}
+                  disabled={reshapeStep < 6}
                   onClick={() => goToStage(3)}
-                  style={nextStyle(reshapeStep >= 4)}
+                  style={nextStyle(reshapeStep >= 6)}
                 >
                   Test Disc B with the same steps →
                 </button>
@@ -1979,34 +2217,15 @@ export default function PlasticMouldingViewer() {
 
             {stage === 3 ? (
               <div style={{ display: "grid", gap: 9 }}>
-                <label
-                  style={{
-                    display: "grid",
-                    gap: 6,
-                    fontSize: 13,
-                    fontWeight: 700,
-                  }}
-                >
-                  Polymer structure:{" "}
-                  {afterSetting ? "After Setting" : "Before Setting"}
-                  <input
-                    aria-label="Before setting to after setting"
-                    type="range"
-                    min={0}
-                    max={1}
-                    step={1}
-                    value={afterSetting ? 1 : 0}
-                    onChange={(event) => {
-                      if (event.currentTarget.value === "1") revealCrosslinks();
-                    }}
-                  />
-                </label>
                 {[
-                  [2, "Turn on simulated heat"],
-                  [3, "Press into star mould"],
-                  [4, "Magnify the permanent links"],
-                ].map(([stepValue, label]) => {
-                  const step = Number(stepValue);
+                  "Load Disc B with virtual tongs",
+                  "Close and lock the safety cover",
+                  "Run the approved heat-and-mould cycle",
+                  "Try the higher-heat safety limit",
+                  "Compare the disc with the star cavity",
+                  "Cool until Safe to Open",
+                ].map((label, index) => {
+                  const step = index + 1;
                   return (
                     <button
                       key={String(label)}
@@ -2019,7 +2238,7 @@ export default function PlasticMouldingViewer() {
                     </button>
                   );
                 })}
-                {crosslinkStep >= 4 ? (
+                {crosslinkStep >= 6 ? (
                   <div
                     style={{
                       padding: 9,
@@ -2028,14 +2247,14 @@ export default function PlasticMouldingViewer() {
                       fontSize: 12,
                     }}
                   >
-                    <strong>Thermosetting plastic:</strong> permanent
-                    cross-links stop it flowing into a new mould.
+                    <strong>Bakelite stayed round:</strong> more heat is not
+                    the solution. Excessive heating can damage the material.
                   </div>
                 ) : null}
                 <button
-                  disabled={crosslinkStep < 4}
+                  disabled={crosslinkStep < 6}
                   onClick={() => goToStage(4)}
-                  style={nextStyle(crosslinkStep >= 4)}
+                  style={nextStyle(crosslinkStep >= 6)}
                 >
                   Compare everyday plastics →
                 </button>
@@ -2044,8 +2263,30 @@ export default function PlasticMouldingViewer() {
 
             {stage === 4 ? (
               <div style={{ display: "grid", gap: 8 }}>
+                <label
+                  style={{
+                    display: "grid",
+                    gap: 6,
+                    fontSize: 13,
+                    fontWeight: 700,
+                  }}
+                >
+                  Molecular model: {afterSetting ? "Heated" : "Cool"}
+                  <input
+                    aria-label="Cool to heated molecular model"
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={1}
+                    value={afterSetting ? 1 : 0}
+                    onChange={(event) => {
+                      if (event.currentTarget.value === "1") revealCrosslinks();
+                    }}
+                  />
+                </label>
                 <button
                   onClick={replayComparison}
+                  disabled={!afterSetting}
                   style={choiceStyle(replayed, "#fbbf24")}
                 >
                   {replayed ? "✓ " : "▶ "}Replay both reheating tests
@@ -2088,142 +2329,224 @@ export default function PlasticMouldingViewer() {
                   onClick={() => goToStage(5)}
                   style={nextStyle(comparisonComplete)}
                 >
-                  Begin the Workshop Challenge →
+                  View the learning summary
                 </button>
               </div>
             ) : null}
 
             {stage === 5 ? (
-              <div style={{ display: "grid", gap: 11 }}>
-                {(
-                  [
-                    ["pvc", "🧯 Rigid PVC pipe"],
-                    ["bakelite", "🔌 Bakelite switch casing"],
-                  ] as Array<[SortKey, string]>
-                ).map(([key, label]) => (
-                  <div key={key} style={{ display: "grid", gap: 6 }}>
-                    <strong style={{ fontSize: 13 }}>
-                      {sorted[key] ? "✓ " : ""}
-                      {label}
-                    </strong>
-                    {sorted[key] ? (
-                      <div style={{ color: "#86efac", fontSize: 12 }}>
-                        Correct:{" "}
-                        {sorted[key] === "thermoplastic"
-                          ? "Thermoplastic"
-                          : "Thermosetting"}
-                      </div>
-                    ) : (
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns: "1fr 1fr",
-                          gap: 6,
-                        }}
-                      >
-                        <button
-                          onClick={() => sortObject(key, "thermoplastic")}
-                          style={choiceStyle(false)}
-                        >
-                          Thermoplastic
-                        </button>
-                        <button
-                          onClick={() => sortObject(key, "thermoset")}
-                          style={choiceStyle(false, "#c084fc")}
-                        >
-                          Thermosetting
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-                <button
-                  disabled={!sortingComplete}
-                  onClick={() => goToStage(6)}
-                  style={nextStyle(sortingComplete)}
+              <div style={{ display: "grid", gap: 10 }}>
+                <div
+                  style={{
+                    padding: 12,
+                    borderRadius: 10,
+                    background: "rgba(249,115,22,.13)",
+                    lineHeight: 1.55,
+                    fontSize: 13,
+                  }}
                 >
-                  Make the missing badge →
+                  <strong>Thermoplastic:</strong> Heat → Reshape → Cool
+                </div>
+                <div
+                  style={{
+                    padding: 12,
+                    borderRadius: 10,
+                    background: "rgba(139,92,246,.14)",
+                    lineHeight: 1.55,
+                    fontSize: 13,
+                  }}
+                >
+                  <strong>Thermosetting:</strong> Once Set → Cannot Be
+                  Remoulded by Reheating
+                </div>
+                <button
+                  onClick={() => goToStage(6)}
+                  style={nextStyle(true)}
+                >
+                  Complete the Materials Display
                 </button>
               </div>
             ) : null}
 
-            {stage === 6 && !badgeComplete ? (
-              <div style={{ display: "grid", gap: 9 }}>
+            {stage === 6 ? (
+              <div style={{ display: "grid", gap: 11 }}>
+                {EXAMPLE_KEYS.map((key) => {
+                  const item = EXAMPLES[key];
+                  return (
+                    <div key={key} style={{ display: "grid", gap: 6 }}>
+                      <strong style={{ fontSize: 13 }}>
+                        {sorted[key] ? "✓ " : ""}
+                        {item.emoji} {item.label}
+                      </strong>
+                      {sorted[key] ? (
+                        <div style={{ color: "#86efac", fontSize: 12 }}>
+                          Correct:{" "}
+                          {sorted[key] === "thermoplastic"
+                            ? "Thermoplastic"
+                            : "Thermosetting"}
+                        </div>
+                      ) : (
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "1fr 1fr",
+                            gap: 6,
+                          }}
+                        >
+                          <button
+                            onClick={() => sortObject(key, "thermoplastic")}
+                            style={choiceStyle(false)}
+                          >
+                            Thermoplastic
+                          </button>
+                          <button
+                            onClick={() => sortObject(key, "thermoset")}
+                            style={choiceStyle(false, "#c084fc")}
+                          >
+                            Thermosetting
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
                 <button
-                  onClick={heatFinalDiscs}
-                  style={choiceStyle(finalHeated, "#ef4444")}
+                  disabled={!sortingComplete}
+                  onClick={() => goToStage(7)}
+                  style={nextStyle(sortingComplete)}
                 >
-                  {finalHeated ? "✓ " : "🔥 "}Heat both unlabelled discs
+                  Reshape the Display Tag
                 </button>
-                {finalHeated ? (
+              </div>
+            ) : null}
+
+            {stage === 7 ? (
+              <div style={{ display: "grid", gap: 9 }}>
+                {tagStep === 0 ? (
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: retryCount === 0 ? "1fr 1fr" : "1fr",
+                      gridTemplateColumns: "1fr 1fr",
                       gap: 8,
                     }}
                   >
                     <button
-                      onClick={() => chooseBadgeDisc("a")}
+                      onClick={() => chooseTagMaterial("a")}
                       style={choiceStyle(false, "#fbbf24")}
                     >
-                      Choose Sample A — softened
+                      Choose the polythene star
                     </button>
-                    {retryCount === 0 ? (
-                      <button
-                        onClick={() => chooseBadgeDisc("b")}
-                        style={choiceStyle(false, "#c084fc")}
-                      >
-                        Choose Sample B — stayed set
-                      </button>
-                    ) : null}
+                    <button
+                      onClick={() => chooseTagMaterial("b")}
+                      style={choiceStyle(false, "#c084fc")}
+                    >
+                      Choose the set Bakelite disc
+                    </button>
                   </div>
                 ) : null}
-                {retryCount > 0 ? (
+                {tagRetry > 0 && tagStep === 0 ? (
                   <div role="alert" style={{ color: "#fecaca", fontSize: 12 }}>
-                    One retry available: choose the sample that softened during
-                    the test. The incorrect sample is now unavailable.
+                    The Bakelite sample has already set. Use the material that
+                    softened and became a star.
                   </div>
+                ) : null}
+                {tagStep > 0 && !tagComplete
+                  ? [
+                      "Load the polythene star with tongs",
+                      "Close and lock the safety cover",
+                      "Heat and mould the rectangle",
+                      "Cool until Safe to Open",
+                      "Open and install the tag",
+                    ].map((label, index) => {
+                      const step = index + 2;
+                      return (
+                        <button
+                          key={label}
+                          onClick={() => advanceTag(step)}
+                          disabled={tagStep < step - 1}
+                          style={choiceStyle(tagStep >= step, "#fbbf24")}
+                        >
+                          {tagStep >= step ? "✓ " : `${step - 1}. `}
+                          {label}
+                        </button>
+                      );
+                    })
+                  : null}
+                {tagComplete ? (
+                  <>
+                    <div style={{ color: "#86efac", fontSize: 13 }}>
+                      ✓ Rectangular thermoplastic tag installed on the display.
+                    </div>
+                      <button
+                        onClick={() => goToStage(8)}
+                        style={nextStyle(true)}
+                      >
+                        Choose the Saucepan Handle
+                      </button>
+                  </>
                 ) : null}
               </div>
             ) : null}
 
-            {stage === 6 && badgeComplete ? (
-              <div
-                style={{
-                  padding: 14,
-                  borderRadius: 11,
-                  background:
-                    "linear-gradient(135deg, rgba(234,88,12,.2), rgba(250,204,21,.15))",
-                  border: "1px solid rgba(253,186,116,.34)",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ fontSize: 42 }}>⭐🏅</div>
-                <h3 style={{ margin: "4px 0 8px" }}>
-                  {guidedCompletion
-                    ? "Guided Result Completed"
-                    : "Star Badge Completed!"}
-                </h3>
-                <p
+            {stage === 8 ? (
+              !displayComplete ? (
+                <div style={{ display: "grid", gap: 9 }}>
+                  <button
+                    onClick={() => chooseHandle("polythene")}
+                    style={choiceStyle(false, "#fb923c")}
+                  >
+                    Choose ready-made Polythene handle
+                  </button>
+                  <button
+                    onClick={() => chooseHandle("bakelite")}
+                    style={choiceStyle(false, "#c084fc")}
+                  >
+                    Choose ready-made Bakelite handle
+                  </button>
+                  {handleRetry > 0 ? (
+                    <div role="alert" style={{ color: "#fecaca", fontSize: 12 }}>
+                      Think about heat resistance and poor heat conduction for
+                      a saucepan handle.
+                    </div>
+                  ) : null}
+                </div>
+              ) : (
+                <div
                   style={{
-                    margin: "0 0 12px",
-                    color: "#ffedd5",
-                    fontSize: 13,
-                    lineHeight: 1.55,
+                    padding: 14,
+                    borderRadius: 11,
+                    background:
+                      "linear-gradient(135deg, rgba(14,116,144,.22), rgba(250,204,21,.16))",
+                    border: "1px solid rgba(103,232,249,.34)",
+                    textAlign: "center",
                   }}
                 >
-                  {guidedCompletion
-                    ? "The five-minute learning slot is complete. Sample A softened and filled the star mould; permanent cross-links kept Sample B round. Guided completion does not add challenge points."
-                    : "Both samples started round. Only the thermoplastic softened and could be remoulded. Permanent cross-links kept the thermosetting sample round."}
-                </p>
-                <button
-                  onClick={() => window.location.reload()}
-                  style={nextStyle(true)}
-                >
-                  Run the workshop mission again
-                </button>
-              </div>
+                  <div style={{ fontSize: 42 }}>🏷️🍳🏅</div>
+                  <h3 style={{ margin: "4px 0 8px" }}>
+                    {guidedCompletion
+                      ? "Guided Result Completed"
+                      : "Materials Display Complete"}
+                  </h3>
+                  <p
+                    style={{
+                      margin: "0 0 12px",
+                      color: "#ffedd5",
+                      fontSize: 13,
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    {guidedCompletion
+                      ? "The 5:45 learning slot is complete. Polythene was remoulded into the tag, while the ready-made Bakelite handle was chosen for its suitable properties. Guided completion does not add challenge points."
+                      : "You reused a thermoplastic by reshaping it and selected a thermosetting plastic for the handle. Choose by properties—not appearance."}
+                  </p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    style={nextStyle(true)}
+                  >
+                    Run the workshop mission again
+                  </button>
+                </div>
+              )
             ) : null}
           </aside>
 

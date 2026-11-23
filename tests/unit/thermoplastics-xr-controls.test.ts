@@ -17,19 +17,27 @@ describe("thermoplastics immersive controls", () => {
       "mould:4",
       "stage:2",
       "reshape:1",
-      "reshape:4",
+      "reshape:6",
       "stage:3",
       "cross:1",
-      "cross:4",
+      "cross:6",
       "stage:4",
+      "molecule:heat",
       "compare:replay",
       "stage:5",
+      "stage:6",
+      "sort:polythene:thermoplastic",
       "sort:pvc:thermoplastic",
       "sort:bakelite:thermoset",
-      "stage:6",
-      "final:heat",
-      "final:a",
-      "final:b",
+      "sort:melamine:thermoset",
+      "stage:7",
+      "tag:a",
+      "tag:b",
+      "tag:2",
+      "tag:6",
+      "stage:8",
+      "handle:polythene",
+      "handle:bakelite",
       "restart",
     ];
 
@@ -39,8 +47,10 @@ describe("thermoplastics immersive controls", () => {
     expect(source).toContain("`compare:${key}`");
   });
 
-  it("includes the five-minute guided result and reduced-motion support", () => {
-    expect(source).toContain("const SIMULATION_DURATION_SECONDS = 5 * 60");
+  it("includes the 5:45 guided result and reduced-motion support", () => {
+    expect(source).toContain(
+      "const SIMULATION_DURATION_SECONDS = 5 * 60 + 45",
+    );
     expect(source).toContain("showGuidedResult");
     expect(source).toContain("prefers-reduced-motion: reduce");
   });
