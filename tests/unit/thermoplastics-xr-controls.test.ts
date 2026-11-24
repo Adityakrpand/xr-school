@@ -16,9 +16,13 @@ describe("thermoplastics immersive controls", () => {
       "mould:1",
       "mould:4",
       "stage:2",
+      "predict:a:changes-shape",
+      "predict:a:stays-round",
       "reshape:1",
       "reshape:6",
       "stage:3",
+      "predict:b:changes-shape",
+      "predict:b:stays-round",
       "cross:1",
       "cross:6",
       "stage:4",
@@ -48,10 +52,16 @@ describe("thermoplastics immersive controls", () => {
   });
 
   it("includes the 5:45 guided result and reduced-motion support", () => {
-    expect(source).toContain(
-      "const SIMULATION_DURATION_SECONDS = 5 * 60 + 45",
-    );
+    expect(source).toContain("const SIMULATION_DURATION_SECONDS = 5 * 60 + 45");
     expect(source).toContain("showGuidedResult");
     expect(source).toContain("prefers-reduced-motion: reduce");
+  });
+
+  it("requires predictions and shows measured machine evidence", () => {
+    expect(source).toContain("PredictionPrompt");
+    expect(source).toContain("MachineReadout");
+    expect(source).toContain("Awaiting prediction");
+    expect(source).toContain("SAFE TO OPEN");
+    expect(source).toContain("pulseHaptic");
   });
 });

@@ -14,6 +14,8 @@ type ScanKey = "task-card" | "disc-a" | "disc-b";
 type ExampleKey = "polythene" | "pvc" | "bakelite" | "melamine";
 type SortKey = ExampleKey;
 type PlasticKind = "thermoplastic" | "thermoset";
+type ShapePrediction = "changes-shape" | "stays-round";
+type MachineSample = "a" | "b";
 
 const STAGES = [
   {
@@ -98,6 +100,130 @@ const EXAMPLES: Record<
 
 const EXAMPLE_KEYS = Object.keys(EXAMPLES) as ExampleKey[];
 const SIMULATION_DURATION_SECONDS = 5 * 60 + 45;
+
+const MACHINE_STATES: Record<
+  MachineSample,
+  Array<{
+    cover: "Open" | "Locked";
+    cycle: string;
+    temperature: number;
+    shape: "Round" | "Star";
+    safe: boolean;
+  }>
+> = {
+  a: [
+    {
+      cover: "Open",
+      cycle: "Awaiting prediction",
+      temperature: 24,
+      shape: "Round",
+      safe: true,
+    },
+    {
+      cover: "Open",
+      cycle: "Sample loaded",
+      temperature: 24,
+      shape: "Round",
+      safe: true,
+    },
+    {
+      cover: "Locked",
+      cycle: "Ready",
+      temperature: 24,
+      shape: "Round",
+      safe: false,
+    },
+    {
+      cover: "Locked",
+      cycle: "Cool test",
+      temperature: 24,
+      shape: "Round",
+      safe: false,
+    },
+    {
+      cover: "Locked",
+      cycle: "Heating and pressing",
+      temperature: 135,
+      shape: "Star",
+      safe: false,
+    },
+    {
+      cover: "Locked",
+      cycle: "Cooling",
+      temperature: 42,
+      shape: "Star",
+      safe: true,
+    },
+    {
+      cover: "Open",
+      cycle: "Test complete",
+      temperature: 24,
+      shape: "Star",
+      safe: true,
+    },
+  ],
+  b: [
+    {
+      cover: "Open",
+      cycle: "Awaiting prediction",
+      temperature: 24,
+      shape: "Round",
+      safe: true,
+    },
+    {
+      cover: "Open",
+      cycle: "Sample loaded",
+      temperature: 24,
+      shape: "Round",
+      safe: true,
+    },
+    {
+      cover: "Locked",
+      cycle: "Ready",
+      temperature: 24,
+      shape: "Round",
+      safe: false,
+    },
+    {
+      cover: "Locked",
+      cycle: "Approved heat cycle",
+      temperature: 135,
+      shape: "Round",
+      safe: false,
+    },
+    {
+      cover: "Locked",
+      cycle: "Safety limit active",
+      temperature: 140,
+      shape: "Round",
+      safe: false,
+    },
+    {
+      cover: "Locked",
+      cycle: "Comparing result",
+      temperature: 82,
+      shape: "Round",
+      safe: false,
+    },
+    {
+      cover: "Open",
+      cycle: "Test complete",
+      temperature: 24,
+      shape: "Round",
+      safe: true,
+    },
+  ],
+};
+
+function pulseHaptic(kind: "success" | "warning" | "soft" = "soft") {
+  if (typeof navigator === "undefined" || !("vibrate" in navigator)) return;
+  const patterns: Record<"success" | "warning" | "soft", number | number[]> = {
+    soft: 18,
+    success: [22, 35, 32],
+    warning: [45, 35, 45],
+  };
+  navigator.vibrate(patterns[kind]);
+}
 
 function speak(text: string) {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
@@ -260,6 +386,153 @@ function nextStyle(enabled: boolean): CSSProperties {
   };
 }
 
+function PredictionPrompt({
+  disc,
+  value,
+  onChange,
+}: {
+  disc: "A" | "B";
+  value: ShapePrediction | null;
+  onChange: (prediction: ShapePrediction) => void;
+}) {
+  return (
+    <fieldset
+      style={{
+        margin: 0,
+        padding: 10,
+        borderRadius: 10,
+        border: "1px solid rgba(103,232,249,.28)",
+        background: "rgba(8,47,73,.22)",
+      }}
+    >
+      <legend style={{ padding: "0 6px", color: "#a5f3fc", fontWeight: 800 }}>
+        Predict before heating · Disc {disc}
+      </legend>
+      <p style={{ margin: "0 0 8px", color: "#e2e8f0", lineHeight: 1.45 }}>
+        What will the sample do during the approved heat-and-mould cycle?
+      </p>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gap: 7,
+        }}
+      >
+        <button
+          type="button"
+          aria-pressed={value === "changes-shape"}
+          onClick={() => onChange("changes-shape")}
+          style={choiceStyle(value === "changes-shape", "#22d3ee")}
+        >
+          Changes shape
+        </button>
+        <button
+          type="button"
+          aria-pressed={value === "stays-round"}
+          onClick={() => onChange("stays-round")}
+          style={choiceStyle(value === "stays-round", "#22d3ee")}
+        >
+          Stays round
+        </button>
+      </div>
+      <div style={{ marginTop: 7, color: "#94a3b8", fontSize: 13 }}>
+        Predictions are for thinking and do not affect challenge points.
+      </div>
+    </fieldset>
+  );
+}
+
+function MachineReadout({
+  sample,
+  step,
+}: {
+  sample: MachineSample;
+  step: number;
+}) {
+  const reading = MACHINE_STATES[sample][Math.min(step, 6)];
+  const heatPercent = Math.min(
+    100,
+    Math.round((reading.temperature / 160) * 100),
+  );
+  return (
+    <div
+      role="status"
+      aria-label={`Machine status: cover ${reading.cover}, ${reading.temperature} degrees Celsius, ${reading.shape} shape`}
+      style={{
+        display: "grid",
+        gap: 8,
+        padding: 10,
+        borderRadius: 10,
+        border: `1px solid ${reading.safe ? "rgba(74,222,128,.35)" : "rgba(251,146,60,.34)"}`,
+        background: "rgba(15,23,42,.7)",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 10,
+          alignItems: "center",
+          fontWeight: 800,
+        }}
+      >
+        <span>Enclosed machine</span>
+        <span style={{ color: reading.safe ? "#86efac" : "#fdba74" }}>
+          {reading.safe ? "SAFE TO OPEN" : "COVER LOCKED"}
+        </span>
+      </div>
+      <div
+        aria-hidden="true"
+        style={{
+          height: 8,
+          borderRadius: 999,
+          background: "#334155",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            width: `${heatPercent}%`,
+            height: "100%",
+            borderRadius: 999,
+            background:
+              reading.temperature > 100
+                ? "linear-gradient(90deg, #f59e0b, #ef4444)"
+                : "linear-gradient(90deg, #22d3ee, #4ade80)",
+            transition: "width 320ms ease",
+          }}
+        />
+      </div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 6,
+          color: "#cbd5e1",
+          fontSize: 13,
+        }}
+      >
+        <span>
+          <strong>{reading.temperature}°C</strong>
+          <br />
+          Temperature
+        </span>
+        <span>
+          <strong>{reading.shape}</strong>
+          <br />
+          Observed shape
+        </span>
+        <span>
+          <strong>{reading.cover}</strong>
+          <br />
+          Safety cover
+        </span>
+      </div>
+      <div style={{ color: "#e2e8f0", fontSize: 13 }}>{reading.cycle}</div>
+    </div>
+  );
+}
+
 export default function PlasticMouldingViewer() {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -267,6 +540,8 @@ export default function PlasticMouldingViewer() {
   const pointsRef = useRef(0);
   const scannedRef = useRef<Partial<Record<ScanKey, boolean>>>({});
   const mouldRef = useRef(0);
+  const predictionARef = useRef<ShapePrediction | null>(null);
+  const predictionBRef = useRef<ShapePrediction | null>(null);
   const reshapeRef = useRef(0);
   const crosslinkRef = useRef(0);
   const moleculeRevealedRef = useRef(false);
@@ -291,6 +566,8 @@ export default function PlasticMouldingViewer() {
   const [points, setPoints] = useState(0);
   const [scanned, setScanned] = useState<Partial<Record<ScanKey, boolean>>>({});
   const [mouldStep, setMouldStep] = useState(0);
+  const [predictionA, setPredictionA] = useState<ShapePrediction | null>(null);
+  const [predictionB, setPredictionB] = useState<ShapePrediction | null>(null);
   const [reshapeStep, setReshapeStep] = useState(0);
   const [afterSetting, setAfterSetting] = useState(false);
   const [crosslinkStep, setCrosslinkStep] = useState(0);
@@ -320,6 +597,7 @@ export default function PlasticMouldingViewer() {
     pointsRef.current += 1;
     setPoints(pointsRef.current);
     boardUpdateRef.current();
+    pulseHaptic("success");
   }, []);
 
   const narrate = useCallback((text: string) => {
@@ -372,8 +650,26 @@ export default function PlasticMouldingViewer() {
       setFeedback(STAGES[next].cue);
       stageVisualRef.current(next);
       narrate(NARRATIONS[next]);
+      pulseHaptic("soft");
     },
     [narrate],
+  );
+
+  const recordPrediction = useCallback(
+    (sample: MachineSample, prediction: ShapePrediction) => {
+      if (sample === "a") {
+        predictionARef.current = prediction;
+        setPredictionA(prediction);
+      } else {
+        predictionBRef.current = prediction;
+        setPredictionB(prediction);
+      }
+      setFeedback(
+        `Prediction saved for Disc ${sample.toUpperCase()}: ${prediction === "changes-shape" ? "it will change shape" : "it will stay round"}. Now collect evidence with the enclosed machine.`,
+      );
+      pulseHaptic("soft");
+    },
+    [],
   );
 
   const scanItem = useCallback((key: ScanKey) => {
@@ -389,6 +685,7 @@ export default function PlasticMouldingViewer() {
     if (scannedRef.current[key]) return;
     scannedRef.current = { ...scannedRef.current, [key]: true };
     setScanned(scannedRef.current);
+    pulseHaptic("soft");
   }, []);
 
   const advanceMould = useCallback((next: number) => {
@@ -403,9 +700,17 @@ export default function PlasticMouldingViewer() {
       "The mould cavity controls the product's shape during manufacturing.",
     ];
     setFeedback(messages[next]);
+    pulseHaptic("soft");
   }, []);
 
   const advanceReshape = useCallback((next: number) => {
+    if (!predictionARef.current) {
+      setFeedback(
+        "Make a prediction for Disc A before starting the machine test.",
+      );
+      pulseHaptic("warning");
+      return;
+    }
     if (next !== reshapeRef.current + 1) return;
     reshapeRef.current = next;
     setReshapeStep(next);
@@ -419,6 +724,7 @@ export default function PlasticMouldingViewer() {
       "The cover opens safely. Disc A is now a star: it is a thermoplastic.",
     ];
     setFeedback(messages[next]);
+    pulseHaptic(next === 6 ? "success" : "soft");
   }, []);
 
   const revealCrosslinks = useCallback(() => {
@@ -431,6 +737,13 @@ export default function PlasticMouldingViewer() {
   }, []);
 
   const advanceCrosslink = useCallback((next: number) => {
+    if (!predictionBRef.current) {
+      setFeedback(
+        "Make a prediction for Disc B before starting the machine test.",
+      );
+      pulseHaptic("warning");
+      return;
+    }
     if (next !== crosslinkRef.current + 1) return;
     crosslinkRef.current = next;
     setCrosslinkStep(next);
@@ -444,6 +757,7 @@ export default function PlasticMouldingViewer() {
       "The sample is cool and safe to remove. Disc B is a thermosetting plastic.",
     ];
     setFeedback(messages[next]);
+    pulseHaptic(next === 4 ? "warning" : next === 6 ? "success" : "soft");
   }, []);
 
   const replayComparison = useCallback(() => {
@@ -479,6 +793,7 @@ export default function PlasticMouldingViewer() {
         setFeedback(
           "Think about the material—not appearance or stiffness. Which one can soften and be reshaped when reheated?",
         );
+        pulseHaptic("warning");
         return;
       }
       if (!sortedRef.current[key]) {
@@ -506,6 +821,7 @@ export default function PlasticMouldingViewer() {
       setFeedback(
         "Bakelite has already set and cannot be remoulded. Choose the polythene star that softened earlier.",
       );
+      pulseHaptic("warning");
       return;
     }
     if (tagStepRef.current > 0) return;
@@ -514,6 +830,7 @@ export default function PlasticMouldingViewer() {
     setFeedback(
       "Correct material selected: the polythene star can be remoulded into the new rectangular tag.",
     );
+    pulseHaptic("success");
   }, []);
 
   const advanceTag = useCallback(
@@ -548,6 +865,7 @@ export default function PlasticMouldingViewer() {
         setFeedback(
           "Polythene is not the suitable choice here. Select the ready-made handle that is heat-resistant and a poor conductor of heat.",
         );
+        pulseHaptic("warning");
         return;
       }
       if (!displayCompleteRef.current) {
@@ -996,6 +1314,26 @@ export default function PlasticMouldingViewer() {
     );
     reshapeLabel.position.set(0, 4.25, -1.65);
     reshapeGroup.add(reshapeLabel);
+    const reshapePredictionButtons = [
+      makeActionButton(
+        reshapeGroup,
+        "PREDICT: CHANGES SHAPE",
+        "predict:a:changes-shape",
+        -1.2,
+        0.55,
+        1.75,
+        "#22d3ee",
+      ),
+      makeActionButton(
+        reshapeGroup,
+        "PREDICT: STAYS ROUND",
+        "predict:a:stays-round",
+        1.2,
+        0.55,
+        1.7,
+        "#22d3ee",
+      ),
+    ];
     const reshapeActionButtons = [
       ["LOAD DISC A WITH TONGS", "reshape:1"],
       ["CLOSE SAFETY COVER", "reshape:2"],
@@ -1085,6 +1423,26 @@ export default function PlasticMouldingViewer() {
     );
     crossLabel.position.set(0, 4.15, -1.6);
     crossGroup.add(crossLabel);
+    const crossPredictionButtons = [
+      makeActionButton(
+        crossGroup,
+        "PREDICT: CHANGES SHAPE",
+        "predict:b:changes-shape",
+        -1.2,
+        0.55,
+        1.75,
+        "#22d3ee",
+      ),
+      makeActionButton(
+        crossGroup,
+        "PREDICT: STAYS ROUND",
+        "predict:b:stays-round",
+        1.2,
+        0.55,
+        1.7,
+        "#22d3ee",
+      ),
+    ];
     const crossActionButtons = [
       ["LOAD DISC B WITH TONGS", "cross:1"],
       ["CLOSE SAFETY COVER", "cross:2"],
@@ -1198,9 +1556,7 @@ export default function PlasticMouldingViewer() {
     summaryDisc.rotation.x = Math.PI / 2;
     summaryDisc.position.set(0, 1.55, -0.9);
     const summaryOutline = new THREE.LineSegments(
-      new THREE.EdgesGeometry(
-        new THREE.CylinderGeometry(0.58, 0.58, 0.2, 32),
-      ),
+      new THREE.EdgesGeometry(new THREE.CylinderGeometry(0.58, 0.58, 0.2, 32)),
       new THREE.LineBasicMaterial({ color: 0xfbbf24 }),
     );
     summaryOutline.rotation.x = Math.PI / 2;
@@ -1555,6 +1911,18 @@ export default function PlasticMouldingViewer() {
         goToStage(2);
         return;
       }
+      if (
+        (stageRef.current === 2 || stageRef.current === 3) &&
+        action.startsWith("predict:")
+      ) {
+        const [, sample, prediction] = action.split(":") as [
+          "predict",
+          MachineSample,
+          ShapePrediction,
+        ];
+        recordPrediction(sample, prediction);
+        return;
+      }
       if (stageRef.current === 2 && action.startsWith("reshape:")) {
         advanceReshape(Number(action.slice(8)));
         return;
@@ -1627,7 +1995,11 @@ export default function PlasticMouldingViewer() {
         advanceTag(Number(action.slice(4)));
         return;
       }
-      if (stageRef.current === 7 && action === "stage:8" && tagCompleteRef.current) {
+      if (
+        stageRef.current === 7 &&
+        action === "stage:8" &&
+        tagCompleteRef.current
+      ) {
         goToStage(8);
         return;
       }
@@ -1754,12 +2126,20 @@ export default function PlasticMouldingViewer() {
         button.visible = mouldRef.current === index;
       });
       mouldContinueButton.visible = mouldRef.current >= 4;
+      reshapePredictionButtons.forEach((button) => {
+        button.visible = !predictionARef.current;
+      });
       reshapeActionButtons.forEach((button, index) => {
-        button.visible = reshapeRef.current === index;
+        button.visible =
+          Boolean(predictionARef.current) && reshapeRef.current === index;
       });
       reshapeContinueButton.visible = reshapeRef.current >= 6;
+      crossPredictionButtons.forEach((button) => {
+        button.visible = !predictionBRef.current;
+      });
       crossActionButtons.forEach((button, index) => {
-        button.visible = crosslinkRef.current === index;
+        button.visible =
+          Boolean(predictionBRef.current) && crosslinkRef.current === index;
       });
       crossContinueButton.visible = crosslinkRef.current >= 6;
       moleculeHeatButton.visible = !moleculeRevealedRef.current;
@@ -1852,6 +2232,7 @@ export default function PlasticMouldingViewer() {
     goToStage,
     inspectExample,
     narrate,
+    recordPrediction,
     replayComparison,
     revealCrosslinks,
     scanItem,
@@ -1899,6 +2280,7 @@ export default function PlasticMouldingViewer() {
 
   return (
     <div
+      className="plastic-workshop"
       style={{
         position: "relative",
         width: "100%",
@@ -1909,6 +2291,30 @@ export default function PlasticMouldingViewer() {
         fontFamily: "system-ui, sans-serif",
       }}
     >
+      <style>{`
+        .plastic-workshop button {
+          font-size: .875rem;
+          transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+        }
+        .plastic-workshop button:not(:disabled):hover {
+          filter: brightness(1.08);
+          transform: translateY(-1px);
+        }
+        .plastic-workshop button:focus-visible,
+        .plastic-workshop input:focus-visible {
+          outline: 3px solid #67e8f9;
+          outline-offset: 3px;
+          box-shadow: 0 0 0 5px rgba(8,47,73,.72);
+        }
+        .plastic-workshop input[type="range"] {
+          accent-color: #f97316;
+          min-height: 44px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .plastic-workshop button { transition: none; }
+          .plastic-workshop button:not(:disabled):hover { transform: none; }
+        }
+      `}</style>
       <div
         ref={mountRef}
         role="img"
@@ -1963,6 +2369,7 @@ export default function PlasticMouldingViewer() {
               onClick={() => {
                 setStarted(true);
                 narrate(NARRATIONS[0]);
+                pulseHaptic("success");
               }}
               style={{
                 padding: "13px 26px",
@@ -2057,7 +2464,7 @@ export default function PlasticMouldingViewer() {
               style={{
                 color: "#fed7aa",
                 lineHeight: 1.5,
-                fontSize: 13,
+                fontSize: 14,
                 margin: "0 0 10px",
               }}
             >
@@ -2093,14 +2500,16 @@ export default function PlasticMouldingViewer() {
               </button>
             </div>
             <div
+              role="status"
               aria-live="polite"
+              aria-atomic="true"
               style={{
                 padding: 10,
                 borderRadius: 9,
                 background: "rgba(249,115,22,.1)",
                 color: "#ffedd5",
                 lineHeight: 1.45,
-                fontSize: 13,
+                fontSize: 14,
                 marginBottom: 12,
               }}
             >
@@ -2171,6 +2580,12 @@ export default function PlasticMouldingViewer() {
 
             {stage === 2 ? (
               <div style={{ display: "grid", gap: 8 }}>
+                <PredictionPrompt
+                  disc="A"
+                  value={predictionA}
+                  onChange={(prediction) => recordPrediction("a", prediction)}
+                />
+                <MachineReadout sample="a" step={reshapeStep} />
                 {[
                   "Load Disc A with virtual tongs",
                   "Close and lock the safety cover",
@@ -2184,7 +2599,7 @@ export default function PlasticMouldingViewer() {
                     <button
                       key={label}
                       onClick={() => advanceReshape(step)}
-                      disabled={reshapeStep < step - 1}
+                      disabled={!predictionA || reshapeStep < step - 1}
                       style={choiceStyle(reshapeStep >= step)}
                     >
                       {reshapeStep >= step ? "✓ " : `${step}. `}
@@ -2198,11 +2613,17 @@ export default function PlasticMouldingViewer() {
                       padding: 9,
                       borderRadius: 8,
                       background: "rgba(249,115,22,.12)",
-                      fontSize: 12,
+                      fontSize: 14,
+                      lineHeight: 1.5,
                     }}
                   >
-                    <strong>Thermoplastic:</strong> softens on suitable
-                    reheating and can be remoulded.
+                    <strong>Prediction:</strong>{" "}
+                    {predictionA === "changes-shape"
+                      ? "Disc A would change shape."
+                      : "Disc A would stay round."}{" "}
+                    <strong>Observed:</strong> it filled the star mould.
+                    Polythene is a thermoplastic because suitable heating lets
+                    it soften and be remoulded.
                   </div>
                 ) : null}
                 <button
@@ -2210,13 +2631,19 @@ export default function PlasticMouldingViewer() {
                   onClick={() => goToStage(3)}
                   style={nextStyle(reshapeStep >= 6)}
                 >
-                  Test Disc B with the same steps →
+                  Test Disc B with the same steps
                 </button>
               </div>
             ) : null}
 
             {stage === 3 ? (
               <div style={{ display: "grid", gap: 9 }}>
+                <PredictionPrompt
+                  disc="B"
+                  value={predictionB}
+                  onChange={(prediction) => recordPrediction("b", prediction)}
+                />
+                <MachineReadout sample="b" step={crosslinkStep} />
                 {[
                   "Load Disc B with virtual tongs",
                   "Close and lock the safety cover",
@@ -2230,7 +2657,7 @@ export default function PlasticMouldingViewer() {
                     <button
                       key={String(label)}
                       onClick={() => advanceCrosslink(step)}
-                      disabled={crosslinkStep < step - 1}
+                      disabled={!predictionB || crosslinkStep < step - 1}
                       style={choiceStyle(crosslinkStep >= step, "#c084fc")}
                     >
                       {crosslinkStep >= step ? "✓ " : ""}
@@ -2244,11 +2671,16 @@ export default function PlasticMouldingViewer() {
                       padding: 9,
                       borderRadius: 8,
                       background: "rgba(139,92,246,.14)",
-                      fontSize: 12,
+                      fontSize: 14,
+                      lineHeight: 1.5,
                     }}
                   >
-                    <strong>Bakelite stayed round:</strong> more heat is not
-                    the solution. Excessive heating can damage the material.
+                    <strong>Prediction:</strong>{" "}
+                    {predictionB === "changes-shape"
+                      ? "Disc B would change shape."
+                      : "Disc B would stay round."}{" "}
+                    <strong>Observed:</strong> Bakelite stayed round. More heat
+                    is not the solution; excessive heating can damage it.
                   </div>
                 ) : null}
                 <button
@@ -2256,7 +2688,7 @@ export default function PlasticMouldingViewer() {
                   onClick={() => goToStage(4)}
                   style={nextStyle(crosslinkStep >= 6)}
                 >
-                  Compare everyday plastics →
+                  Compare everyday plastics
                 </button>
               </div>
             ) : null}
@@ -2356,13 +2788,10 @@ export default function PlasticMouldingViewer() {
                     fontSize: 13,
                   }}
                 >
-                  <strong>Thermosetting:</strong> Once Set → Cannot Be
-                  Remoulded by Reheating
+                  <strong>Thermosetting:</strong> Once Set → Cannot Be Remoulded
+                  by Reheating
                 </div>
-                <button
-                  onClick={() => goToStage(6)}
-                  style={nextStyle(true)}
-                >
+                <button onClick={() => goToStage(6)} style={nextStyle(true)}>
                   Complete the Materials Display
                 </button>
               </div>
@@ -2477,12 +2906,12 @@ export default function PlasticMouldingViewer() {
                     <div style={{ color: "#86efac", fontSize: 13 }}>
                       ✓ Rectangular thermoplastic tag installed on the display.
                     </div>
-                      <button
-                        onClick={() => goToStage(8)}
-                        style={nextStyle(true)}
-                      >
-                        Choose the Saucepan Handle
-                      </button>
+                    <button
+                      onClick={() => goToStage(8)}
+                      style={nextStyle(true)}
+                    >
+                      Choose the Saucepan Handle
+                    </button>
                   </>
                 ) : null}
               </div>
@@ -2504,9 +2933,12 @@ export default function PlasticMouldingViewer() {
                     Choose ready-made Bakelite handle
                   </button>
                   {handleRetry > 0 ? (
-                    <div role="alert" style={{ color: "#fecaca", fontSize: 12 }}>
-                      Think about heat resistance and poor heat conduction for
-                      a saucepan handle.
+                    <div
+                      role="alert"
+                      style={{ color: "#fecaca", fontSize: 12 }}
+                    >
+                      Think about heat resistance and poor heat conduction for a
+                      saucepan handle.
                     </div>
                   ) : null}
                 </div>
@@ -2563,7 +2995,7 @@ export default function PlasticMouldingViewer() {
               fontSize: 11,
             }}
           >
-            Point and scan · Use guided controls · Drag to look · Scroll to zoom
+            Point and scan · Guided controls · Drag to look · Scroll to zoom
           </div>
         </>
       )}

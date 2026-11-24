@@ -34,6 +34,10 @@ test("completes the two-disc workshop with safety feedback and transfer challeng
   await page
     .getByRole("button", { name: "Test Disc A in the enclosed machine" })
     .click();
+  await expect(
+    page.getByText("Awaiting prediction", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Changes shape" }).click();
 
   for (const name of [
     "Load Disc A with virtual tongs",
@@ -46,8 +50,9 @@ test("completes the two-disc workshop with safety feedback and transfer challeng
     await page.getByRole("button", { name }).click();
   }
   await page
-    .getByRole("button", { name: "Test Disc B with the same steps →" })
+    .getByRole("button", { name: "Test Disc B with the same steps" })
     .click();
+  await page.getByRole("button", { name: "Stays round" }).click();
 
   for (const name of [
     "Load Disc B with virtual tongs",
@@ -59,13 +64,13 @@ test("completes the two-disc workshop with safety feedback and transfer challeng
   ]) {
     await page.getByRole("button", { name }).click();
   }
-  await expect(page.getByText(/Bakelite stayed round:/i)).toBeVisible();
-  await page
-    .getByRole("button", { name: "Compare everyday plastics →" })
-    .click();
+  await expect(page.getByText(/Bakelite stayed round/i)).toBeVisible();
+  await page.getByRole("button", { name: "Compare everyday plastics" }).click();
 
   await page.getByLabel("Cool to heated molecular model").fill("1");
-  await page.getByRole("button", { name: /Replay both reheating tests/ }).click();
+  await page
+    .getByRole("button", { name: /Replay both reheating tests/ })
+    .click();
   for (const name of [
     /Polythene bag/,
     /PVC pipe/,
@@ -105,9 +110,7 @@ test("completes the two-disc workshop with safety feedback and transfer challeng
     .getByRole("button", { name: "Choose the set Bakelite disc" })
     .click();
   await expect(page.getByRole("alert").getByText(/already set/i)).toBeVisible();
-  await page
-    .getByRole("button", { name: "Choose the polythene star" })
-    .click();
+  await page.getByRole("button", { name: "Choose the polythene star" }).click();
   for (const name of [
     "Load the polythene star with tongs",
     "Close and lock the safety cover",
@@ -123,7 +126,9 @@ test("completes the two-disc workshop with safety feedback and transfer challeng
   await page
     .getByRole("button", { name: "Choose ready-made Polythene handle" })
     .click();
-  await expect(page.getByRole("alert").getByText(/heat resistance/i)).toBeVisible();
+  await expect(
+    page.getByRole("alert").getByText(/heat resistance/i),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "Choose ready-made Bakelite handle" })
     .click();
@@ -131,7 +136,9 @@ test("completes the two-disc workshop with safety feedback and transfer challeng
   await expect(
     page.getByRole("heading", { name: "Materials Display Complete" }),
   ).toBeVisible();
-  await expect(page.getByText("6/6 challenge points", { exact: false })).toBeVisible();
+  await expect(
+    page.getByText("6/6 challenge points", { exact: false }),
+  ).toBeVisible();
   expect(pageErrors).toEqual([]);
 });
 
@@ -162,7 +169,9 @@ test("keeps the mobile layout usable and touch targets accessible", async ({
   });
 });
 
-test("shows a non-scoring guided result when 5:45 expires", async ({ page }) => {
+test("shows a non-scoring guided result when 5:45 expires", async ({
+  page,
+}) => {
   await page.clock.install();
   await page.goto(route);
   await page
@@ -175,5 +184,7 @@ test("shows a non-scoring guided result when 5:45 expires", async ({ page }) => 
     page.getByRole("heading", { name: "Guided Result Completed" }),
   ).toBeVisible();
   await expect(page.getByText(/does not add challenge points/)).toBeVisible();
-  await expect(page.getByText("0/6 challenge points", { exact: false })).toBeVisible();
+  await expect(
+    page.getByText("0/6 challenge points", { exact: false }),
+  ).toBeVisible();
 });
